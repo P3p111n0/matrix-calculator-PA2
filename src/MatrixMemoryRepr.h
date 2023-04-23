@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef MELCRJOS_MATRIXMEMORYREPR_H
 #define MELCRJOS_MATRIXMEMORYREPR_H
 
@@ -15,7 +13,7 @@ class MatrixMemoryRepr {
     MatrixMemoryRepr(std::size_t, std::size_t);
     virtual ~MatrixMemoryRepr() = default;
     virtual MatrixMemoryRepr * clone() const = 0;
-    friend std::ostream & operator<<(ostream &, const MatrixMemoryRepr &);
+    friend std::ostream & operator<<(std::ostream &, const MatrixMemoryRepr &);
 
     virtual int det() = 0;
     virtual int det() const = 0;
