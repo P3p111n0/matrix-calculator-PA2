@@ -12,7 +12,7 @@
 class MatrixMemoryRepr {
   public:
     MatrixMemoryRepr() = delete;
-    MatrixMemoryRepr(std::size_t rows, std::size_t columns);
+    MatrixMemoryRepr(std::size_t, std::size_t);
     virtual ~MatrixMemoryRepr() = default;
     virtual MatrixMemoryRepr * clone() const = 0;
     friend std::ostream & operator<<(ostream &, const MatrixMemoryRepr &);
@@ -27,9 +27,9 @@ class MatrixMemoryRepr {
     virtual MatrixMemoryRepr * inverse() const = 0;
     virtual void transpose() = 0;
     virtual MatrixMemoryRepr * transpose() const = 0;
-    virtual std::vector<MatrixElement> dump() const = 0;
     virtual void unite(const MatrixMemoryRepr &) = 0;
     virtual MatrixMemoryRepr * unite(const MatrixMemoryRepr &) const = 0;
+    virtual std::vector<MatrixElement> dump() const = 0;
 
   protected:
     std::size_t _rows;
