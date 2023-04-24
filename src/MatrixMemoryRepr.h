@@ -14,6 +14,8 @@ class MatrixMemoryRepr {
     virtual ~MatrixMemoryRepr() = default;
     virtual MatrixMemoryRepr * clone() const = 0;
     friend std::ostream & operator<<(std::ostream &, const MatrixMemoryRepr &);
+    size_t rows() const;
+    size_t columns() const;
 
     virtual int det() = 0;
     virtual int det() const = 0;
