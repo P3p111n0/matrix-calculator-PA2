@@ -47,7 +47,7 @@ int SparseMatrix::det() const {
     return calc_det();
 }
 
-int SparseMatrix::rank() {
+std::size_t SparseMatrix::rank() {
     if (_rank.has_value()) {
         return _rank.value();
     }
@@ -55,7 +55,7 @@ int SparseMatrix::rank() {
     return _rank.value();
 }
 
-int SparseMatrix::rank() const {
+std::size_t SparseMatrix::rank() const {
     if (_rank.has_value()) {
         return _rank.value();
     }
@@ -143,8 +143,8 @@ void SparseMatrix::print(std::ostream &) const {}
 
 int SparseMatrix::calc_det() const {}
 
-int SparseMatrix::calc_rank() const {
-    int rank = static_cast<int>(std::min(_rows, _columns));
+std::size_t SparseMatrix::calc_rank() const {
+    std::size_t rank = std::min(_rows, _columns);
     std::unique_ptr<MatrixMemoryRepr> matrix_copy(clone());
     matrix_copy->gem();
     auto copy_dump = matrix_copy->dump();
