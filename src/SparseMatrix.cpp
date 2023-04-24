@@ -179,7 +179,10 @@ void SparseMatrix::print(std::ostream & os) const {
         for (std::size_t j = 0; j < _columns - 1; j++) {
             os << self_dump[i + j].value << ", ";
         }
-        os << self_dump[i + _columns - 1].value << " ]" << std::endl;
+        os << self_dump[i + _columns - 1].value << " ]";
+        if (i + _columns - 1 != self_dump.size() - 1){
+            os << std::endl;
+        }
     }
 }
 
