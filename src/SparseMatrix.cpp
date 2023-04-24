@@ -14,7 +14,7 @@ SparseMatrix::SparseMatrix(size_t rows, size_t columns)
     : MatrixMemoryRepr(rows, columns) {}
 
 SparseMatrix::SparseMatrix(const std::vector<MatrixElement> & dump)
-    : MatrixMemoryRepr(dump.back().row, dump.back().column) {
+    : MatrixMemoryRepr(dump.back().row + 1, dump.back().column + 1) {
 
     std::copy_if(dump.begin(), dump.end(), std::inserter(_data, _data.begin()),
                  [](const MatrixElement & e) { return e.value != 0; });
@@ -64,46 +64,51 @@ std::size_t SparseMatrix::rank() const {
 
 void SparseMatrix::gem() {
     auto matrix_array = dump();
-    for (std::size_t i = 1; i < _rows; i++) {
-        for (std::size_t j = 0; j < _columns; j++) {
-            int source_coef = matrix_array[i + j].value;
-            int target_coef = matrix_array[j].value;
-            matrix_array[i + j].value *= target_coef;
-            matrix_array[i + j].value -= matrix_array[j].value * source_coef;
-        }
-    }
-
-    std::vector<std::vector<MatrixElement>> matrix;
+    std::vector<std::vector<int>> matrix;
     for (std::size_t i = 0; i < _rows; i++) {
-        std::vector<MatrixElement> tmp;
-        tmp.emplace_back(0, 0, 0);
+        std::vector<int> tmp;
+        tmp.emplace_back(0);
         tmp.erase(tmp.begin());
         matrix.emplace_back(tmp);
     }
 
     for (const auto & i : matrix_array) {
-        matrix[i.row].emplace_back(i);
+        matrix[i.row].emplace_back(i.value);
     }
 
     std::size_t col_index = 0;
     for (std::size_t i = 0; i < _rows; i++) {
         if (col_index == _columns)
             break;
-        if (matrix[i][col_index].value == 0) {
+        if (matrix[i][col_index] == 0) {
             for (std::size_t j = i; j < _rows; j++) {
-                if (matrix[j][col_index].value != 0) {
-                    std::swap(matrix[i], matrix[j]);
-                    break;
+                for (std::size_t h = col_index; h < _columns; h++) {
+                    if (matrix[i][h] == 0 && matrix[j][h] != 0) {
+                        std::swap(matrix[i], matrix[j]);
+                        break;
+                    }
                 }
             }
         }
         ++col_index;
     }
 
+    col_index = 0;
+    for (std::size_t i = 1; i < _rows; i++) {
+        int source_coeff = matrix[i][col_index] ? matrix[i][col_index] : 1;
+        int target_coeff =
+            matrix[i - 1][col_index] ? matrix[i - 1][col_index] : 1;
+        for (std::size_t j = 0; j < _columns; j++) {
+            matrix[i][j] *= target_coeff;
+            matrix[i][j] -= matrix[i - 1][j] * source_coeff;
+        }
+        col_index++;
+    }
+
     std::vector<MatrixElement> gaussed_matrix_dump;
-    for (const auto & i : matrix) {
-        for (const auto & j : i) {
-            gaussed_matrix_dump.emplace_back(j);
+    for (std::size_t i = 0; i < _rows; i++) {
+        for (std::size_t j = 0; j < _columns; j++) {
+            gaussed_matrix_dump.emplace_back(i, j, matrix[i][j]);
         }
     }
 
@@ -156,12 +161,12 @@ std::vector<MatrixElement> SparseMatrix::dump() const {
 
 void SparseMatrix::print(std::ostream & os) const {
     auto self_dump = dump();
-    for (std::size_t i = 0; i < _rows; i++){
+    for (std::size_t i = 0; i < _rows * _columns; i += _columns) {
         os << "[ ";
-        for (std::size_t j = 0; j < _columns - 1; j++){
-            os << self_dump[i +j].value << ", ";
+        for (std::size_t j = 0; j < _columns; j++) {
+            os << self_dump[i + j].value << ", ";
         }
-        os << self_dump[i + _columns - 1].value << " ]" << std::endl;
+        os << " ]" << std::endl;
     }
 }
 
