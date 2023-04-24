@@ -45,7 +45,7 @@ MatrixMemoryRepr * SparseMatrix::clone() const {
 double SparseMatrix::det() {
     if (_rows != _columns) {
         throw std::logic_error(
-            "Determinant is undefined for non-square matrices");
+            "Determinant is undefined for non-square matrices.");
     }
     if (_det.has_value()) {
         return _det.value();
@@ -57,7 +57,7 @@ double SparseMatrix::det() {
 double SparseMatrix::det() const {
     if (_rows != _columns) {
         throw std::logic_error(
-            "Determinant is undefined for non-square matrices");
+            "Determinant is undefined for non-square matrices.");
     }
     if (_det.has_value()) {
         return _det.value();
@@ -144,6 +144,10 @@ void SparseMatrix::transpose() {
 }
 
 void SparseMatrix::unite(const MatrixMemoryRepr & other) {
+    if (_rows != other.rows() || _columns != other.columns()){
+        throw std::logic_error("Matrices don't have the same dimensions.");
+    }
+
     auto other_dump = other.dump();
 
     for (auto & element : other_dump) {
