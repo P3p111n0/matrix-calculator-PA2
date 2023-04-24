@@ -89,6 +89,7 @@ void SparseMatrix::gem() {
         }
     }
 
+    // https://www.math-cs.gordon.edu/courses/ma342/handouts/gauss.pdf
     for (std::size_t i = 0; i < _rows - 1; i++) {
         for (std::size_t j = i + 1; j < _rows; j++) {
             for (std::size_t k = i; k < _columns; k++) {
