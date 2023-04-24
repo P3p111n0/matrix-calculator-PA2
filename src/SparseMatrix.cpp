@@ -26,6 +26,9 @@ MatrixMemoryRepr * SparseMatrix::clone() const {
 }
 
 int SparseMatrix::det() {
+    if (_rows != _columns){
+        throw std::logic_error("Determinant is undefined for non-square matrices");
+    }
     if (_det.has_value()){
         return _det.value();
     }
@@ -34,6 +37,9 @@ int SparseMatrix::det() {
 }
 
 int SparseMatrix::det() const {
+    if (_rows != _columns){
+        throw std::logic_error("Determinant is undefined for non-square matrices");
+    }
     if (_det.has_value()){
         return _det.value();
     }
