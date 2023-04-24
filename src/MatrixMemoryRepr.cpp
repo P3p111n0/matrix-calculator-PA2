@@ -3,7 +3,7 @@
 MatrixMemoryRepr::MatrixMemoryRepr(std::size_t rows, std::size_t columns)
     : _rows(std::move(rows)), _columns(std::move(columns)) {}
 
-std::ostream & operator<<(ostream & os, const MatrixMemoryRepr & matrix) {
+std::ostream & operator<<(std::ostream & os, const MatrixMemoryRepr & matrix) {
     matrix.print(os);
     return os;
 }
