@@ -65,10 +65,9 @@ std::size_t SparseMatrix::rank() const {
 void SparseMatrix::gem() {
     auto matrix_array = dump();
     std::vector<std::vector<int>> matrix;
+
     for (std::size_t i = 0; i < _rows; i++) {
         std::vector<int> tmp;
-        tmp.emplace_back(0);
-        tmp.erase(tmp.begin());
         matrix.emplace_back(tmp);
     }
 
@@ -76,13 +75,11 @@ void SparseMatrix::gem() {
         matrix[i.row].emplace_back(i.value);
     }
 
-    std::size_t col_index = 0;
-    for (std::size_t i = 0; i < _rows; i++) {
-        if (col_index == _columns)
-            break;
-        if (matrix[i][col_index] == 0) {
+    for (std::size_t i = 0, column_index = 0;
+         i < _rows && column_index < _columns; i++, column_index++) {
+        if (matrix[i][column_index] == 0) {
             for (std::size_t j = i; j < _rows; j++) {
-                for (std::size_t h = col_index; h < _columns; h++) {
+                for (std::size_t h = column_index; h < _columns; h++) {
                     if (matrix[i][h] == 0 && matrix[j][h] != 0) {
                         std::swap(matrix[i], matrix[j]);
                         break;
@@ -90,19 +87,15 @@ void SparseMatrix::gem() {
                 }
             }
         }
-        ++col_index;
     }
 
-    col_index = 0;
-    for (std::size_t i = 1; i < _rows; i++) {
-        int source_coeff = matrix[i][col_index] ? matrix[i][col_index] : 1;
-        int target_coeff =
-            matrix[i - 1][col_index] ? matrix[i - 1][col_index] : 1;
-        for (std::size_t j = 0; j < _columns; j++) {
-            matrix[i][j] *= target_coeff;
-            matrix[i][j] -= matrix[i - 1][j] * source_coeff;
+    for (std::size_t i = 0; i < _rows - 1; i++) {
+        for (std::size_t j = i + 1; j < _rows; j++) {
+            for (std::size_t k = i; k < _columns; k++) {
+                matrix[j][k] = (matrix[j][k] * matrix[i][i]) -
+                               (matrix[j][i] * matrix[i][k]);
+            }
         }
-        col_index++;
     }
 
     std::vector<MatrixElement> gaussed_matrix_dump;
@@ -178,7 +171,7 @@ std::size_t SparseMatrix::calc_rank() const {
     matrix_copy->gem();
     auto copy_dump = matrix_copy->dump();
 
-    for (std::size_t i = 0; i < _rows; i++) {
+    for (std::size_t i = 0; i < _rows * _columns; i += _columns) {
         for (std::size_t j = 0; j < _columns; j++) {
             if (copy_dump[i + j].value != 0) {
                 rank--;
