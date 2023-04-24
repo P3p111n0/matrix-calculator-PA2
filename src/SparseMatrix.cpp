@@ -1,5 +1,6 @@
 #include "SparseMatrix.h"
 #include <algorithm>
+#include <memory>
 
 bool SparseMatrix::MatrixElementComparator::operator()(
     const MatrixElement & lhs, const MatrixElement & rhs) const {
@@ -142,4 +143,20 @@ void SparseMatrix::print(std::ostream &) const {}
 
 int SparseMatrix::calc_det() const {}
 
-int SparseMatrix::calc_rank() const {}
+int SparseMatrix::calc_rank() const {
+    int rank = static_cast<int>(std::min(_rows, _columns));
+    std::unique_ptr<MatrixMemoryRepr> matrix_copy(clone());
+    matrix_copy->gem();
+    auto copy_dump = matrix_copy->dump();
+
+    for (std::size_t i = 0; i < _rows; i++){
+        for (std::size_t j = 0; j < _columns; j++){
+            if (copy_dump[i + j].value != 0){
+                rank--;
+                break;
+            }
+        }
+    }
+
+    return rank;
+}
