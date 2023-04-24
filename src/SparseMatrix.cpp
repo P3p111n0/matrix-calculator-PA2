@@ -125,7 +125,22 @@ void SparseMatrix::transpose() {
     _data = std::move(new_data);
 }
 
-void SparseMatrix::unite(const MatrixMemoryRepr &) {}
+void SparseMatrix::unite(const MatrixMemoryRepr & other) {
+    auto other_dump = other.dump();
+
+    for (auto & element : other_dump) {
+        if (element.value != 0) {
+            element.row += _rows;
+            element.column += _columns;
+        }
+    }
+    _rows += other.rows();
+    _columns += other.columns();
+
+    std::copy_if(other_dump.begin(), other_dump.end(),
+                 std::inserter(_data, _data.begin()),
+                 [](const MatrixElement & e) { return e.value != 0; });
+}
 
 std::vector<MatrixElement> SparseMatrix::dump() const {
     auto intermediate = _data;
@@ -139,7 +154,16 @@ std::vector<MatrixElement> SparseMatrix::dump() const {
     return result;
 }
 
-void SparseMatrix::print(std::ostream &) const {}
+void SparseMatrix::print(std::ostream & os) const {
+    auto self_dump = dump();
+    for (std::size_t i = 0; i < _rows; i++){
+        os << "[ ";
+        for (std::size_t j = 0; j < _columns - 1; j++){
+            os << self_dump[i +j].value << ", ";
+        }
+        os << self_dump[i + _columns - 1].value << " ]" << std::endl;
+    }
+}
 
 int SparseMatrix::calc_det() const {}
 
@@ -149,9 +173,9 @@ std::size_t SparseMatrix::calc_rank() const {
     matrix_copy->gem();
     auto copy_dump = matrix_copy->dump();
 
-    for (std::size_t i = 0; i < _rows; i++){
-        for (std::size_t j = 0; j < _columns; j++){
-            if (copy_dump[i + j].value != 0){
+    for (std::size_t i = 0; i < _rows; i++) {
+        for (std::size_t j = 0; j < _columns; j++) {
+            if (copy_dump[i + j].value != 0) {
                 rank--;
                 break;
             }
