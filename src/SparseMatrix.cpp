@@ -205,6 +205,21 @@ double SparseMatrix::calc_det() const {
     matrix.emplace_back(row);
 
     std::vector<int> division_vec;
+    for (std::size_t i = 0, column_index = 0;
+         i < _rows && column_index < _columns; i++, column_index++) {
+        if (matrix[i][column_index] == 0) {
+            for (std::size_t j = i; j < _rows; j++) {
+                for (std::size_t h = column_index; h < _columns; h++) {
+                    if (matrix[i][h] == 0 && matrix[j][h] != 0) {
+                        std::swap(matrix[i], matrix[j]);
+                        division_vec.emplace_back(-1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     // https://www.math-cs.gordon.edu/courses/ma342/handouts/gauss.pdf
     for (std::size_t i = 0; i < _rows - 1; i++) {
         for (std::size_t j = i + 1; j < _rows; j++) {
