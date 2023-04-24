@@ -1,4 +1,5 @@
 #include "SparseMatrix.h"
+#include <algorithm>
 
 bool SparseMatrix::MatrixElementComparator::operator()(
     const MatrixElement & lhs, const MatrixElement & rhs) const {
@@ -14,11 +15,8 @@ SparseMatrix::SparseMatrix(size_t rows, size_t columns)
 SparseMatrix::SparseMatrix(const std::vector<MatrixElement> & dump)
     : MatrixMemoryRepr(dump.back().row, dump.back().column) {
 
-    for (const auto & element : dump) {
-        if (element.value != 0) {
-            _data.emplace(element);
-        }
-    }
+    std::copy_if(dump.begin(), dump.end(), std::inserter(_data, _data.begin()),
+                 [](const MatrixElement & e) { return e.value != 0; });
 }
 
 MatrixMemoryRepr * SparseMatrix::clone() const {
@@ -26,10 +24,11 @@ MatrixMemoryRepr * SparseMatrix::clone() const {
 }
 
 int SparseMatrix::det() {
-    if (_rows != _columns){
-        throw std::logic_error("Determinant is undefined for non-square matrices");
+    if (_rows != _columns) {
+        throw std::logic_error(
+            "Determinant is undefined for non-square matrices");
     }
-    if (_det.has_value()){
+    if (_det.has_value()) {
         return _det.value();
     }
     _det = calc_det();
@@ -37,17 +36,18 @@ int SparseMatrix::det() {
 }
 
 int SparseMatrix::det() const {
-    if (_rows != _columns){
-        throw std::logic_error("Determinant is undefined for non-square matrices");
+    if (_rows != _columns) {
+        throw std::logic_error(
+            "Determinant is undefined for non-square matrices");
     }
-    if (_det.has_value()){
+    if (_det.has_value()) {
         return _det.value();
     }
     return calc_det();
 }
 
 int SparseMatrix::rank() {
-    if (_rank.has_value()){
+    if (_rank.has_value()) {
         return _rank.value();
     }
     _rank = calc_rank();
@@ -55,19 +55,70 @@ int SparseMatrix::rank() {
 }
 
 int SparseMatrix::rank() const {
-    if (_rank.has_value()){
+    if (_rank.has_value()) {
         return _rank.value();
     }
     return calc_rank();
 }
 
-void SparseMatrix::gem() {}
+void SparseMatrix::gem() {
+    auto matrix_array = dump();
+    for (std::size_t i = 1; i < _rows; i++) {
+        for (std::size_t j = 0; j < _columns; j++) {
+            int source_coef = matrix_array[i + j].value;
+            int target_coef = matrix_array[j].value;
+            matrix_array[i + j].value *= target_coef;
+            matrix_array[i + j].value -= matrix_array[j].value * source_coef;
+        }
+    }
+
+    std::vector<std::vector<MatrixElement>> matrix;
+    for (std::size_t i = 0; i < _rows; i++) {
+        std::vector<MatrixElement> tmp;
+        tmp.emplace_back(0, 0, 0);
+        tmp.erase(tmp.begin());
+        matrix.emplace_back(tmp);
+    }
+
+    for (const auto & i : matrix_array) {
+        matrix[i.row].emplace_back(i);
+    }
+
+    std::size_t col_index = 0;
+    for (std::size_t i = 0; i < _rows; i++) {
+        if (col_index == _columns)
+            break;
+        if (matrix[i][col_index].value == 0) {
+            for (std::size_t j = i; j < _rows; j++) {
+                if (matrix[j][col_index].value != 0) {
+                    std::swap(matrix[i], matrix[j]);
+                    break;
+                }
+            }
+        }
+        ++col_index;
+    }
+
+    std::vector<MatrixElement> gaussed_matrix_dump;
+    for (const auto & i : matrix) {
+        for (const auto & j : i) {
+            gaussed_matrix_dump.emplace_back(j);
+        }
+    }
+
+    std::set<MatrixElement, MatrixElementComparator> new_data;
+    std::copy_if(gaussed_matrix_dump.begin(), gaussed_matrix_dump.end(),
+                 std::inserter(new_data, new_data.begin()),
+                 [](const MatrixElement & e) { return e.value != 0; });
+
+    _data = std::move(new_data);
+}
 
 void SparseMatrix::inverse() {}
 
 void SparseMatrix::transpose() {
     std::set<MatrixElement, MatrixElementComparator> new_data;
-    for (const auto & i : _data){
+    for (const auto & i : _data) {
         new_data.emplace(i.column, i.row, i.value);
     }
     _data = std::move(new_data);
