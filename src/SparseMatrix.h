@@ -10,8 +10,8 @@ class SparseMatrix : public MatrixMemoryRepr {
     SparseMatrix(const std::vector<MatrixElement> &);
     MatrixMemoryRepr * clone() const override;
 
-    int det() override;
-    int det() const override;
+    double det() override;
+    double det() const override;
     std::size_t rank() override;
     std::size_t rank() const override;
     void gem() override;
@@ -29,7 +29,7 @@ class SparseMatrix : public MatrixMemoryRepr {
     };
     std::set<MatrixElement, MatrixElementComparator> _data;
 
-    int calc_det() const;
+    double calc_det() const;
     size_t calc_rank() const;
 };
 

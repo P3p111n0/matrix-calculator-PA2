@@ -17,8 +17,8 @@ class MatrixMemoryRepr {
     size_t rows() const;
     size_t columns() const;
 
-    virtual int det() = 0;
-    virtual int det() const = 0;
+    virtual double det() = 0;
+    virtual double det() const = 0;
     virtual std::size_t rank() = 0;
     virtual std::size_t rank() const = 0;
     virtual void gem() = 0;
@@ -30,7 +30,7 @@ class MatrixMemoryRepr {
   protected:
     std::size_t _rows;
     std::size_t _columns;
-    std::optional<int> _det;
+    std::optional<double> _det;
     std::optional<std::size_t> _rank;
     virtual void print(std::ostream &) const = 0;
 };

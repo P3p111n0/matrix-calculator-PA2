@@ -24,7 +24,7 @@ MatrixMemoryRepr * SparseMatrix::clone() const {
     return new SparseMatrix(*this);
 }
 
-int SparseMatrix::det() {
+double SparseMatrix::det() {
     if (_rows != _columns) {
         throw std::logic_error(
             "Determinant is undefined for non-square matrices");
@@ -36,7 +36,7 @@ int SparseMatrix::det() {
     return _det.value();
 }
 
-int SparseMatrix::det() const {
+double SparseMatrix::det() const {
     if (_rows != _columns) {
         throw std::logic_error(
             "Determinant is undefined for non-square matrices");
@@ -92,9 +92,10 @@ void SparseMatrix::gem() {
     // https://www.math-cs.gordon.edu/courses/ma342/handouts/gauss.pdf
     for (std::size_t i = 0; i < _rows - 1; i++) {
         for (std::size_t j = i + 1; j < _rows; j++) {
+            int multiplier = matrix[j][i];
             for (std::size_t k = i; k < _columns; k++) {
                 matrix[j][k] = (matrix[j][k] * matrix[i][i]) -
-                               (matrix[j][i] * matrix[i][k]);
+                               (multiplier * matrix[i][k]);
             }
         }
     }
@@ -164,7 +165,48 @@ void SparseMatrix::print(std::ostream & os) const {
     }
 }
 
-int SparseMatrix::calc_det() const {}
+double SparseMatrix::calc_det() const {
+    std::unique_ptr<MatrixMemoryRepr> matrix_copy(clone());
+    auto matrix_array = matrix_copy->dump();
+    std::vector<std::vector<int>> matrix;
+
+    std::vector<int> row;
+    size_t last_row = matrix_array.front().row;
+
+    for (const auto & element : matrix_array){
+        if (last_row != element.row){
+            matrix.emplace_back(row);
+            row.clear();
+            last_row = element.row;
+        }
+        row.emplace_back(element.value);
+    }
+    matrix.emplace_back(row);
+
+    std::vector<int> division_vec;
+    // https://www.math-cs.gordon.edu/courses/ma342/handouts/gauss.pdf
+    for (std::size_t i = 0; i < _rows - 1; i++) {
+        for (std::size_t j = i + 1; j < _rows; j++) {
+            division_vec.emplace_back(matrix[i][i]);
+            int multiplier = matrix[j][i];
+            for (std::size_t k = i; k < _columns; k++) {
+                matrix[j][k] = (matrix[j][k] * matrix[i][i]) -
+                               (multiplier * matrix[i][k]);
+            }
+        }
+    }
+
+    double det = 1;
+    for (std::size_t i = 0; i < _rows; i++){
+        det *= matrix[i][i];
+    }
+
+    for (const auto & i : division_vec){
+        det /= i;
+    }
+
+    return det;
+}
 
 std::size_t SparseMatrix::calc_rank() const {
     std::size_t rank = std::min(_rows, _columns);
