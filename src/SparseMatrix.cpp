@@ -20,6 +20,24 @@ SparseMatrix::SparseMatrix(const std::vector<MatrixElement> & dump)
                  [](const MatrixElement & e) { return e.value != 0; });
 }
 
+SparseMatrix::SparseMatrix(
+    std::initializer_list<std::initializer_list<int>> init_list)
+    : MatrixMemoryRepr(init_list.size(),
+                       init_list.size() ? init_list.begin()->size() : 0) {
+
+    std::size_t row = 0;
+    for (const auto & list : init_list){
+        std::size_t col = 0;
+        for (const auto & val : list){
+            if (val != 0){
+                _data.emplace(row, col, val);
+            }
+            ++col;
+        }
+        ++row;
+    }
+}
+
 MatrixMemoryRepr * SparseMatrix::clone() const {
     return new SparseMatrix(*this);
 }
@@ -94,8 +112,8 @@ void SparseMatrix::gem() {
         for (std::size_t j = i + 1; j < _rows; j++) {
             int multiplier = matrix[j][i];
             for (std::size_t k = i; k < _columns; k++) {
-                matrix[j][k] = (matrix[j][k] * matrix[i][i]) -
-                               (multiplier * matrix[i][k]);
+                matrix[j][k] =
+                    (matrix[j][k] * matrix[i][i]) - (multiplier * matrix[i][k]);
             }
         }
     }
@@ -173,8 +191,8 @@ double SparseMatrix::calc_det() const {
     std::vector<int> row;
     size_t last_row = matrix_array.front().row;
 
-    for (const auto & element : matrix_array){
-        if (last_row != element.row){
+    for (const auto & element : matrix_array) {
+        if (last_row != element.row) {
             matrix.emplace_back(row);
             row.clear();
             last_row = element.row;
@@ -190,18 +208,18 @@ double SparseMatrix::calc_det() const {
             division_vec.emplace_back(matrix[i][i]);
             int multiplier = matrix[j][i];
             for (std::size_t k = i; k < _columns; k++) {
-                matrix[j][k] = (matrix[j][k] * matrix[i][i]) -
-                               (multiplier * matrix[i][k]);
+                matrix[j][k] =
+                    (matrix[j][k] * matrix[i][i]) - (multiplier * matrix[i][k]);
             }
         }
     }
 
     double det = 1;
-    for (std::size_t i = 0; i < _rows; i++){
+    for (std::size_t i = 0; i < _rows; i++) {
         det *= matrix[i][i];
     }
 
-    for (const auto & i : division_vec){
+    for (const auto & i : division_vec) {
         det /= i;
     }
 

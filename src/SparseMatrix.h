@@ -1,5 +1,7 @@
 #include "MatrixMemoryRepr.h"
 #include <set>
+#include <initializer_list>
+#include <vector>
 
 #ifndef MELCRJOS_SPARSEMATRIX_H
 #define MELCRJOS_SPARSEMATRIX_H
@@ -8,6 +10,8 @@ class SparseMatrix : public MatrixMemoryRepr {
   public:
     SparseMatrix(size_t, size_t);
     SparseMatrix(const std::vector<MatrixElement> &);
+    SparseMatrix(std::initializer_list<std::initializer_list<int>>);
+
     MatrixMemoryRepr * clone() const override;
 
     double det() override;
