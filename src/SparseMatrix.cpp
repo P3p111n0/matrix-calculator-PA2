@@ -26,10 +26,10 @@ SparseMatrix::SparseMatrix(
                        init_list.size() ? init_list.begin()->size() : 0) {
 
     std::size_t row = 0;
-    for (const auto & list : init_list){
+    for (const auto & list : init_list) {
         std::size_t col = 0;
-        for (const auto & val : list){
-            if (val != 0){
+        for (const auto & val : list) {
+            if (val != 0) {
                 _data.emplace(row, col, val);
             }
             ++col;
@@ -227,7 +227,7 @@ double SparseMatrix::calc_det() const {
 }
 
 std::size_t SparseMatrix::calc_rank() const {
-    std::size_t rank = std::min(_rows, _columns);
+    std::size_t rank = 0;
     std::unique_ptr<MatrixMemoryRepr> matrix_copy(clone());
     matrix_copy->gem();
     auto copy_dump = matrix_copy->dump();
@@ -235,7 +235,7 @@ std::size_t SparseMatrix::calc_rank() const {
     for (std::size_t i = 0; i < _rows * _columns; i += _columns) {
         for (std::size_t j = 0; j < _columns; j++) {
             if (copy_dump[i + j].value != 0) {
-                rank--;
+                rank++;
                 break;
             }
         }
