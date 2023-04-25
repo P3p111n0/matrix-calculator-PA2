@@ -2,12 +2,12 @@
 #include <algorithm>
 #include <memory>
 
-bool SparseMatrix::MatrixElementComparator::operator()(
-    const MatrixElement & lhs, const MatrixElement & rhs) const {
-    if (lhs.row != rhs.row) {
-        return lhs.row < rhs.row;
+bool SparseMatrix::MatrixElement::operator<(
+    const SparseMatrix::MatrixElement & rhs) const {
+    if (row != rhs.row) {
+        return row < rhs.row;
     }
-    return lhs.column < rhs.column;
+    return column < rhs.column;
 }
 
 SparseMatrix::SparseMatrix(size_t rows, size_t columns)
@@ -16,9 +16,9 @@ SparseMatrix::SparseMatrix(size_t rows, size_t columns)
 SparseMatrix::SparseMatrix(const std::vector<std::vector<double>> & dump)
     : MatrixMemoryRepr(dump.size(), dump.size() ? dump.at(0).size() : 0) {
 
-    for (std::size_t i = 0; i < _rows; i++){
-        for (std::size_t j = 0; j < _columns; j++){
-            if (dump[i][j] != 0){
+    for (std::size_t i = 0; i < _rows; i++) {
+        for (std::size_t j = 0; j < _columns; j++) {
+            if (dump[i][j] != 0) {
                 _data.emplace(i, j, dump[i][j]);
             }
         }
@@ -120,19 +120,19 @@ void SparseMatrix::gem() {
         }
     }
 
-    std::set<MatrixElement, MatrixElementComparator> new_data;
+    std::set<MatrixElement> new_data;
     std::copy_if(gaussed_matrix_dump.begin(), gaussed_matrix_dump.end(),
                  std::inserter(new_data, new_data.begin()),
                  [](const MatrixElement & e) { return e.value != 0; });
 
     _data = std::move(new_data);
-    _det.reset(); //invalidate determinant
+    _det.reset(); // invalidate determinant
 }
 
 void SparseMatrix::inverse() {}
 
 void SparseMatrix::transpose() {
-    std::set<MatrixElement, MatrixElementComparator> new_data;
+    std::set<MatrixElement> new_data;
     for (const auto & i : _data) {
         new_data.emplace(i.column, i.row, i.value);
     }
@@ -140,39 +140,38 @@ void SparseMatrix::transpose() {
 }
 
 void SparseMatrix::unite(const MatrixMemoryRepr & other) {
-    if (_rows != other.rows() || _columns != other.columns()){
+    if (_rows != other.rows() || _columns != other.columns()) {
         throw std::logic_error("Matrices don't have the same dimensions.");
     }
 
     auto other_dump = other.dump();
 
-    for (std::size_t i = 0; i < _rows; i++){
-        for (std::size_t j = 0; j < _columns; j++){
-            if (other_dump[i][j] != 0){
+    for (std::size_t i = 0; i < _rows; i++) {
+        for (std::size_t j = 0; j < _columns; j++) {
+            if (other_dump[i][j] != 0) {
                 _data.emplace(i, j + _columns, other_dump[i][j]);
             }
         }
     }
 
     _columns += other.columns();
-    _rank.reset(); //invalidate rank
+    _rank.reset(); // invalidate rank
 }
 
 const std::vector<std::vector<double>> SparseMatrix::dump() const {
     std::vector<std::vector<double>> result;
-    for (std::size_t i = 0; i < _rows; i++){
+    for (std::size_t i = 0; i < _rows; i++) {
         std::vector<double> row;
-        for (std::size_t j = 0; j < _columns; j++){
+        for (std::size_t j = 0; j < _columns; j++) {
             row.emplace_back(0);
         }
         result.emplace_back(row);
     }
-    for (const auto & e : _data){
+    for (const auto & e : _data) {
         result[e.row][e.column] = e.value;
     }
 
     return result;
-
 }
 
 void SparseMatrix::print(std::ostream & os) const {
@@ -183,7 +182,7 @@ void SparseMatrix::print(std::ostream & os) const {
             os << self_dump[i][j] << ", ";
         }
         os << self_dump[i][_columns - 1] << " ]";
-        if (i != self_dump.size() - 1){
+        if (i != self_dump.size() - 1) {
             os << std::endl;
         }
     }

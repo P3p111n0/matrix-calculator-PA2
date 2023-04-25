@@ -28,10 +28,16 @@ class SparseMatrix : public MatrixMemoryRepr {
     void print(std::ostream &) const override;
 
   private:
-    struct MatrixElementComparator {
-        inline bool operator()(const MatrixElement &, const MatrixElement &) const;
+    struct MatrixElement {
+        MatrixElement() = delete;
+        MatrixElement(std::size_t r, std::size_t col, int val)
+                : row(r), column(col), value(val) {}
+        std::size_t row;
+        std::size_t column;
+        double value;
+        inline bool operator<(const MatrixElement & rhs) const;
     };
-    std::set<MatrixElement, MatrixElementComparator> _data;
+    std::set<MatrixElement> _data;
 
     double calc_det() const;
     size_t calc_rank() const;
