@@ -1,6 +1,7 @@
 #include "SparseMatrix.h"
 #include <algorithm>
 #include <memory>
+#include <queue>
 
 bool SparseMatrix::MatrixElement::operator<(
     const SparseMatrix::MatrixElement & rhs) const {
@@ -120,13 +121,56 @@ void SparseMatrix::inverse() {
         throw std::logic_error("Matrix is not invertible.");
     }
 
+    std::queue<std::size_t> index_queue;
+    std::set<std::size_t> visited_indexes;
     double determinant = 1;
     std::size_t dim = _rows;
+    bool is_transposed = false;
+
+    // check, if matrix should be transposed
+    std::size_t missing_diagonal_el = 0;
+    for (std::size_t i = 0; i < dim; i++){
+        if (!_data.count(MatrixElement(i, i, 0))){
+            missing_diagonal_el++;
+        }
+    }
+
+    if (missing_diagonal_el == dim) {
+        transpose();
+        is_transposed = true;
+    }
+
+    for (std::size_t i = 0; i < dim; i++) {
+        index_queue.emplace(i);
+    }
+
     auto matrix = dump();
-    for (std::size_t pivot_loc = 0; pivot_loc < dim; pivot_loc++) {
+    std::vector<std::pair<std::size_t, std::size_t>> row_swap_vec;
+    for (std::size_t i = 0, column_index = 0;
+         i < _rows && column_index < _columns; i++, column_index++) {
+        if (dbl_eq(matrix[i][column_index], 0)) {
+            for (std::size_t j = i; j < _rows; j++) {
+                for (std::size_t h = column_index; h < _columns; h++) {
+                    if (dbl_eq(matrix[i][h], 0) && !dbl_eq(matrix[j][h], 0)) {
+                        std::swap(matrix[i], matrix[j]);
+                        row_swap_vec.emplace_back(i, j);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    for (std::size_t pivot_loc = index_queue.front(); !index_queue.empty();
+         index_queue.pop(), pivot_loc = index_queue.front()) {
         double pivot = matrix[pivot_loc][pivot_loc];
         determinant *= pivot; // step 3
         if (dbl_eq(pivot, 0)) {
+            if (!visited_indexes.count(pivot_loc)) {
+                index_queue.emplace(pivot_loc);
+                visited_indexes.emplace(pivot_loc);
+                continue;
+            }
             _det = 0;
             throw std::logic_error("Matrix is not invertible.");
         }
@@ -155,8 +199,15 @@ void SparseMatrix::inverse() {
         matrix[pivot_loc][pivot_loc] = 1 / pivot; // step 8
     }
 
+    for (const auto & [first_row, second_row] : row_swap_vec){
+        std::swap(matrix[first_row], matrix[second_row]);
+    }
+
     _det = determinant;
     memory_dump_to_data(matrix);
+    if (is_transposed) {
+        transpose();
+    }
 }
 
 void SparseMatrix::transpose() {
@@ -164,6 +215,7 @@ void SparseMatrix::transpose() {
     for (const auto & i : _data) {
         new_data.emplace(i.column, i.row, i.value);
     }
+    std::swap(_rows, _columns);
     _data = std::move(new_data);
 }
 
