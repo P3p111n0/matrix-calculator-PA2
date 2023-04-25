@@ -7,9 +7,10 @@
 #define MELCRJOS_SPARSEMATRIX_H
 
 class SparseMatrix : public MatrixMemoryRepr {
+    using MemoryDump = std::vector<std::vector<double>>;
   public:
     SparseMatrix(size_t, size_t);
-    SparseMatrix(const std::vector<std::vector<double>> &);
+    SparseMatrix(const MemoryDump &);
     SparseMatrix(std::initializer_list<std::initializer_list<int>>);
 
     MatrixMemoryRepr * clone() const override;
@@ -22,7 +23,7 @@ class SparseMatrix : public MatrixMemoryRepr {
     void inverse() override;
     void transpose() override;
     void unite(const MatrixMemoryRepr &) override;
-    const std::vector<std::vector<double>> dump() const override;
+    std::vector<std::vector<double>> dump() const override;
 
   protected:
     void print(std::ostream &) const override;
@@ -41,6 +42,7 @@ class SparseMatrix : public MatrixMemoryRepr {
 
     double calc_det() const;
     size_t calc_rank() const;
+    void memory_dump_to_data(const MemoryDump &);
 };
 
 #endif // MELCRJOS_SPARSEMATRIX_H

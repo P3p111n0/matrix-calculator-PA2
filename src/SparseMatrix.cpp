@@ -13,16 +13,10 @@ bool SparseMatrix::MatrixElement::operator<(
 SparseMatrix::SparseMatrix(size_t rows, size_t columns)
     : MatrixMemoryRepr(rows, columns) {}
 
-SparseMatrix::SparseMatrix(const std::vector<std::vector<double>> & dump)
+SparseMatrix::SparseMatrix(const MemoryDump & dump)
     : MatrixMemoryRepr(dump.size(), dump.size() ? dump.at(0).size() : 0) {
 
-    for (std::size_t i = 0; i < _rows; i++) {
-        for (std::size_t j = 0; j < _columns; j++) {
-            if (dbl_eq(dump[i][j], 0)) {
-                _data.emplace(i, j, dump[i][j]);
-            }
-        }
-    }
+    memory_dump_to_data(dump);
 }
 
 SparseMatrix::SparseMatrix(
@@ -34,7 +28,7 @@ SparseMatrix::SparseMatrix(
     for (const auto & list : init_list) {
         std::size_t col = 0;
         for (const auto & val : list) {
-            if (dbl_eq(val, 0)) {
+            if (!dbl_eq(val, 0)) {
                 _data.emplace(row, col, val);
             }
             ++col;
@@ -113,23 +107,57 @@ void SparseMatrix::gem() {
         }
     }
 
-    std::vector<MatrixElement> gaussed_matrix_dump;
-    for (std::size_t i = 0; i < _rows; i++) {
-        for (std::size_t j = 0; j < _columns; j++) {
-            gaussed_matrix_dump.emplace_back(i, j, matrix[i][j]);
-        }
-    }
-
-    std::set<MatrixElement> new_data;
-    std::copy_if(gaussed_matrix_dump.begin(), gaussed_matrix_dump.end(),
-                 std::inserter(new_data, new_data.begin()),
-                 [](const MatrixElement & e) { return e.value != 0; });
-
-    _data = std::move(new_data);
+    memory_dump_to_data(matrix);
     _det.reset(); // invalidate determinant
 }
 
-void SparseMatrix::inverse() {}
+// https://www.researchgate.net/publication/220337322_An_Efficient_and_Simple_Algorithm_for_Matrix_Inversion
+void SparseMatrix::inverse() {
+    if (_rows != _columns) {
+        throw std::logic_error("Non-square matrices cannot be inverted.");
+    }
+    if (_det.has_value() && dbl_eq(_det.value(), 0)) {
+        throw std::logic_error("Matrix is not invertible.");
+    }
+
+    double determinant = 1;
+    std::size_t dim = _rows;
+    auto matrix = dump();
+    for (std::size_t pivot_loc = 0; pivot_loc < dim; pivot_loc++) {
+        double pivot = matrix[pivot_loc][pivot_loc];
+        determinant *= pivot; // step 3
+        if (dbl_eq(pivot, 0)) {
+            _det = 0;
+            throw std::logic_error("Matrix is not invertible.");
+        }
+        // step 5
+        for (std::size_t pivot_row = 0; pivot_row < dim; pivot_row++) {
+            if (pivot_row != pivot_loc) {
+                matrix[pivot_loc][pivot_row] /= pivot;
+            }
+        }
+        // step 6
+        for (std::size_t pivot_column = 0; pivot_column < dim; pivot_column++) {
+            if (pivot_column != pivot_loc) {
+                matrix[pivot_column][pivot_loc] /= (-1) * pivot;
+            }
+        }
+        // step 7
+        for (std::size_t j = 0; j < dim; j++) {
+            if (pivot_loc != j) {
+                for (std::size_t k = 0; k < dim; k++) {
+                    if (pivot_loc != k) {
+                        matrix[j][k] += matrix[pivot_loc][k] * matrix[j][k];
+                    }
+                }
+            }
+        }
+        matrix[pivot_loc][pivot_loc] = 1 / pivot; // step 8
+    }
+
+    _det = determinant;
+    memory_dump_to_data(matrix);
+}
 
 void SparseMatrix::transpose() {
     std::set<MatrixElement> new_data;
@@ -148,7 +176,7 @@ void SparseMatrix::unite(const MatrixMemoryRepr & other) {
 
     for (std::size_t i = 0; i < _rows; i++) {
         for (std::size_t j = 0; j < _columns; j++) {
-            if (dbl_eq(other_dump[i][j], 0)) {
+            if (!dbl_eq(other_dump[i][j], 0)) {
                 _data.emplace(i, j + _columns, other_dump[i][j]);
             }
         }
@@ -158,7 +186,7 @@ void SparseMatrix::unite(const MatrixMemoryRepr & other) {
     _rank.reset(); // invalidate rank
 }
 
-const std::vector<std::vector<double>> SparseMatrix::dump() const {
+std::vector<std::vector<double>> SparseMatrix::dump() const {
     std::vector<std::vector<double>> result;
     for (std::size_t i = 0; i < _rows; i++) {
         std::vector<double> row;
@@ -248,4 +276,15 @@ std::size_t SparseMatrix::calc_rank() const {
     }
 
     return rank;
+}
+void SparseMatrix::memory_dump_to_data(
+    const SparseMatrix::MemoryDump & matrix) {
+    _data.clear();
+    for (std::size_t i = 0; i < matrix.size(); i++) {
+        for (std::size_t j = 0; j < matrix[i].size(); j++) {
+            if (!dbl_eq(matrix[i][j], 0)) {
+                _data.emplace(i, j, matrix[i][j]);
+            }
+        }
+    }
 }

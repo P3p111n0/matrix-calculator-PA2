@@ -24,7 +24,7 @@ class MatrixMemoryRepr {
     virtual void inverse() = 0;
     virtual void transpose() = 0;
     virtual void unite(const MatrixMemoryRepr &) = 0;
-    virtual const std::vector<std::vector<double>> dump() const = 0;
+    virtual std::vector<std::vector<double>> dump() const = 0;
 
   protected:
     std::size_t _rows;
