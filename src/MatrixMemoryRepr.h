@@ -1,7 +1,6 @@
 #ifndef MELCRJOS_MATRIXMEMORYREPR_H
 #define MELCRJOS_MATRIXMEMORYREPR_H
 
-#include "MatrixElement.h"
 #include <cstdlib>
 #include <iostream>
 #include <optional>
