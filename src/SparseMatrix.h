@@ -2,6 +2,7 @@
 #include <set>
 #include <initializer_list>
 #include <vector>
+#include <functional>
 
 #ifndef MELCRJOS_SPARSEMATRIX_H
 #define MELCRJOS_SPARSEMATRIX_H
@@ -43,6 +44,8 @@ class SparseMatrix : public MatrixMemoryRepr {
     double calc_det() const;
     size_t calc_rank() const;
     void memory_dump_to_data(const MemoryDump &);
+    static void gem_swap_lines(MemoryDump &, std::function<void(std::size_t, std::size_t, double)> &&);
+    static void gem_row_elim(MemoryDump &, std::function<void(std::size_t, std::size_t, double)> &&);
 };
 
 #endif // MELCRJOS_SPARSEMATRIX_H
