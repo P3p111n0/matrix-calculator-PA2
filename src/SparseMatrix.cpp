@@ -125,7 +125,7 @@ void SparseMatrix::gem() {
     auto matrix = dump();
 
     gem_swap_lines(matrix, [](std::size_t, std::size_t, double) { return; });
-    gem_row_elim(matrix, [](std::size_t, std::size_t, double){ return; });
+    gem_row_elim(matrix, [](std::size_t, std::size_t, double) { return; });
 
     memory_dump_to_data(matrix);
     _det.reset(); // invalidate determinant
@@ -143,7 +143,7 @@ void SparseMatrix::inverse() {
     std::queue<std::size_t> index_queue;
     std::set<std::size_t> visited_indexes;
     double determinant = 1;
-    std::size_t dim = _rows;
+    const std::size_t dim = _rows;
     bool is_transposed = false;
 
     // check, if matrix should be transposed
@@ -152,6 +152,7 @@ void SparseMatrix::inverse() {
         if (!_data.count(MatrixElement(i, i, 0))) {
             missing_diagonal_el++;
         }
+        break;
     }
 
     if (missing_diagonal_el == dim) {
@@ -165,20 +166,9 @@ void SparseMatrix::inverse() {
 
     auto matrix = dump();
     std::vector<std::pair<std::size_t, std::size_t>> row_swap_vec;
-    for (std::size_t i = 0, column_index = 0;
-         i < _rows && column_index < _columns; i++, column_index++) {
-        if (dbl_eq(matrix[i][column_index], 0)) {
-            for (std::size_t j = i; j < _rows; j++) {
-                for (std::size_t h = column_index; h < _columns; h++) {
-                    if (dbl_eq(matrix[i][h], 0) && !dbl_eq(matrix[j][h], 0)) {
-                        std::swap(matrix[i], matrix[j]);
-                        row_swap_vec.emplace_back(i, j);
-                        break;
-                    }
-                }
-            }
-        }
-    }
+    gem_swap_lines(matrix, [&](std::size_t i, std::size_t j, double) {
+        row_swap_vec.emplace_back(i, j);
+    });
 
     for (std::size_t pivot_loc = index_queue.front(); !index_queue.empty();
          index_queue.pop(), pivot_loc = index_queue.front()) {
@@ -193,27 +183,24 @@ void SparseMatrix::inverse() {
             _det = 0;
             throw std::logic_error("Matrix is not invertible.");
         }
-        // step 5
-        for (std::size_t pivot_row = 0; pivot_row < dim; pivot_row++) {
-            if (pivot_row != pivot_loc) {
-                matrix[pivot_loc][pivot_row] /= pivot;
-            }
-        }
         // step 6
         for (std::size_t pivot_column = 0; pivot_column < dim; pivot_column++) {
-            if (pivot_column != pivot_loc) {
-                matrix[pivot_column][pivot_loc] /= (-1) * pivot;
-            }
+            matrix[pivot_column][pivot_loc] /= (-1) * pivot;
         }
         // step 7
         for (std::size_t j = 0; j < dim; j++) {
             if (pivot_loc != j) {
                 for (std::size_t k = 0; k < dim; k++) {
                     if (pivot_loc != k) {
-                        matrix[j][k] += matrix[pivot_loc][k] * matrix[j][k];
+                        matrix[j][k] +=
+                            matrix[pivot_loc][k] * matrix[j][pivot_loc];
                     }
                 }
             }
+        }
+        // step 5
+        for (std::size_t pivot_row = 0; pivot_row < dim; pivot_row++) {
+            matrix[pivot_loc][pivot_row] /= pivot;
         }
         matrix[pivot_loc][pivot_loc] = 1 / pivot; // step 8
     }
@@ -292,11 +279,11 @@ double SparseMatrix::calc_det() const {
     auto matrix = matrix_copy->dump();
 
     std::vector<int> division_vec;
-    gem_swap_lines(matrix, [&](std::size_t, std::size_t, double){
+    gem_swap_lines(matrix, [&](std::size_t, std::size_t, double) {
         division_vec.emplace_back(-1);
     });
 
-    gem_row_elim(matrix, [&](std::size_t, std::size_t, double val){
+    gem_row_elim(matrix, [&](std::size_t, std::size_t, double val) {
         division_vec.emplace_back(val);
     });
 
@@ -340,4 +327,3 @@ void SparseMatrix::memory_dump_to_data(
         }
     }
 }
-
