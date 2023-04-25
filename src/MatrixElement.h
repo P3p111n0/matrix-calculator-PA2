@@ -10,7 +10,7 @@ class MatrixElement {
         : row(r), column(col), value(val) {}
     std::size_t row;
     std::size_t column;
-    int value;
+    double value;
 };
 
 #endif // MELCRJOS_MATRIXELEMENT_H

@@ -9,7 +9,7 @@
 class SparseMatrix : public MatrixMemoryRepr {
   public:
     SparseMatrix(size_t, size_t);
-    SparseMatrix(const std::vector<MatrixElement> &);
+    SparseMatrix(const std::vector<std::vector<double>> &);
     SparseMatrix(std::initializer_list<std::initializer_list<int>>);
 
     MatrixMemoryRepr * clone() const override;
@@ -22,7 +22,7 @@ class SparseMatrix : public MatrixMemoryRepr {
     void inverse() override;
     void transpose() override;
     void unite(const MatrixMemoryRepr &) override;
-    std::vector<MatrixElement> dump() const override;
+    const std::vector<std::vector<double>> dump() const override;
 
   protected:
     void print(std::ostream &) const override;

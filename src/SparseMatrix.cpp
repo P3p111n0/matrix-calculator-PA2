@@ -13,11 +13,16 @@ bool SparseMatrix::MatrixElementComparator::operator()(
 SparseMatrix::SparseMatrix(size_t rows, size_t columns)
     : MatrixMemoryRepr(rows, columns) {}
 
-SparseMatrix::SparseMatrix(const std::vector<MatrixElement> & dump)
-    : MatrixMemoryRepr(dump.back().row + 1, dump.back().column + 1) {
+SparseMatrix::SparseMatrix(const std::vector<std::vector<double>> & dump)
+    : MatrixMemoryRepr(dump.size(), dump.size() ? dump.at(0).size() : 0) {
 
-    std::copy_if(dump.begin(), dump.end(), std::inserter(_data, _data.begin()),
-                 [](const MatrixElement & e) { return e.value != 0; });
+    for (std::size_t i = 0; i < _rows; i++){
+        for (std::size_t j = 0; j < _columns; j++){
+            if (dump[i][j] != 0){
+                _data.emplace(i, j, dump[i][j]);
+            }
+        }
+    }
 }
 
 SparseMatrix::SparseMatrix(
@@ -81,17 +86,7 @@ std::size_t SparseMatrix::rank() const {
 }
 
 void SparseMatrix::gem() {
-    auto matrix_array = dump();
-    std::vector<std::vector<int>> matrix;
-
-    for (std::size_t i = 0; i < _rows; i++) {
-        std::vector<int> tmp;
-        matrix.emplace_back(tmp);
-    }
-
-    for (const auto & i : matrix_array) {
-        matrix[i.row].emplace_back(i.value);
-    }
+    auto matrix = dump();
 
     for (std::size_t i = 0, column_index = 0;
          i < _rows && column_index < _columns; i++, column_index++) {
@@ -131,6 +126,7 @@ void SparseMatrix::gem() {
                  [](const MatrixElement & e) { return e.value != 0; });
 
     _data = std::move(new_data);
+    _det.reset(); //invalidate determinant
 }
 
 void SparseMatrix::inverse() {}
@@ -150,41 +146,44 @@ void SparseMatrix::unite(const MatrixMemoryRepr & other) {
 
     auto other_dump = other.dump();
 
-    for (auto & element : other_dump) {
-        if (element.value != 0) {
-            element.row += _rows;
-            element.column += _columns;
+    for (std::size_t i = 0; i < _rows; i++){
+        for (std::size_t j = 0; j < _columns; j++){
+            if (other_dump[i][j] != 0){
+                _data.emplace(i, j + _columns, other_dump[i][j]);
+            }
         }
     }
-    _rows += other.rows();
-    _columns += other.columns();
 
-    std::copy_if(other_dump.begin(), other_dump.end(),
-                 std::inserter(_data, _data.begin()),
-                 [](const MatrixElement & e) { return e.value != 0; });
+    _columns += other.columns();
+    _rank.reset(); //invalidate rank
 }
 
-std::vector<MatrixElement> SparseMatrix::dump() const {
-    auto intermediate = _data;
-    std::vector<MatrixElement> result;
-    for (std::size_t i = 0; i < _rows; i++) {
-        for (std::size_t j = 0; j < _columns; j++) {
-            intermediate.emplace(i, j, 0);
+const std::vector<std::vector<double>> SparseMatrix::dump() const {
+    std::vector<std::vector<double>> result;
+    for (std::size_t i = 0; i < _rows; i++){
+        std::vector<double> row;
+        for (std::size_t j = 0; j < _columns; j++){
+            row.emplace_back(0);
         }
+        result.emplace_back(row);
     }
-    copy(intermediate.begin(), intermediate.end(), std::back_inserter(result));
+    for (const auto & e : _data){
+        result[e.row][e.column] = e.value;
+    }
+
     return result;
+
 }
 
 void SparseMatrix::print(std::ostream & os) const {
     auto self_dump = dump();
-    for (std::size_t i = 0; i < _rows * _columns; i += _columns) {
+    for (std::size_t i = 0; i < _rows; i++) {
         os << "[ ";
         for (std::size_t j = 0; j < _columns - 1; j++) {
-            os << self_dump[i + j].value << ", ";
+            os << self_dump[i][j] << ", ";
         }
-        os << self_dump[i + _columns - 1].value << " ]";
-        if (i + _columns - 1 != self_dump.size() - 1){
+        os << self_dump[i][_columns - 1] << " ]";
+        if (i != self_dump.size() - 1){
             os << std::endl;
         }
     }
@@ -192,21 +191,7 @@ void SparseMatrix::print(std::ostream & os) const {
 
 double SparseMatrix::calc_det() const {
     std::unique_ptr<MatrixMemoryRepr> matrix_copy(clone());
-    auto matrix_array = matrix_copy->dump();
-    std::vector<std::vector<int>> matrix;
-
-    std::vector<int> row;
-    size_t last_row = matrix_array.front().row;
-
-    for (const auto & element : matrix_array) {
-        if (last_row != element.row) {
-            matrix.emplace_back(row);
-            row.clear();
-            last_row = element.row;
-        }
-        row.emplace_back(element.value);
-    }
-    matrix.emplace_back(row);
+    auto matrix = matrix_copy->dump();
 
     std::vector<int> division_vec;
     for (std::size_t i = 0, column_index = 0;
@@ -254,9 +239,9 @@ std::size_t SparseMatrix::calc_rank() const {
     matrix_copy->gem();
     auto copy_dump = matrix_copy->dump();
 
-    for (std::size_t i = 0; i < _rows * _columns; i += _columns) {
+    for (std::size_t i = 0; i < _rows; i++) {
         for (std::size_t j = 0; j < _columns; j++) {
-            if (copy_dump[i + j].value != 0) {
+            if (copy_dump[i][j] != 0) {
                 rank++;
                 break;
             }
