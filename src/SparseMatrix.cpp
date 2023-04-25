@@ -198,7 +198,7 @@ double SparseMatrix::calc_det() const {
         if (dbl_eq(matrix[i][column_index], 0)) {
             for (std::size_t j = i; j < _rows; j++) {
                 for (std::size_t h = column_index; h < _columns; h++) {
-                    if (dbl_eq(matrix[i][h], 0) && dbl_eq(matrix[j][h], 0)) {
+                    if (dbl_eq(matrix[i][h], 0) && !dbl_eq(matrix[j][h], 0)) {
                         std::swap(matrix[i], matrix[j]);
                         division_vec.emplace_back(-1);
                         break;
