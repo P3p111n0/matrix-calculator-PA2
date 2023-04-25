@@ -32,7 +32,7 @@ class MatrixMemoryRepr {
     std::optional<double> _det;
     std::optional<std::size_t> _rank;
     virtual void print(std::ostream &) const = 0;
-    static bool dbl_cmp(double lhs, double rhs);
+    static bool dbl_eq(double lhs, double rhs);
 };
 
 #endif // MELCRJOS_MATRIXMEMORYREPR_H

@@ -13,7 +13,7 @@ size_t MatrixMemoryRepr::rows() const { return _rows; }
 
 size_t MatrixMemoryRepr::columns() const { return _columns; }
 
-bool MatrixMemoryRepr::dbl_cmp(double lhs, double rhs) {
+bool MatrixMemoryRepr::dbl_eq(double lhs, double rhs) {
     constexpr int magic_constant = 420;
     return abs(abs(lhs) - abs(rhs)) <=
            magic_constant * std::numeric_limits<double>::epsilon() *
