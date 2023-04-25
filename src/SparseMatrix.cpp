@@ -18,7 +18,7 @@ SparseMatrix::SparseMatrix(const std::vector<std::vector<double>> & dump)
 
     for (std::size_t i = 0; i < _rows; i++) {
         for (std::size_t j = 0; j < _columns; j++) {
-            if (dump[i][j] != 0) {
+            if (dbl_cmp(dump[i][j], 0)) {
                 _data.emplace(i, j, dump[i][j]);
             }
         }
@@ -34,7 +34,7 @@ SparseMatrix::SparseMatrix(
     for (const auto & list : init_list) {
         std::size_t col = 0;
         for (const auto & val : list) {
-            if (val != 0) {
+            if (dbl_cmp(val, 0)) {
                 _data.emplace(row, col, val);
             }
             ++col;
@@ -90,10 +90,10 @@ void SparseMatrix::gem() {
 
     for (std::size_t i = 0, column_index = 0;
          i < _rows && column_index < _columns; i++, column_index++) {
-        if (matrix[i][column_index] == 0) {
+        if (dbl_cmp(matrix[i][column_index], 0)) {
             for (std::size_t j = i; j < _rows; j++) {
                 for (std::size_t h = column_index; h < _columns; h++) {
-                    if (matrix[i][h] == 0 && matrix[j][h] != 0) {
+                    if (dbl_cmp(matrix[i][h], 0) && !dbl_cmp(matrix[j][h], 0)) {
                         std::swap(matrix[i], matrix[j]);
                         break;
                     }
@@ -148,7 +148,7 @@ void SparseMatrix::unite(const MatrixMemoryRepr & other) {
 
     for (std::size_t i = 0; i < _rows; i++) {
         for (std::size_t j = 0; j < _columns; j++) {
-            if (other_dump[i][j] != 0) {
+            if (dbl_cmp(other_dump[i][j], 0)) {
                 _data.emplace(i, j + _columns, other_dump[i][j]);
             }
         }
@@ -195,10 +195,10 @@ double SparseMatrix::calc_det() const {
     std::vector<int> division_vec;
     for (std::size_t i = 0, column_index = 0;
          i < _rows && column_index < _columns; i++, column_index++) {
-        if (matrix[i][column_index] == 0) {
+        if (dbl_cmp(matrix[i][column_index], 0)) {
             for (std::size_t j = i; j < _rows; j++) {
                 for (std::size_t h = column_index; h < _columns; h++) {
-                    if (matrix[i][h] == 0 && matrix[j][h] != 0) {
+                    if (dbl_cmp(matrix[i][h], 0) && dbl_cmp(matrix[j][h], 0)) {
                         std::swap(matrix[i], matrix[j]);
                         division_vec.emplace_back(-1);
                         break;
@@ -240,7 +240,7 @@ std::size_t SparseMatrix::calc_rank() const {
 
     for (std::size_t i = 0; i < _rows; i++) {
         for (std::size_t j = 0; j < _columns; j++) {
-            if (copy_dump[i][j] != 0) {
+            if (dbl_cmp(copy_dump[i][j], 0)) {
                 rank++;
                 break;
             }
