@@ -243,6 +243,7 @@ void SparseMatrix::unite(const MatrixMemoryRepr & other) {
 
     _columns += other.columns();
     _rank.reset(); // invalidate rank
+    _det.reset();
 }
 
 std::vector<std::vector<Rational>> SparseMatrix::dump() const {
@@ -308,7 +309,7 @@ std::size_t SparseMatrix::calc_rank() const {
 
     for (std::size_t i = 0; i < _rows; i++) {
         for (std::size_t j = 0; j < _columns; j++) {
-            if (copy_dump[i][j] == 0) {
+            if (copy_dump[i][j] != 0) {
                 rank++;
                 break;
             }
