@@ -21,7 +21,7 @@ SparseMatrix::SparseMatrix(const MemoryDump & dump)
 }
 
 SparseMatrix::SparseMatrix(
-    std::initializer_list<std::initializer_list<int>> init_list)
+    std::initializer_list<std::initializer_list<Rational>> init_list)
     : MatrixMemoryRepr(init_list.size(),
                        init_list.size() ? init_list.begin()->size() : 0) {
 
@@ -29,7 +29,7 @@ SparseMatrix::SparseMatrix(
     for (const auto & list : init_list) {
         std::size_t col = 0;
         for (const auto & val : list) {
-            if (!dbl_eq(val, 0)) {
+            if (val != 0) {
                 _data.emplace(row, col, val);
             }
             ++col;
@@ -42,7 +42,7 @@ MatrixMemoryRepr * SparseMatrix::clone() const {
     return new SparseMatrix(*this);
 }
 
-double SparseMatrix::det() {
+Rational SparseMatrix::det() {
     if (_rows != _columns) {
         throw std::logic_error(
             "Determinant is undefined for non-square matrices.");
@@ -54,7 +54,7 @@ double SparseMatrix::det() {
     return _det.value();
 }
 
-double SparseMatrix::det() const {
+Rational SparseMatrix::det() const {
     if (_rows != _columns) {
         throw std::logic_error(
             "Determinant is undefined for non-square matrices.");
@@ -82,16 +82,16 @@ std::size_t SparseMatrix::rank() const {
 
 void SparseMatrix::gem_swap_lines(
     SparseMatrix::MemoryDump & matrix,
-    std::function<void(std::size_t, std::size_t, double)> && capture_fn) {
+    std::function<void(std::size_t, std::size_t, Rational)> && capture_fn) {
 
     std::size_t rows = matrix.size();
     std::size_t columns = rows ? matrix.at(0).size() : 0;
     for (std::size_t i = 0, column_index = 0;
          i < rows && column_index < columns; i++, column_index++) {
-        if (dbl_eq(matrix[i][column_index], 0)) {
+        if (matrix[i][column_index] == 0) {
             for (std::size_t j = i; j < rows; j++) {
                 for (std::size_t h = column_index; h < columns; h++) {
-                    if (dbl_eq(matrix[i][h], 0) && !dbl_eq(matrix[j][h], 0)) {
+                    if (matrix[i][h] == 0 && matrix[j][h] != 0) {
                         std::swap(matrix[i], matrix[j]);
                         capture_fn(i, j, matrix[i][j]);
                         break;
@@ -105,14 +105,14 @@ void SparseMatrix::gem_swap_lines(
 // https://www.math-cs.gordon.edu/courses/ma342/handouts/gauss.pdf
 void SparseMatrix::gem_row_elim(
     SparseMatrix::MemoryDump & matrix,
-    std::function<void(std::size_t, std::size_t, double)> && capture_fn) {
+    std::function<void(std::size_t, std::size_t, Rational)> && capture_fn) {
 
     std::size_t rows = matrix.size();
     std::size_t columns = rows ? matrix.at(0).size() : 0;
     for (std::size_t i = 0; i < rows - 1; i++) {
         for (std::size_t j = i + 1; j < rows; j++) {
             capture_fn(i, j, matrix[i][i]);
-            int multiplier = matrix[j][i];
+            Rational multiplier = matrix[j][i];
             for (std::size_t k = i; k < columns; k++) {
                 matrix[j][k] =
                     (matrix[j][k] * matrix[i][i]) - (multiplier * matrix[i][k]);
@@ -124,8 +124,8 @@ void SparseMatrix::gem_row_elim(
 void SparseMatrix::gem() {
     auto matrix = dump();
 
-    gem_swap_lines(matrix, [](std::size_t, std::size_t, double) { return; });
-    gem_row_elim(matrix, [](std::size_t, std::size_t, double) { return; });
+    gem_swap_lines(matrix, [](std::size_t, std::size_t, Rational) { return; });
+    gem_row_elim(matrix, [](std::size_t, std::size_t, Rational) { return; });
 
     memory_dump_to_data(matrix);
     _det.reset(); // invalidate determinant
@@ -136,14 +136,14 @@ void SparseMatrix::inverse() {
     if (_rows != _columns) {
         throw std::logic_error("Non-square matrices cannot be inverted.");
     }
-    if (_det.has_value() && dbl_eq(_det.value(), 0)) {
+    if (_det.has_value() && _det.value() == 0) {
         throw std::logic_error("Matrix is not invertible.");
     }
 
     std::queue<std::size_t> index_queue;
     std::set<std::size_t> visited_indexes;
-    double determinant = 1;
-    const std::size_t dim = _rows;
+    Rational determinant = 1;
+    std::size_t dim = _rows;
     bool is_transposed = false;
 
     // check, if matrix should be transposed
@@ -151,6 +151,7 @@ void SparseMatrix::inverse() {
     for (std::size_t i = 0; i < dim; i++) {
         if (!_data.count(MatrixElement(i, i, 0))) {
             missing_diagonal_el++;
+            continue;
         }
         break;
     }
@@ -166,15 +167,15 @@ void SparseMatrix::inverse() {
 
     auto matrix = dump();
     std::vector<std::pair<std::size_t, std::size_t>> row_swap_vec;
-    gem_swap_lines(matrix, [&](std::size_t i, std::size_t j, double) {
+    gem_swap_lines(matrix, [&](std::size_t i, std::size_t j, Rational) {
         row_swap_vec.emplace_back(i, j);
     });
 
     for (std::size_t pivot_loc = index_queue.front(); !index_queue.empty();
          index_queue.pop(), pivot_loc = index_queue.front()) {
-        double pivot = matrix[pivot_loc][pivot_loc];
+        Rational pivot = matrix[pivot_loc][pivot_loc];
         determinant *= pivot; // step 3
-        if (dbl_eq(pivot, 0)) {
+        if (pivot == 0) {
             if (!visited_indexes.count(pivot_loc)) {
                 index_queue.emplace(pivot_loc);
                 visited_indexes.emplace(pivot_loc);
@@ -185,7 +186,7 @@ void SparseMatrix::inverse() {
         }
         // step 6
         for (std::size_t pivot_column = 0; pivot_column < dim; pivot_column++) {
-            matrix[pivot_column][pivot_loc] /= (-1) * pivot;
+            matrix[pivot_column][pivot_loc] /= Rational(-1) * pivot;
         }
         // step 7
         for (std::size_t j = 0; j < dim; j++) {
@@ -202,7 +203,7 @@ void SparseMatrix::inverse() {
         for (std::size_t pivot_row = 0; pivot_row < dim; pivot_row++) {
             matrix[pivot_loc][pivot_row] /= pivot;
         }
-        matrix[pivot_loc][pivot_loc] = 1 / pivot; // step 8
+        matrix[pivot_loc][pivot_loc] = Rational(1) / pivot; // step 8
     }
 
     for (const auto & [first_row, second_row] : row_swap_vec) {
@@ -234,7 +235,7 @@ void SparseMatrix::unite(const MatrixMemoryRepr & other) {
 
     for (std::size_t i = 0; i < _rows; i++) {
         for (std::size_t j = 0; j < _columns; j++) {
-            if (!dbl_eq(other_dump[i][j], 0)) {
+            if (other_dump[i][j] != 0) {
                 _data.emplace(i, j + _columns, other_dump[i][j]);
             }
         }
@@ -244,10 +245,10 @@ void SparseMatrix::unite(const MatrixMemoryRepr & other) {
     _rank.reset(); // invalidate rank
 }
 
-std::vector<std::vector<double>> SparseMatrix::dump() const {
-    std::vector<std::vector<double>> result;
+std::vector<std::vector<Rational>> SparseMatrix::dump() const {
+    std::vector<std::vector<Rational>> result;
     for (std::size_t i = 0; i < _rows; i++) {
-        std::vector<double> row;
+        std::vector<Rational> row;
         for (std::size_t j = 0; j < _columns; j++) {
             row.emplace_back(0);
         }
@@ -274,20 +275,20 @@ void SparseMatrix::print(std::ostream & os) const {
     }
 }
 
-double SparseMatrix::calc_det() const {
+Rational SparseMatrix::calc_det() const {
     std::unique_ptr<MatrixMemoryRepr> matrix_copy(clone());
     auto matrix = matrix_copy->dump();
 
-    std::vector<int> division_vec;
-    gem_swap_lines(matrix, [&](std::size_t, std::size_t, double) {
+    std::vector<Rational> division_vec;
+    gem_swap_lines(matrix, [&](std::size_t, std::size_t, Rational) {
         division_vec.emplace_back(-1);
     });
 
-    gem_row_elim(matrix, [&](std::size_t, std::size_t, double val) {
+    gem_row_elim(matrix, [&](std::size_t, std::size_t, Rational val) {
         division_vec.emplace_back(val);
     });
 
-    double det = 1;
+    Rational det = 1;
     for (std::size_t i = 0; i < _rows; i++) {
         det *= matrix[i][i];
     }
@@ -307,7 +308,7 @@ std::size_t SparseMatrix::calc_rank() const {
 
     for (std::size_t i = 0; i < _rows; i++) {
         for (std::size_t j = 0; j < _columns; j++) {
-            if (dbl_eq(copy_dump[i][j], 0)) {
+            if (copy_dump[i][j] == 0) {
                 rank++;
                 break;
             }
@@ -321,7 +322,7 @@ void SparseMatrix::memory_dump_to_data(
     _data.clear();
     for (std::size_t i = 0; i < matrix.size(); i++) {
         for (std::size_t j = 0; j < matrix[i].size(); j++) {
-            if (!dbl_eq(matrix[i][j], 0)) {
+            if (matrix[i][j] != 0) {
                 _data.emplace(i, j, matrix[i][j]);
             }
         }

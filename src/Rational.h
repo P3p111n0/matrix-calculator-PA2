@@ -6,13 +6,20 @@
 class Rational {
 public:
     Rational() = delete;
+    Rational(int);
     Rational(int, int);
     Rational operator+ (const Rational &) const;
     Rational operator- (const Rational &) const;
     Rational operator* (const Rational &) const;
     Rational operator/ (const Rational &) const;
+    Rational & operator+=(const Rational &);
+    Rational & operator-=(const Rational &);
+    Rational & operator*=(const Rational &);
+    Rational & operator/=(const Rational &);
+
     bool operator<(const Rational &) const;
     bool operator==(const Rational &) const;
+    bool operator!=(const Rational &) const;
     friend std::ostream & operator<<(std::ostream &, const Rational &);
 private:
     void simplify();

@@ -2,7 +2,7 @@
 #include <numeric>
 
 void Rational::simplify() {
-    if (_num < 0 && _denom < 0){
+    if ((_num < 0 && _denom < 0) || (_num >= 0 && _denom < 0)) {
         _num *= -1;
         _denom *= -1;
     }
@@ -11,6 +11,8 @@ void Rational::simplify() {
     _num /= gcd;
     _denom /= gcd;
 }
+
+Rational::Rational(int numerator) : _num(numerator), _denom(1) {}
 
 Rational::Rational(int numerator, int denominator)
     : _num(numerator), _denom(denominator) {
@@ -39,10 +41,38 @@ Rational Rational::operator/(const Rational & other) const {
     return Rational(_num * other._denom, _denom * other._num);
 }
 
+Rational & Rational::operator+=(const Rational & other) {
+    Rational temp = *this + other;
+    _num = temp._num;
+    _denom = temp._denom;
+    return *this;
+}
+
+Rational & Rational::operator-=(const Rational & other) {
+    Rational temp = *this - other;
+    _num = temp._num;
+    _denom = temp._denom;
+    return *this;
+}
+
+Rational & Rational::operator*=(const Rational & other) {
+    Rational temp = *this * other;
+    _num = temp._num;
+    _denom = temp._denom;
+    return *this;
+}
+
+Rational & Rational::operator/=(const Rational & other) {
+    Rational temp = *this / other;
+    _num = temp._num;
+    _denom = temp._denom;
+    return *this;
+}
+
 bool Rational::operator<(const Rational & other) const {
     int lcm = std::lcm(_denom, other._denom);
-    int lhs_numerator = _num * (lcm/_denom);
-    int rhs_numerator = other._num * (lcm/other._denom);
+    int lhs_numerator = _num * (lcm / _denom);
+    int rhs_numerator = other._num * (lcm / other._denom);
 
     return lhs_numerator < rhs_numerator;
 }
@@ -51,7 +81,14 @@ bool Rational::operator==(const Rational & other) const {
     return _num == other._num && _denom == other._denom;
 }
 
+bool Rational::operator!=(const Rational & other) const {
+    return !(*this == other);
+}
+
 std::ostream & operator<<(std::ostream & os, const Rational & x) {
-    os << x._num << '/' << x._denom;
+    os << x._num;
+    if (x._denom != 1) {
+        os << '/' << x._denom;
+    }
     return os;
 }
