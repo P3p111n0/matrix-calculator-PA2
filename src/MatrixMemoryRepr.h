@@ -14,24 +14,18 @@ class MatrixMemoryRepr {
     virtual ~MatrixMemoryRepr() = default;
     virtual MatrixMemoryRepr * clone() const = 0;
     friend std::ostream & operator<<(std::ostream &, const MatrixMemoryRepr &);
-    size_t rows() const;
-    size_t columns() const;
+    std::size_t rows() const;
+    std::size_t columns() const;
+    Rational at(std::size_t, std::size_t) const;
+    void add(std::size_t, std::size_t, const Rational &);
+    Rational & modify(std::size_t, std::size_t);
+    void swap_rows(std::size_t, std::size_t);
 
-    virtual Rational det() = 0;
-    virtual Rational det() const = 0;
-    virtual std::size_t rank() = 0;
-    virtual std::size_t rank() const = 0;
-    virtual void gem() = 0;
-    virtual void inverse() = 0;
-    virtual void transpose() = 0;
-    virtual void unite(const MatrixMemoryRepr &) = 0;
     virtual std::vector<std::vector<Rational>> dump() const = 0;
 
   protected:
     std::size_t _rows;
     std::size_t _columns;
-    std::optional<Rational> _det;
-    std::optional<std::size_t> _rank;
     virtual void print(std::ostream &) const = 0;
 };
 

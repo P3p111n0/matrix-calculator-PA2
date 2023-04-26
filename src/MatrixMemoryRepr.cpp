@@ -2,7 +2,7 @@
 #include <limits>
 
 MatrixMemoryRepr::MatrixMemoryRepr(std::size_t rows, std::size_t columns)
-    : _rows(std::move(rows)), _columns(std::move(columns)) {}
+    : _rows(rows), _columns(columns) {}
 
 std::ostream & operator<<(std::ostream & os, const MatrixMemoryRepr & matrix) {
     matrix.print(os);
