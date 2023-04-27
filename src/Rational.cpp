@@ -12,6 +12,8 @@ void Rational::simplify() {
     _denom /= gcd;
 }
 
+Rational::Rational() : _num(0), _denom(1) {}
+
 Rational::Rational(int numerator) : _num(numerator), _denom(1) {}
 
 Rational::Rational(int numerator, int denominator)
@@ -24,21 +26,21 @@ Rational::Rational(int numerator, int denominator)
     simplify();
 }
 Rational Rational::operator+(const Rational & other) const {
-    return Rational(_num * other._denom + other._num * _denom,
-                    _denom * other._denom);
+    return {_num * other._denom + other._num * _denom,
+                    _denom * other._denom};
 }
 
 Rational Rational::operator-(const Rational & other) const {
-    return Rational(_num * other._denom - other._num * _denom,
-                    _denom * other._denom);
+    return {_num * other._denom - other._num * _denom,
+                    _denom * other._denom};
 }
 
 Rational Rational::operator*(const Rational & other) const {
-    return Rational(_num * other._num, _denom * other._denom);
+    return {_num * other._num, _denom * other._denom};
 }
 
 Rational Rational::operator/(const Rational & other) const {
-    return Rational(_num * other._denom, _denom * other._num);
+    return {_num * other._denom, _denom * other._num};
 }
 
 Rational & Rational::operator+=(const Rational & other) {

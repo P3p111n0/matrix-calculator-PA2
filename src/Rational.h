@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef MATRIXCALCULATOR_RATIONAL_H
 #define MATRIXCALCULATOR_RATIONAL_H
 
@@ -5,7 +7,7 @@
 
 class Rational {
 public:
-    Rational() = delete;
+    Rational();
     Rational(int);
     Rational(int, int);
     Rational operator+ (const Rational &) const;
