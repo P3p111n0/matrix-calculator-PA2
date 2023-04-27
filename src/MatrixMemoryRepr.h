@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef MELCRJOS_MATRIXMEMORYREPR_H
 #define MELCRJOS_MATRIXMEMORYREPR_H
 
@@ -20,8 +22,6 @@ class MatrixMemoryRepr {
     virtual void add(std::size_t, std::size_t, const Rational &) = 0;
     virtual void modify(std::size_t, std::size_t, const Rational &) = 0;
     virtual void swap_rows(std::size_t, std::size_t) = 0;
-
-    virtual std::vector<std::vector<Rational>> dump() const = 0;
 
   protected:
     std::size_t _rows;
