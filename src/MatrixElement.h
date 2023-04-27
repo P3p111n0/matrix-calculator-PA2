@@ -5,7 +5,8 @@
 #ifndef MATRIXCALCULATOR_MATRIXELEMENT_H
 #define MATRIXCALCULATOR_MATRIXELEMENT_H
 
-struct MatrixElement {
+class MatrixElement {
+  public:
     MatrixElement() = delete;
     MatrixElement(std::size_t r, std::size_t col, const Rational & val)
         : row(r), column(col), value(val) {}
