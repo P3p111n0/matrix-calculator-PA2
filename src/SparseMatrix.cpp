@@ -1,8 +1,9 @@
 #include "SparseMatrix.h"
-#include "Rational.h"
 #include "MatrixElement.h"
+#include "Rational.h"
 
-bool SparseMatrix::Position::operator<(const SparseMatrix::Position & rhs) const {
+bool SparseMatrix::Position::operator<(
+    const SparseMatrix::Position & rhs) const {
     return row == rhs.row ? col < rhs.col : row < rhs.row;
 }
 
@@ -23,6 +24,10 @@ SparseMatrix::SparseMatrix(
             }
             ++col;
         }
+        if (col != _columns) {
+            throw std::invalid_argument(
+                "Column size mismatch in initializer list.");
+        }
         ++row;
     }
 }
@@ -31,7 +36,10 @@ MatrixMemoryRepr * SparseMatrix::clone() const {
     return new SparseMatrix(*this);
 }
 
-Rational SparseMatrix::at(std::size_t row, std::size_t column) const {
+std::optional<Rational> SparseMatrix::at(std::size_t row, std::size_t column) const {
+    if (row >= _rows || column >= _columns){
+        return std::nullopt;
+    }
     if (!_data.count({row, column})) {
         return 0;
     }
@@ -40,27 +48,35 @@ Rational SparseMatrix::at(std::size_t row, std::size_t column) const {
 
 void SparseMatrix::add(std::size_t row, std::size_t column,
                        const Rational & val) {
-
+    if (row >= _rows || column >= _columns){
+        throw std::out_of_range("Add: index out of bounds");
+    }
     _data[{row, column}] += val;
 }
 
 void SparseMatrix::modify(std::size_t row, std::size_t column,
                           const Rational & new_val) {
-    if (new_val != 0){
+    if (row >= _rows || column >= _columns){
+        throw std::out_of_range("Modify: index out of bounds");
+    }
+    if (new_val != 0) {
         _data[{row, column}] = new_val;
     }
 }
 
 void SparseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
     std::vector<MatrixElement> swap_elements;
-
+    if (f_row >= _rows || s_row >= _rows){
+        throw std::out_of_range("Swap_rows: index out of range");
+    }
     for (const auto & [key, value] : _data) {
         if (key.row == f_row || key.row == s_row) {
             swap_elements.emplace_back(key.row, key.col, value);
         }
     }
     for (const auto & element : swap_elements) {
-        Position new_pos = {element.row == f_row ? s_row : f_row, element.column};
+        Position new_pos = {element.row == f_row ? s_row : f_row,
+                            element.column};
         _data[new_pos] = element.value;
     }
 }
