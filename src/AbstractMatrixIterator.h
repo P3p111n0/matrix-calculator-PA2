@@ -8,6 +8,7 @@ class MatrixMemoryRepr;
 class AbstractMatrixIterator {
   public:
     AbstractMatrixIterator(const MatrixMemoryRepr *, std::size_t, std::size_t);
+    virtual ~AbstractMatrixIterator() = default;
     virtual void operator++() = 0;
     virtual MatrixElement operator*() const = 0;
     bool operator==(const AbstractMatrixIterator &) const;
