@@ -10,8 +10,10 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
     SparseMatrixIterator(const SparseMatrix * ptr,
                          const MapIterator & map_iterator)
         : AbstractMatrixIterator(
-              ptr, _it == ptr->_data.end() ? ptr->_rows : _it->first.row,
-              _it == ptr->_data.end() ? 0 : _it->first.col),
+              ptr,
+              map_iterator == ptr->_data.end() ? ptr->_rows
+                                               : map_iterator->first.row,
+              map_iterator == ptr->_data.end() ? 0 : map_iterator->first.col),
           _it(map_iterator) {}
     void operator++() override {
         ++_it;
@@ -26,7 +28,7 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
     std::size_t operator-(const AbstractMatrixIterator & other) const override {
         SparseMatrixIterator it_copy(*this);
         std::size_t result = 0;
-        while (it_copy != other && _row < _ptr->rows()){
+        while (it_copy != other && _row < _ptr->rows()) {
             ++it_copy;
             ++result;
         }
@@ -135,9 +137,9 @@ void SparseMatrix::print(std::ostream & os) const {
 }
 
 IteratorWrapper SparseMatrix::begin() const {
-    return {new SparseMatrixIterator(this, _data.begin())};
+    return IteratorWrapper(new SparseMatrixIterator(this, _data.begin()));
 }
 
 IteratorWrapper SparseMatrix::end() const {
-    return {new SparseMatrixIterator(this, _data.end())};
+    return IteratorWrapper(new SparseMatrixIterator(this, _data.end()));
 }
