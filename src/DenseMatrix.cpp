@@ -10,7 +10,7 @@ class DenseMatrixIterator : public AbstractMatrixIterator {
           _matrix_rows(ptr->_rows), _matrix_columns(ptr->_columns) {}
     void operator++() override {
         next_element();
-        while (_data[_row][_column] == 0 && _row < _matrix_rows) {
+        while (_row < _matrix_rows && _data[_row][_column] == 0) {
             next_element();
         }
     }

@@ -14,9 +14,14 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
               map_iterator == ptr->_data.end() ? ptr->_rows
                                                : map_iterator->first.row,
               map_iterator == ptr->_data.end() ? 0 : map_iterator->first.col),
-          _it(map_iterator) {}
+          _it(map_iterator), _end(ptr->_data.end()) {}
     void operator++() override {
         ++_it;
+        if (_it == _end){
+            _row = _ptr->rows();
+            _column = 0;
+            return;
+        }
         const auto & pos = _it->first;
         _row = pos.row;
         _column = pos.col;
@@ -37,6 +42,7 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
 
   private:
     MapIterator _it;
+    MapIterator _end;
 };
 
 bool SparseMatrix::Position::operator<(
@@ -137,9 +143,9 @@ void SparseMatrix::print(std::ostream & os) const {
 }
 
 IteratorWrapper SparseMatrix::begin() const {
-    return IteratorWrapper(new SparseMatrixIterator(this, _data.begin()));
+    return {new SparseMatrixIterator(this, _data.begin())};
 }
 
 IteratorWrapper SparseMatrix::end() const {
-    return IteratorWrapper(new SparseMatrixIterator(this, _data.end()));
+    return {new SparseMatrixIterator(this, _data.end())};
 }
