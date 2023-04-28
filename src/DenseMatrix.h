@@ -8,6 +8,7 @@
 #define MATRIXCALCULATOR_DENSEMATRIX_H
 
 class DenseMatrix : public MatrixMemoryRepr {
+    friend class DenseMatrixIterator;
   public:
     DenseMatrix(std::size_t, std::size_t);
     DenseMatrix(std::initializer_list<std::initializer_list<Rational>>);
@@ -19,6 +20,9 @@ class DenseMatrix : public MatrixMemoryRepr {
     void modify(std::size_t, std::size_t,
                 const Rational &) override;
     void swap_rows(std::size_t, std::size_t) override;
+
+    IteratorWrapper begin() const override;
+    IteratorWrapper end() const override;
 
   protected:
     void print(std::ostream &) const override;

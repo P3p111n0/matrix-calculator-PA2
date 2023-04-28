@@ -1,5 +1,33 @@
 #include "DenseMatrix.h"
 
+class DenseMatrixIterator : public AbstractMatrixIterator {
+  public:
+    DenseMatrixIterator(std::size_t row, std::size_t column,
+                        const DenseMatrix * data)
+        : _row(row), _column(column), _ptr(data) {}
+    void operator++() override {
+        while (_ptr->_data[_row][_column] == 0 && _row < _ptr->_rows) {
+            ++_column;
+            _column %= _ptr->_columns;
+        }
+    }
+    MatrixElement operator*() const override {
+        return {_row, _column, _ptr->_data[_row][_column]};
+    }
+    bool operator==(const DenseMatrixIterator & other) const {
+        return _row == other._row && _column == other._column &&
+               _ptr == other._ptr;
+    }
+    bool operator!=(const DenseMatrixIterator & other) const {
+        return !(*this == other);
+    }
+
+  private:
+    std::size_t _row;
+    std::size_t _column;
+    const DenseMatrix * _ptr;
+};
+
 DenseMatrix::DenseMatrix(std::size_t row, std::size_t col)
     : MatrixMemoryRepr(row, col), _data(row) {
     for (auto & vec : _data) {
@@ -66,8 +94,16 @@ void DenseMatrix::print(std::ostream & os) const {
             os << _data[row_index][val_index] << ", ";
         }
         os << _data[row_index][_columns - 1] << " ]";
-        if (row_index != _rows - 1){
+        if (row_index != _rows - 1) {
             os << std::endl;
         }
     }
+}
+
+IteratorWrapper DenseMatrix::begin() const {
+    return {new DenseMatrixIterator(0, 0, this)};
+}
+
+IteratorWrapper DenseMatrix::end() const {
+    return {new DenseMatrixIterator{_rows, 0, this}};
 }
