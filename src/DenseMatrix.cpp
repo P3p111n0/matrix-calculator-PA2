@@ -49,10 +49,12 @@ DenseMatrix::DenseMatrix(std::size_t row, std::size_t col)
 
 DenseMatrix::DenseMatrix(
     std::initializer_list<std::initializer_list<Rational>> init)
-    : MatrixMemoryRepr(init.size(), init.size() ? init.begin()->size() : 0) {
+    : MatrixMemoryRepr(init.size(), init.size() ? init.begin()->size() : 0),
+      _data(init.size()) {
 
     std::size_t row = 0;
     for (const auto & list : init) {
+        _data[row].resize(_columns);
         std::size_t col = 0;
         for (const auto & val : list) {
             _data[row][col] = val;
