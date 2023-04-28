@@ -22,6 +22,9 @@ class Matrix {
     Matrix operator*(const Matrix &) const;
     friend Matrix operator*(const Rational &, const Matrix &);
 
+    IteratorWrapper begin() const;
+    IteratorWrapper end() const;
+
     std::size_t rows() const;
     std::size_t columns() const;
 
