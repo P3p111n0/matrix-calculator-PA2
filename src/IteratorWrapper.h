@@ -8,7 +8,7 @@
 
 class IteratorWrapper {
   public:
-    IteratorWrapper(const AbstractMatrixIterator *);
+    IteratorWrapper(AbstractMatrixIterator *);
     void operator++();
     MatrixElement operator*() const;
     std::size_t operator-(const IteratorWrapper &) const;

@@ -1,8 +1,10 @@
 #include "IteratorWrapper.h"
 
-IteratorWrapper::IteratorWrapper(const AbstractMatrixIterator *) {}
+IteratorWrapper::IteratorWrapper(AbstractMatrixIterator * ptr) : _iterator(ptr) {}
 
-void IteratorWrapper::operator++() {}
+void IteratorWrapper::operator++() {
+
+}
 
 MatrixElement IteratorWrapper::operator*() const { return MatrixElement(); }
 
