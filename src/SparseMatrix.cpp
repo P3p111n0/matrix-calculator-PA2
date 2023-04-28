@@ -2,6 +2,32 @@
 #include "MatrixElement.h"
 #include "Rational.h"
 
+class SparseMatrixIterator : public AbstractMatrixIterator {
+    using MapIterator =
+        std::map<SparseMatrix::Position, Rational>::const_iterator;
+
+  public:
+    SparseMatrixIterator(const MapIterator & map_iterator)
+        : _it(map_iterator) {}
+    void operator++() override { ++_it; }
+    MatrixElement operator*() const override {
+        auto & [pos, value] = *_it;
+        return {pos.row, pos.col, value};
+    }
+    bool operator==(const SparseMatrixIterator & other) const {
+        return _it == other._it;
+    }
+    bool operator!=(const SparseMatrixIterator & other) const {
+        return _it != other._it;
+    }
+    std::size_t operator-(const SparseMatrixIterator & other) const {
+        return std::distance(_it, other._it);
+    }
+
+  private:
+    MapIterator _it;
+};
+
 bool SparseMatrix::Position::operator<(
     const SparseMatrix::Position & rhs) const {
     return row == rhs.row ? col < rhs.col : row < rhs.row;
@@ -36,8 +62,9 @@ MatrixMemoryRepr * SparseMatrix::clone() const {
     return new SparseMatrix(*this);
 }
 
-std::optional<Rational> SparseMatrix::at(std::size_t row, std::size_t column) const {
-    if (row >= _rows || column >= _columns){
+std::optional<Rational> SparseMatrix::at(std::size_t row,
+                                         std::size_t column) const {
+    if (row >= _rows || column >= _columns) {
         return std::nullopt;
     }
     if (!_data.count({row, column})) {
@@ -48,7 +75,7 @@ std::optional<Rational> SparseMatrix::at(std::size_t row, std::size_t column) co
 
 void SparseMatrix::add(std::size_t row, std::size_t column,
                        const Rational & val) {
-    if (row >= _rows || column >= _columns){
+    if (row >= _rows || column >= _columns) {
         throw std::out_of_range("Add: index out of bounds");
     }
     _data[{row, column}] += val;
@@ -56,7 +83,7 @@ void SparseMatrix::add(std::size_t row, std::size_t column,
 
 void SparseMatrix::modify(std::size_t row, std::size_t column,
                           const Rational & new_val) {
-    if (row >= _rows || column >= _columns){
+    if (row >= _rows || column >= _columns) {
         throw std::out_of_range("Modify: index out of bounds");
     }
     if (new_val != 0) {
@@ -66,7 +93,7 @@ void SparseMatrix::modify(std::size_t row, std::size_t column,
 
 void SparseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
     std::vector<MatrixElement> swap_elements;
-    if (f_row >= _rows || s_row >= _rows){
+    if (f_row >= _rows || s_row >= _rows) {
         throw std::out_of_range("Swap_rows: index out of range");
     }
     for (const auto & [key, value] : _data) {
@@ -96,4 +123,11 @@ void SparseMatrix::print(std::ostream & os) const {
             os << std::endl;
         }
     }
+}
+
+IteratorWrapper SparseMatrix::begin() const {
+    return {new SparseMatrixIterator(_data.begin())};
+}
+IteratorWrapper SparseMatrix::end() const {
+    return {new SparseMatrixIterator(_data.end())};
 }

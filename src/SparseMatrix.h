@@ -11,7 +11,7 @@
 #define MELCRJOS_SPARSEMATRIX_H
 
 class SparseMatrix : public MatrixMemoryRepr {
-
+    friend class SparseMatrixIterator;
   public:
     SparseMatrix(size_t, size_t);
     SparseMatrix(std::initializer_list<std::initializer_list<Rational>>);
@@ -20,6 +20,9 @@ class SparseMatrix : public MatrixMemoryRepr {
     void add(std::size_t, std::size_t, const Rational &) override;
     void modify(std::size_t, std::size_t, const Rational &) override;
     void swap_rows(std::size_t, std::size_t) override;
+
+    IteratorWrapper begin() const override;
+    IteratorWrapper end() const override;
 
   protected:
     void print(std::ostream &) const override;
