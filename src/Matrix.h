@@ -7,9 +7,6 @@
 #include <optional>
 #include <iostream>
 
-#ifndef MATRIXCALCULATOR_MATRIX_H
-#define MATRIXCALCULATOR_MATRIX_H
-
 class Matrix {
   public:
     Matrix(std::size_t, std::size_t);
@@ -45,5 +42,3 @@ class Matrix {
 
     static Rational value_ratio;
 };
-
-#endif // MATRIXCALCULATOR_MATRIX_H

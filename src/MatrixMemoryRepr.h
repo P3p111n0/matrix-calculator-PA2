@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef MELCRJOS_MATRIXMEMORYREPR_H
-#define MELCRJOS_MATRIXMEMORYREPR_H
-
 #include <cstdlib>
 #include <iostream>
 #include <optional>
@@ -24,13 +21,11 @@ class MatrixMemoryRepr {
     virtual void modify(std::size_t, std::size_t, const Rational &) = 0;
     virtual void swap_rows(std::size_t, std::size_t) = 0;
 
-    virtual IteratorWrapper begin() const;
-    virtual IteratorWrapper end() const;
+    virtual IteratorWrapper begin() const = 0;
+    virtual IteratorWrapper end() const = 0;
 
   protected:
     std::size_t _rows;
     std::size_t _columns;
     virtual void print(std::ostream &) const = 0;
 };
-
-#endif // MELCRJOS_MATRIXMEMORYREPR_H

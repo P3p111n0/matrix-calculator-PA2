@@ -3,9 +3,6 @@
 #include "AbstractMatrixIterator.h"
 #include <memory>
 
-#ifndef MATRIXCALCULATOR_ITERATORWRAPPER_H
-#define MATRIXCALCULATOR_ITERATORWRAPPER_H
-
 class IteratorWrapper {
   public:
     IteratorWrapper(AbstractMatrixIterator *);
@@ -17,5 +14,3 @@ class IteratorWrapper {
   private:
     std::unique_ptr<AbstractMatrixIterator> _iterator;
 };
-
-#endif // MATRIXCALCULATOR_ITERATORWRAPPER_H

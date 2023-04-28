@@ -4,9 +4,6 @@
 #include "MatrixMemoryRepr.h"
 #include "Rational.h"
 
-#ifndef MATRIXCALCULATOR_DENSEMATRIX_H
-#define MATRIXCALCULATOR_DENSEMATRIX_H
-
 class DenseMatrix : public MatrixMemoryRepr {
     friend class DenseMatrixIterator;
   public:
@@ -29,5 +26,3 @@ class DenseMatrix : public MatrixMemoryRepr {
   private:
     std::vector<std::vector<Rational>> _data;
 };
-
-#endif // MATRIXCALCULATOR_DENSEMATRIX_H

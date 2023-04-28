@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef MATRIXCALCULATOR_RATIONAL_H
-#define MATRIXCALCULATOR_RATIONAL_H
-
 #include <iostream>
 
 class Rational {
@@ -29,6 +26,3 @@ private:
     int _num;
     int _denom;
 };
-
-
-#endif //MATRIXCALCULATOR_RATIONAL_H

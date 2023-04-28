@@ -1,9 +1,7 @@
 #pragma once
 
 #include "MatrixElement.h"
-
-#ifndef MATRIXCALCULATOR_ABSTRACTMATRIXITERATOR_H
-#define MATRIXCALCULATOR_ABSTRACTMATRIXITERATOR_H
+#include "MatrixMemoryRepr.h"
 
 class AbstractMatrixIterator {
   public:
@@ -12,6 +10,7 @@ class AbstractMatrixIterator {
     virtual bool operator==(const AbstractMatrixIterator *) const = 0;
     virtual bool operator!=(const AbstractMatrixIterator *) const = 0;
     virtual std::size_t operator-(const AbstractMatrixIterator *) const = 0;
+  protected:
+    MatrixMemoryRepr * _ptr;
 };
 
-#endif // MATRIXCALCULATOR_ABSTRACTMATRIXITERATOR_H

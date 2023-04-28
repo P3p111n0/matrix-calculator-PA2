@@ -7,9 +7,6 @@
 #include <map>
 #include <vector>
 
-#ifndef MELCRJOS_SPARSEMATRIX_H
-#define MELCRJOS_SPARSEMATRIX_H
-
 class SparseMatrix : public MatrixMemoryRepr {
     friend class SparseMatrixIterator;
   public:
@@ -35,5 +32,3 @@ class SparseMatrix : public MatrixMemoryRepr {
     };
      std::map<Position, Rational> _data;
 };
-
-#endif // MELCRJOS_SPARSEMATRIX_H
