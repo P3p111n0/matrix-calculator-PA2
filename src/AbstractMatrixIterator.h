@@ -1,7 +1,6 @@
 #pragma once
 
 #include "MatrixElement.h"
-#include "MatrixMemoryRepr.h"
 
 class MatrixMemoryRepr;
 
