@@ -94,3 +94,6 @@ std::ostream & operator<<(std::ostream & os, const Rational & x) {
     }
     return os;
 }
+double Rational::evaluate() const {
+    return _num / static_cast<double>(_denom);
+}

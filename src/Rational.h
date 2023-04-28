@@ -20,6 +20,7 @@ public:
     bool operator==(const Rational &) const;
     bool operator!=(const Rational &) const;
     friend std::ostream & operator<<(std::ostream &, const Rational &);
+    double evaluate() const;
 private:
     void simplify();
 
