@@ -6,29 +6,66 @@ Matrix::Matrix(std::size_t, std::size_t) {}
 
 Matrix::Matrix(std::initializer_list<std::initializer_list<Rational>>) {}
 
-Matrix::Matrix(const Matrix &) {}
+Matrix::Matrix(const Matrix & src)
+    : _matrix(src._matrix->clone()), _det(src._det), _rank(src._rank) {}
 
-Matrix::Matrix(Matrix &&) noexcept {}
+Matrix::Matrix(Matrix && src) noexcept
+    : _matrix(std::move(src._matrix)), _det(src._det), _rank(src._rank) {}
 
-Matrix & Matrix::operator=(const Matrix &) { return *this; }
+Matrix & Matrix::operator=(const Matrix & src) {
+    if (this != &src) {
+        _matrix = std::unique_ptr<MatrixMemoryRepr>(src._matrix->clone());
+        _det = src._det;
+        _rank = src._rank;
+    }
+    return *this;
+}
 
-Matrix & Matrix::operator=(Matrix &&) noexcept { return *this; }
+Matrix & Matrix::operator=(Matrix && src) noexcept {
+    if (this != &src) {
+        _matrix = std::move(src._matrix);
+        _det = src._det;
+        _rank = src._rank;
+    }
+    return *this;
+}
 
-Matrix Matrix::operator+(const Matrix &) const { return Matrix(0, 0); }
+Matrix Matrix::operator+(const Matrix & other) const {
+    if (rows() != other.rows() || columns() != other.columns()){
+        throw std::invalid_argument("Matrix addition: dimensions are not matching.");
+    }
+    Matrix result(*this);
+    for (const auto & element : other){
+        result._matrix->add(element.row, element.column, element.value);
+    }
+    return result;
+}
 
-Matrix Matrix::operator-(const Matrix &) const { return Matrix(0, 0); }
+Matrix Matrix::operator-(const Matrix & other) const {
+    if (rows() != other.rows() || columns() != other.columns()){
+        throw std::invalid_argument("Matrix subtraction: dimensions are not matching.");
+    }
+    Matrix result(*this);
+    for (const auto & element : other){
+        result._matrix->add(element.row, element.column, element.value * -1);
+    }
+    return result;
+}
 
 Matrix Matrix::operator*(const Matrix &) const { return Matrix(0, 0); }
 
-Matrix operator*(const Rational &, const Matrix &) { return Matrix(0, 0); }
-
-std::size_t Matrix::rows() const {
-    return _matrix->rows();
+Matrix operator*(const Rational & scalar, const Matrix & mx) {
+    Matrix result(mx);
+    for (const auto & element : mx){
+        Rational new_value = element.value * scalar;
+        result._matrix->modify(element.row, element.column, new_value);
+    }
+    return result;
 }
 
-std::size_t Matrix::columns() const {
-    return _matrix->columns();
-}
+std::size_t Matrix::rows() const { return _matrix->rows(); }
+
+std::size_t Matrix::columns() const { return _matrix->columns(); }
 
 IteratorWrapper Matrix::begin() const { return _matrix->begin(); }
 
@@ -42,13 +79,9 @@ void Matrix::cut(std::size_t) {}
 
 void Matrix::inverse() {}
 
-std::optional<Rational> Matrix::det() const {
-    return std::nullopt;
-}
+std::optional<Rational> Matrix::det() const { return std::nullopt; }
 
-std::optional<std::size_t> Matrix::rank() const {
-    return std::nullopt;
-}
+std::optional<std::size_t> Matrix::rank() const { return std::nullopt; }
 
 void Matrix::gem() {}
 
