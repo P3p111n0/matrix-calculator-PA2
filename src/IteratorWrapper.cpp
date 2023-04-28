@@ -3,19 +3,21 @@
 IteratorWrapper::IteratorWrapper(AbstractMatrixIterator * ptr) : _iterator(ptr) {}
 
 void IteratorWrapper::operator++() {
-
+    ++(*_iterator);
 }
 
-MatrixElement IteratorWrapper::operator*() const { return MatrixElement(); }
-
-std::size_t IteratorWrapper::operator-(const IteratorWrapper &) const {
-    return 0;
+MatrixElement IteratorWrapper::operator*() const {
+    return **_iterator;
 }
 
-bool IteratorWrapper::operator==(const IteratorWrapper &) const {
-    return false;
+std::size_t IteratorWrapper::operator-(const IteratorWrapper & other) const {
+    return *_iterator - *(other._iterator);
 }
 
-bool IteratorWrapper::operator!=(const IteratorWrapper &) const {
-    return false;
+bool IteratorWrapper::operator==(const IteratorWrapper & other) const {
+    return *_iterator == *other._iterator;
+}
+
+bool IteratorWrapper::operator!=(const IteratorWrapper & other) const {
+    return !(*this == other);
 }
