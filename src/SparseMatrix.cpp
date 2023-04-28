@@ -7,37 +7,30 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
         std::map<SparseMatrix::Position, Rational>::const_iterator;
 
   public:
-    SparseMatrixIterator(const MapIterator & map_iterator)
-        : _it(map_iterator) {}
-    void operator++() override { ++_it; }
+    SparseMatrixIterator(const SparseMatrix * ptr,
+                         const MapIterator & map_iterator)
+        : AbstractMatrixIterator(
+              ptr, _it == ptr->_data.end() ? ptr->_rows : _it->first.row,
+              _it == ptr->_data.end() ? 0 : _it->first.col),
+          _it(map_iterator) {}
+    void operator++() override {
+        ++_it;
+        const auto & pos = _it->first;
+        _row = pos.row;
+        _column = pos.col;
+    }
     MatrixElement operator*() const override {
         auto & [pos, value] = *_it;
         return {pos.row, pos.col, value};
     }
-    bool operator==(const AbstractMatrixIterator * other) const override {
-        auto matrix_iterator =
-            dynamic_cast<const SparseMatrixIterator *>(other);
-        if (matrix_iterator == nullptr) {
-            return false;
+    std::size_t operator-(const AbstractMatrixIterator & other) const override {
+        SparseMatrixIterator it_copy(*this);
+        std::size_t result = 0;
+        while (it_copy != other && _row < _ptr->rows()){
+            ++it_copy;
+            ++result;
         }
-        return _it == matrix_iterator->_it;
-    }
-    bool operator!=(const AbstractMatrixIterator * other) const override {
-        auto matrix_iterator =
-            dynamic_cast<const SparseMatrixIterator *>(other);
-        if (matrix_iterator == nullptr) {
-            return false;
-        }
-        return _it != matrix_iterator->_it;
-    }
-    std::size_t operator-(const AbstractMatrixIterator * other) const override {
-        auto matrix_iterator =
-            dynamic_cast<const SparseMatrixIterator *>(other);
-        if (matrix_iterator == nullptr) {
-            throw std::invalid_argument(
-                "SparseMatrixIterator: invalid operands in distance");
-        }
-        return std::distance(_it, matrix_iterator->_it);
+        return result;
     }
 
   private:
@@ -142,9 +135,9 @@ void SparseMatrix::print(std::ostream & os) const {
 }
 
 IteratorWrapper SparseMatrix::begin() const {
-    return {new SparseMatrixIterator(_data.begin())};
+    return {new SparseMatrixIterator(this, _data.begin())};
 }
 
 IteratorWrapper SparseMatrix::end() const {
-    return {new SparseMatrixIterator(_data.end())};
+    return {new SparseMatrixIterator(this, _data.end())};
 }

@@ -1,31 +1,36 @@
 #include "DenseMatrix.h"
 
 class DenseMatrixIterator : public AbstractMatrixIterator {
+    using DenseMatrixContainer = std::vector<std::vector<Rational>>;
+
   public:
-    DenseMatrixIterator(std::size_t row, std::size_t column,
-                        const DenseMatrix * data)
-        : _row(row), _column(column), _ptr(data) {}
+    DenseMatrixIterator(const DenseMatrix * ptr, std::size_t row,
+                        std::size_t column)
+        : AbstractMatrixIterator(ptr, row, column), _data(ptr->_data) {}
     void operator++() override {
-        while (_ptr->_data[_row][_column] == 0 && _row < _ptr->_rows) {
+        while (_data[_row][_column] == 0 && _row < _ptr->rows()) {
             ++_column;
-            _column %= _ptr->_columns;
+            if (_column == _ptr->columns()) {
+                _column = 0;
+                ++_row;
+            }
         }
     }
     MatrixElement operator*() const override {
-        return {_row, _column, _ptr->_data[_row][_column]};
+        return {_row, _column, _data[_row][_column]};
     }
-    bool operator==(const DenseMatrixIterator & other) const {
-        return _row == other._row && _column == other._column &&
-               _ptr == other._ptr;
-    }
-    bool operator!=(const DenseMatrixIterator & other) const {
-        return !(*this == other);
+    std::size_t operator-(const AbstractMatrixIterator & other) const override {
+        DenseMatrixIterator it_copy(*this);
+        std::size_t result = 0;
+        while (it_copy != other && _row < _ptr->rows()){
+            ++it_copy;
+            ++result;
+        }
+        return result;
     }
 
   private:
-    std::size_t _row;
-    std::size_t _column;
-    const DenseMatrix * _ptr;
+    const DenseMatrixContainer & _data;
 };
 
 DenseMatrix::DenseMatrix(std::size_t row, std::size_t col)
@@ -101,9 +106,9 @@ void DenseMatrix::print(std::ostream & os) const {
 }
 
 IteratorWrapper DenseMatrix::begin() const {
-    return {new DenseMatrixIterator(0, 0, this)};
+    return {new DenseMatrixIterator(this, 0, 0)};
 }
 
 IteratorWrapper DenseMatrix::end() const {
-    return {new DenseMatrixIterator{_rows, 0, this}};
+    return {new DenseMatrixIterator(this, _rows, 0)};
 }
