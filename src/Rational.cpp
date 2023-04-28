@@ -97,3 +97,13 @@ std::ostream & operator<<(std::ostream & os, const Rational & x) {
 double Rational::evaluate() const {
     return _num / static_cast<double>(_denom);
 }
+Rational & Rational::operator++() {
+    _num += _denom;
+    return *this;
+}
+
+Rational Rational::operator++(int) {
+    Rational tmp = *this;
+    ++*this;
+    return tmp;
+}

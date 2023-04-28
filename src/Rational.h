@@ -15,6 +15,8 @@ public:
     Rational & operator-=(const Rational &);
     Rational & operator*=(const Rational &);
     Rational & operator/=(const Rational &);
+    Rational & operator++();
+    Rational operator++(int);
 
     bool operator<(const Rational &) const;
     bool operator==(const Rational &) const;
