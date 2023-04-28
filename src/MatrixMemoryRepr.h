@@ -8,6 +8,7 @@
 #include <optional>
 #include <vector>
 #include "Rational.h"
+#include "IteratorWrapper.h"
 
 class MatrixMemoryRepr {
   public:
@@ -22,6 +23,9 @@ class MatrixMemoryRepr {
     virtual void add(std::size_t, std::size_t, const Rational &) = 0;
     virtual void modify(std::size_t, std::size_t, const Rational &) = 0;
     virtual void swap_rows(std::size_t, std::size_t) = 0;
+
+    virtual IteratorWrapper begin() const;
+    virtual IteratorWrapper end() const;
 
   protected:
     std::size_t _rows;
