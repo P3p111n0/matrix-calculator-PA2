@@ -8,12 +8,9 @@ class DenseMatrixIterator : public AbstractMatrixIterator {
                         std::size_t column)
         : AbstractMatrixIterator(ptr, row, column), _data(ptr->_data) {}
     void operator++() override {
+        next_element();
         while (_data[_row][_column] == 0 && _row < _ptr->rows()) {
-            ++_column;
-            if (_column == _ptr->columns()) {
-                _column = 0;
-                ++_row;
-            }
+            next_element();
         }
     }
     MatrixElement operator*() const override {
@@ -31,6 +28,13 @@ class DenseMatrixIterator : public AbstractMatrixIterator {
 
   private:
     const DenseMatrixContainer & _data;
+    void next_element() {
+        ++_column;
+        if (_column >= _ptr->columns()){
+            ++_row;
+            _column = 0;
+        }
+    }
 };
 
 DenseMatrix::DenseMatrix(std::size_t row, std::size_t col)
