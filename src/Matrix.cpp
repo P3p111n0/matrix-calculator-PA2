@@ -1,5 +1,44 @@
 #include "Matrix.h"
 
+constexpr auto default_capture = [](std::size_t, std::size_t) { return; };
+
+void Matrix::gem_swap_rows(
+    std::function<void(std::size_t, std::size_t)> && capture_fn = default_capture) {
+
+    for (std::size_t i = 0, column_index = 0;
+         i < rows() && column_index < columns(); i++, column_index++) {
+        if (_matrix->at(i, column_index).value() == 0) {
+            for (std::size_t j = i; j < rows(); j++) {
+                for (std::size_t h = column_index; h < columns(); h++) {
+                    if (_matrix->at(i, h).value() == 0 && _matrix->at(j, h).value() != 0) {
+                        _matrix->swap_rows(i, j);
+                        capture_fn(i, j);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// https://www.math-cs.gordon.edu/courses/ma342/handouts/gauss.pdf
+void Matrix::gem_row_elim(
+    std::function<void(std::size_t, std::size_t)> && capture_fn = default_capture) {
+
+    for (std::size_t i = 0; i < rows() - 1; i++) {
+        for (std::size_t j = i + 1; j < rows(); j++) {
+            capture_fn(i, j);
+            Rational multiplier = _matrix->at(j, i).value();
+            for (std::size_t k = i; k < columns(); k++) {
+                _matrix->modify(
+                    j, k,
+                    (_matrix->at(j, k).value() * _matrix->at(i, i).value() -
+                     (multiplier * _matrix->at(i, k).value())));
+            }
+        }
+    }
+}
+
 Rational Matrix::value_ratio = Rational(2, 3);
 
 Matrix::Matrix(std::size_t, std::size_t) {}
@@ -122,47 +161,12 @@ std::optional<Rational> Matrix::det() const { return std::nullopt; }
 
 std::optional<std::size_t> Matrix::rank() const { return std::nullopt; }
 
-void Matrix::gem() {}
-
 std::ostream & operator<<(std::ostream & os, const Matrix & mx) {
     os << *(mx._matrix);
     return os;
 }
 
-void Matrix::gem_swap_rows(
-    std::function<void(std::size_t, std::size_t)> && capture_fn) {
-
-    for (std::size_t i = 0, column_index = 0;
-         i < rows() && column_index < columns(); i++, column_index++) {
-        if (_matrix->at(i, column_index).value() == 0) {
-            for (std::size_t j = i; j < rows(); j++) {
-                for (std::size_t h = column_index; h < columns(); h++) {
-                    if (_matrix->at(i, h).value() == 0 && _matrix->at(j, h).value() != 0) {
-                        _matrix->swap_rows(i, j);
-                        capture_fn(i, j);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-// https://www.math-cs.gordon.edu/courses/ma342/handouts/gauss.pdf
-void Matrix::gem_row_elim(
-    std::function<void(std::size_t, std::size_t)> && capture_fn) {
-
-    for (std::size_t i = 0; i < rows() - 1; i++) {
-        for (std::size_t j = i + 1; j < rows(); j++) {
-            capture_fn(i, j);
-            Rational multiplier = _matrix->at(j, i).value();
-            for (std::size_t k = i; k < columns(); k++) {
-                _matrix->modify(
-                    j, k,
-                    (_matrix->at(j, k).value() * _matrix->at(i, i).value() -
-                     (multiplier * _matrix->at(i, k).value())));
-            }
-        }
-    }
+void Matrix::gem() {
+    gem_swap_rows();
+    gem_row_elim();
 }
