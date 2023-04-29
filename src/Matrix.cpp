@@ -71,9 +71,27 @@ IteratorWrapper Matrix::begin() const { return _matrix->begin(); }
 
 IteratorWrapper Matrix::end() const { return _matrix->end(); }
 
-void Matrix::transpose() {}
+void Matrix::transpose() {
+    Matrix transposed(columns(), rows());
+    for (const auto & [row, col, val] : *this){
+        transposed._matrix->modify(col, row, val);
+    }
+    _matrix = std::move(transposed._matrix);
+}
 
-void Matrix::unite(const Matrix &) {}
+void Matrix::unite(const Matrix & other) {
+    if (columns() != other.columns()){
+        throw std::invalid_argument("Unite: matrix dimension mismatch");
+    }
+    Matrix united(rows() + other.rows(), columns());
+    for (const auto & [row, col, val] : *this){
+        united._matrix->modify(row, col, val);
+    }
+    for (const auto & [row, col, val] : other){
+        united._matrix->modify(row + rows(), col, val);
+    }
+    _matrix = std::move(united._matrix);
+}
 
 void Matrix::cut(std::size_t) {}
 
