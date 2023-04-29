@@ -31,32 +31,53 @@ Matrix & Matrix::operator=(Matrix && src) noexcept {
 }
 
 Matrix Matrix::operator+(const Matrix & other) const {
-    if (rows() != other.rows() || columns() != other.columns()){
-        throw std::invalid_argument("Matrix addition: dimensions are not matching.");
+    if (rows() != other.rows() || columns() != other.columns()) {
+        throw std::invalid_argument(
+            "Matrix addition: dimensions are not matching.");
     }
     Matrix result(*this);
-    for (const auto & element : other){
+    for (const auto & element : other) {
         result._matrix->add(element.row, element.column, element.value);
     }
     return result;
 }
 
 Matrix Matrix::operator-(const Matrix & other) const {
-    if (rows() != other.rows() || columns() != other.columns()){
-        throw std::invalid_argument("Matrix subtraction: dimensions are not matching.");
+    if (rows() != other.rows() || columns() != other.columns()) {
+        throw std::invalid_argument(
+            "Matrix subtraction: dimensions are not matching.");
     }
     Matrix result(*this);
-    for (const auto & element : other){
+    for (const auto & element : other) {
         result._matrix->add(element.row, element.column, element.value * -1);
     }
     return result;
 }
 
-Matrix Matrix::operator*(const Matrix &) const { return Matrix(0, 0); }
+Matrix Matrix::operator*(const Matrix & other) const {
+    if (columns() != other.rows()) {
+        throw std::invalid_argument(
+            "Matrix multiplication: invalid matrix dimensions.");
+    }
+    Matrix result(rows(), other.columns());
+
+    for (std::size_t i = 0; i < result.rows(); i++) {
+        for (std::size_t j = 0; j < result.columns(); j++) {
+            Rational result_element = 0;
+            for (std::size_t k = 0; k < columns(); k++) {
+                result_element +=
+                    _matrix->at(i, k).value() * other._matrix->at(k, j).value();
+            }
+            result._matrix->modify(i, j, result_element);
+        }
+    }
+
+    return result;
+}
 
 Matrix operator*(const Rational & scalar, const Matrix & mx) {
     Matrix result(mx);
-    for (const auto & element : mx){
+    for (const auto & element : mx) {
         Rational new_value = element.value * scalar;
         result._matrix->modify(element.row, element.column, new_value);
     }
@@ -73,21 +94,21 @@ IteratorWrapper Matrix::end() const { return _matrix->end(); }
 
 void Matrix::transpose() {
     Matrix transposed(columns(), rows());
-    for (const auto & [row, col, val] : *this){
+    for (const auto & [row, col, val] : *this) {
         transposed._matrix->modify(col, row, val);
     }
     _matrix = std::move(transposed._matrix);
 }
 
 void Matrix::unite(const Matrix & other) {
-    if (columns() != other.columns()){
+    if (columns() != other.columns()) {
         throw std::invalid_argument("Unite: matrix dimension mismatch");
     }
     Matrix united(rows() + other.rows(), columns());
-    for (const auto & [row, col, val] : *this){
+    for (const auto & [row, col, val] : *this) {
         united._matrix->modify(row, col, val);
     }
-    for (const auto & [row, col, val] : other){
+    for (const auto & [row, col, val] : other) {
         united._matrix->modify(row + rows(), col, val);
     }
     _matrix = std::move(united._matrix);
