@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 #include <iostream>
+#include <functional>s
 
 class Matrix {
   public:
@@ -42,6 +43,9 @@ class Matrix {
     std::unique_ptr<MatrixMemoryRepr> _matrix;
     std::optional<Rational> _det;
     std::optional<Rational> _rank;
+
+    void gem_swap_rows(std::function<void(std::size_t, std::size_t)> &&);
+    void gem_row_elim(std::function<void(std::size_t, std::size_t)> &&);
 
     static Rational value_ratio;
 };
