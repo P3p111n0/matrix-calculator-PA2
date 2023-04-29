@@ -6,7 +6,7 @@
 #include <memory>
 #include <optional>
 #include <iostream>
-#include <functional>s
+#include <functional>
 
 class Matrix {
   public:
@@ -33,8 +33,10 @@ class Matrix {
     void unite(const Matrix &);
     void cut(std::size_t);
     void inverse();
+    std::optional<Rational> det();
     std::optional<Rational> det() const;
-    std::optional<std::size_t> rank() const;
+    std::size_t rank();
+    std::size_t rank() const;
     void gem();
 
     friend std::ostream & operator<<(std::ostream &, const Matrix &);
@@ -42,10 +44,13 @@ class Matrix {
   private:
     std::unique_ptr<MatrixMemoryRepr> _matrix;
     std::optional<Rational> _det;
-    std::optional<Rational> _rank;
+    std::optional<std::size_t> _rank;
 
     void gem_swap_rows(std::function<void(std::size_t, std::size_t)> &&);
     void gem_row_elim(std::function<void(std::size_t, std::size_t)> &&);
+
+    std::optional<Rational> calc_det() const;
+    std::size_t calc_rank() const;
 
     static Rational value_ratio;
 };

@@ -157,9 +157,41 @@ void Matrix::cut(std::size_t) {}
 
 void Matrix::inverse() {}
 
-std::optional<Rational> Matrix::det() const { return std::nullopt; }
+std::optional<Rational> Matrix::det() {
+    if (rows() != columns()){
+        return std::nullopt;
+    }
+    if (_det.has_value()){
+        return _det;
+    }
+    _det = calc_det();
+    return _det;
+}
 
-std::optional<std::size_t> Matrix::rank() const { return std::nullopt; }
+std::optional<Rational> Matrix::det() const {
+    if (rows() != columns()){
+        return std::nullopt;
+    }
+    if (_det.has_value()){
+        return _det;
+    }
+    return calc_det();
+}
+
+std::size_t Matrix::rank() {
+    if (_rank.has_value()){
+        return _rank.value();
+    }
+    _rank = calc_rank();
+    return _rank.value();
+}
+
+std::size_t Matrix::rank() const {
+    if (_rank.has_value()){
+        return _rank.value();
+    }
+    return calc_rank();
+}
 
 std::ostream & operator<<(std::ostream & os, const Matrix & mx) {
     os << *(mx._matrix);
@@ -169,4 +201,45 @@ std::ostream & operator<<(std::ostream & os, const Matrix & mx) {
 void Matrix::gem() {
     gem_swap_rows();
     gem_row_elim();
+}
+
+std::optional<Rational> Matrix::calc_det() const {
+    Matrix copied_matrix(*this);
+
+    std::vector<Rational> division_vec;
+    copied_matrix.gem_swap_rows([&](std::size_t, std::size_t) {
+        division_vec.emplace_back(-1);
+    });
+
+    copied_matrix.gem_row_elim([&](std::size_t i, std::size_t) {
+        division_vec.emplace_back(copied_matrix._matrix->at(i, i).value());
+    });
+
+    Rational det = 1;
+    for (std::size_t i = 0; i < rows(); i++) {
+        det *= copied_matrix._matrix->at(i, i).value();
+    }
+
+    for (const auto & i : division_vec) {
+        det /= i;
+    }
+
+    return det;
+}
+
+std::size_t Matrix::calc_rank() const {
+    Matrix copied_matrix(*this);
+    copied_matrix.gem();
+
+    std::size_t rank = 0;
+    for (std::size_t i = 0; i < rows(); i++) {
+        for (std::size_t j = 0; j < columns(); j++) {
+            if (copied_matrix._matrix->at(i, j).value() != 0) {
+                rank++;
+                break;
+            }
+        }
+    }
+
+    return rank;
 }
