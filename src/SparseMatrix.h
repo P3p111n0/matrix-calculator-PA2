@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MatrixMemoryRepr.h"
+#include "MatrixElement.h"
 #include "Rational.h"
 #include <functional>
 #include <initializer_list>
@@ -25,10 +26,5 @@ class SparseMatrix : public MatrixMemoryRepr {
     void print(std::ostream &) const override;
 
   private:
-    struct Position {
-        std::size_t row;
-        std::size_t col;
-        inline bool operator<(const Position &) const;
-    };
      std::map<Position, Rational> _data;
 };

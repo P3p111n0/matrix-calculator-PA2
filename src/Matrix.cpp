@@ -78,8 +78,8 @@ Matrix Matrix::operator+(const Matrix & other) const {
             "Matrix addition: dimensions are not matching.");
     }
     Matrix result(*this);
-    for (const auto & element : other) {
-        result._matrix->add(element.row, element.column, element.value);
+    for (const auto & [pos, val] : other) {
+        result._matrix->add(pos.row, pos.column, val);
     }
     return result;
 }
@@ -90,8 +90,8 @@ Matrix Matrix::operator-(const Matrix & other) const {
             "Matrix subtraction: dimensions are not matching.");
     }
     Matrix result(*this);
-    for (const auto & element : other) {
-        result._matrix->add(element.row, element.column, element.value * -1);
+    for (const auto & [pos, val] : other) {
+        result._matrix->add(pos.row, pos.column, val * -1);
     }
     return result;
 }
@@ -119,9 +119,9 @@ Matrix Matrix::operator*(const Matrix & other) const {
 
 Matrix operator*(const Rational & scalar, const Matrix & mx) {
     Matrix result(mx);
-    for (const auto & element : mx) {
-        Rational new_value = element.value * scalar;
-        result._matrix->modify(element.row, element.column, new_value);
+    for (const auto & [pos, val] : mx) {
+        Rational new_value = val * scalar;
+        result._matrix->modify(pos.row, pos.column, new_value);
     }
     return result;
 }
@@ -136,8 +136,8 @@ IteratorWrapper Matrix::end() const { return _matrix->end(); }
 
 void Matrix::transpose() {
     Matrix transposed(columns(), rows());
-    for (const auto & [row, col, val] : *this) {
-        transposed._matrix->modify(col, row, val);
+    for (const auto & [pos, val] : *this) {
+        transposed._matrix->modify(pos.column, pos.row, val);
     }
     _matrix = std::move(transposed._matrix);
 }
@@ -147,11 +147,11 @@ void Matrix::unite(const Matrix & other) {
         throw std::invalid_argument("Unite: matrix dimension mismatch");
     }
     Matrix united(rows() + other.rows(), columns());
-    for (const auto & [row, col, val] : *this) {
-        united._matrix->modify(row, col, val);
+    for (const auto & [pos, val] : *this) {
+        united._matrix->modify(pos.row, pos.column, val);
     }
-    for (const auto & [row, col, val] : other) {
-        united._matrix->modify(row + rows(), col, val);
+    for (const auto & [pos, val] : other) {
+        united._matrix->modify(pos.row + rows(), pos.column, val);
     }
     _matrix = std::move(united._matrix);
 }

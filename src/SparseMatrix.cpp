@@ -4,7 +4,7 @@
 
 class SparseMatrixIterator : public AbstractMatrixIterator {
     using MapIterator =
-        std::map<SparseMatrix::Position, Rational>::const_iterator;
+        std::map<Position, Rational>::const_iterator;
 
   public:
     SparseMatrixIterator(const SparseMatrix * ptr,
@@ -13,7 +13,7 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
               ptr,
               map_iterator == ptr->_data.end() ? ptr->_rows
                                                : map_iterator->first.row,
-              map_iterator == ptr->_data.end() ? 0 : map_iterator->first.col),
+              map_iterator == ptr->_data.end() ? 0 : map_iterator->first.column),
           _it(map_iterator), _end(ptr->_data.end()) {}
     void operator++() override {
         ++_it;
@@ -24,11 +24,11 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
         }
         const auto & pos = _it->first;
         _row = pos.row;
-        _column = pos.col;
+        _column = pos.column;
     }
     MatrixElement operator*() const override {
         auto & [pos, value] = *_it;
-        return {pos.row, pos.col, value};
+        return {pos.row, pos.column, value};
     }
     std::size_t operator-(const AbstractMatrixIterator & other) const override {
         SparseMatrixIterator it_copy(*this);
@@ -44,11 +44,6 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
     MapIterator _it;
     MapIterator _end;
 };
-
-bool SparseMatrix::Position::operator<(
-    const SparseMatrix::Position & rhs) const {
-    return row == rhs.row ? col < rhs.col : row < rhs.row;
-}
 
 SparseMatrix::SparseMatrix(std::size_t r, std::size_t c)
     : MatrixMemoryRepr(r, c) {}
@@ -115,13 +110,13 @@ void SparseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
     }
     for (const auto & [key, value] : _data) {
         if (key.row == f_row || key.row == s_row) {
-            swap_elements.emplace_back(key.row, key.col, value);
+            swap_elements.emplace_back(key.row, key.column, value);
         }
     }
-    for (const auto & element : swap_elements) {
-        Position new_pos = {element.row == f_row ? s_row : f_row,
-                            element.column};
-        _data[new_pos] = element.value;
+    for (const auto & [pos, val] : swap_elements) {
+        Position new_pos = {pos.row == f_row ? s_row : f_row,
+                            pos.column};
+        _data[new_pos] = val;
     }
 }
 
