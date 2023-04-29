@@ -2,6 +2,7 @@
 
 #include "MatrixElement.h"
 
+// todo: fix forward declaration
 class MatrixMemoryRepr;
 
 class AbstractMatrixIterator {

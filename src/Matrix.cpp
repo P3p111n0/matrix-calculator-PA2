@@ -226,12 +226,13 @@ void Matrix::inverse() {
                 }
             }
         }
-        // step 5
+        // step 5 / 8
         for (std::size_t pivot_row = 0; pivot_row < dim; pivot_row++) {
             _matrix->modify(pivot_loc, pivot_row,
                             _matrix->at(pivot_loc, pivot_row).value() / pivot);
         }
-        _matrix->modify(pivot_loc, pivot_loc, Rational(1) / pivot); // step 8
+        _matrix->modify(pivot_loc, pivot_loc,
+                        Rational(1) / pivot); // step 8 / 9
     }
 
     for (const auto & [first_row, second_row] : row_swap_vec) {
