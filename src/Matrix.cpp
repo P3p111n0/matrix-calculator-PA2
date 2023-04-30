@@ -172,7 +172,7 @@ void Matrix::unite(const Matrix & other) {
     _matrix = std::move(united._matrix);
 }
 
-void Matrix::cut(std::size_t) {}
+void Matrix::cut(std::size_t, std::size_t, std::size_t, std::size_t) {}
 
 void Matrix::inverse() {
     if (rows() != columns()) {
