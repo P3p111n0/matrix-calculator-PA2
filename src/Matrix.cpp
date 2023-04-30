@@ -326,6 +326,9 @@ std::optional<double> Matrix::calc_det() const {
     }
 
     for (const auto & i : division_vec) {
+        if (i == 0){
+            return 0;
+        }
         det /= i;
     }
 
