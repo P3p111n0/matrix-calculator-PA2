@@ -28,7 +28,7 @@ void Matrix::gem_swap_rows(std::function<void(std::size_t, std::size_t)> &&
 void Matrix::gem_row_elim(std::function<void(std::size_t, std::size_t)> &&
                               capture_fn = default_capture) {
 
-    for (std::size_t i = 0; i < rows() - 1; i++) {
+    for (std::size_t i = 0; i < columns(); i++) {
         for (std::size_t j = i + 1; j < rows(); j++) {
             capture_fn(i, j);
             double multiplier = _matrix->at(j, i).value();
