@@ -72,7 +72,7 @@ SparseMatrix::SparseMatrix(
 SparseMatrix::SparseMatrix(IteratorWrapper begin, IteratorWrapper end)
     : MatrixMemoryRepr(begin.get_matrix_rows(), begin.get_matrix_columns()) {
 
-    for (; begin != end; ++begin){
+    for (; begin != end; ++begin) {
         const auto & [pos, val] = *begin;
         _data[pos] = val;
     }
@@ -148,4 +148,8 @@ IteratorWrapper SparseMatrix::begin() const {
 
 IteratorWrapper SparseMatrix::end() const {
     return {new SparseMatrixIterator(this, _data.end())};
+}
+bool SparseMatrix::is_efficient(double ratio) const {
+    return _data.size() <=
+           (1 - ratio) * (_dimensions.rows() * _dimensions.columns());
 }

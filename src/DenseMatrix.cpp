@@ -70,13 +70,14 @@ DenseMatrix::DenseMatrix(
 }
 
 DenseMatrix::DenseMatrix(IteratorWrapper begin, IteratorWrapper end)
-    : MatrixMemoryRepr(begin.get_matrix_rows(), begin.get_matrix_columns()), _data(_dimensions.rows()) {
+    : MatrixMemoryRepr(begin.get_matrix_rows(), begin.get_matrix_columns()),
+      _data(_dimensions.rows()) {
 
-    for (auto & column : _data){
+    for (auto & column : _data) {
         column.resize(_dimensions.columns());
     }
 
-    for (; begin != end; ++begin){
+    for (; begin != end; ++begin) {
         const auto & [pos, val] = *begin;
         _data[pos.row][pos.column] = val;
     }
@@ -134,4 +135,8 @@ IteratorWrapper DenseMatrix::begin() const {
 
 IteratorWrapper DenseMatrix::end() const {
     return {new DenseMatrixIterator(this, _dimensions.rows(), 0)};
+}
+bool DenseMatrix::is_efficient(double ratio) const {
+    return begin().distance(end()) >
+           (1 - ratio) * (_dimensions.rows() * _dimensions.columns());
 }

@@ -20,6 +20,7 @@ class MatrixMemoryRepr {
     virtual void add(std::size_t, std::size_t, double) = 0;
     virtual void modify(std::size_t, std::size_t, double) = 0;
     virtual void swap_rows(std::size_t, std::size_t) = 0;
+    virtual bool is_efficient(double) const;
 
     virtual IteratorWrapper begin() const = 0;
     virtual IteratorWrapper end() const = 0;

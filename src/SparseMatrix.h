@@ -18,7 +18,7 @@ class SparseMatrix : public MatrixMemoryRepr {
     void add(std::size_t, std::size_t, double) override;
     void modify(std::size_t, std::size_t, double) override;
     void swap_rows(std::size_t, std::size_t) override;
-
+    bool is_efficient(double) const override;
     IteratorWrapper begin() const override;
     IteratorWrapper end() const override;
 
