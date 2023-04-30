@@ -1,7 +1,6 @@
 #pragma once
 
 #include "MatrixMemoryRepr.h"
-#include "Rational.h"
 #include <vector>
 
 class DenseMatrix : public MatrixMemoryRepr {
@@ -9,12 +8,12 @@ class DenseMatrix : public MatrixMemoryRepr {
 
   public:
     DenseMatrix(std::size_t, std::size_t);
-    DenseMatrix(std::initializer_list<std::initializer_list<Rational>>);
+    DenseMatrix(std::initializer_list<std::initializer_list<double>>);
 
     MatrixMemoryRepr * clone() const override;
-    std::optional<Rational> at(std::size_t, std::size_t) const override;
-    void add(std::size_t, std::size_t, const Rational &) override;
-    void modify(std::size_t, std::size_t, const Rational &) override;
+    std::optional<double> at(std::size_t, std::size_t) const override;
+    void add(std::size_t, std::size_t, double) override;
+    void modify(std::size_t, std::size_t, double) override;
     void swap_rows(std::size_t, std::size_t) override;
 
     IteratorWrapper begin() const override;
@@ -24,5 +23,5 @@ class DenseMatrix : public MatrixMemoryRepr {
     void print(std::ostream &) const override;
 
   private:
-    std::vector<std::vector<Rational>> _data;
+    std::vector<std::vector<double>> _data;
 };

@@ -31,7 +31,7 @@ void Matrix::gem_row_elim(std::function<void(std::size_t, std::size_t)> &&
     for (std::size_t i = 0; i < rows() - 1; i++) {
         for (std::size_t j = i + 1; j < rows(); j++) {
             capture_fn(i, j);
-            Rational multiplier = _matrix->at(j, i).value();
+            double multiplier = _matrix->at(j, i).value();
             for (std::size_t k = i; k < columns(); k++) {
                 _matrix->modify(
                     j, k,
@@ -42,11 +42,11 @@ void Matrix::gem_row_elim(std::function<void(std::size_t, std::size_t)> &&
     }
 }
 
-Rational Matrix::value_ratio = Rational(2, 3);
+double Matrix::value_ratio = 2/3.0;
 
 Matrix::Matrix(std::size_t, std::size_t) {}
 
-Matrix::Matrix(std::initializer_list<std::initializer_list<Rational>>) {}
+Matrix::Matrix(std::initializer_list<std::initializer_list<double>>) {}
 
 Matrix::Matrix(const Matrix & src)
     : _matrix(src._matrix->clone()), _det(src._det), _rank(src._rank) {}
@@ -105,7 +105,7 @@ Matrix Matrix::operator*(const Matrix & other) const {
 
     for (std::size_t i = 0; i < result.rows(); i++) {
         for (std::size_t j = 0; j < result.columns(); j++) {
-            Rational result_element = 0;
+            double result_element = 0;
             for (std::size_t k = 0; k < columns(); k++) {
                 result_element +=
                     _matrix->at(i, k).value() * other._matrix->at(k, j).value();
@@ -117,10 +117,10 @@ Matrix Matrix::operator*(const Matrix & other) const {
     return result;
 }
 
-Matrix operator*(const Rational & scalar, const Matrix & mx) {
+Matrix operator*(double scalar, const Matrix & mx) {
     Matrix result(mx);
     for (const auto & [pos, val] : mx) {
-        Rational new_value = val * scalar;
+        double new_value = val * scalar;
         result._matrix->modify(pos.row, pos.column, new_value);
     }
     return result;
@@ -168,7 +168,7 @@ void Matrix::inverse() {
 
     std::queue<std::size_t> index_queue;
     std::set<std::size_t> visited_indexes;
-    Rational determinant = 1;
+    double determinant = 1;
     std::size_t dim = rows();
     bool is_transposed = false;
 
@@ -197,7 +197,7 @@ void Matrix::inverse() {
 
     for (std::size_t pivot_loc = index_queue.front(); !index_queue.empty();
          index_queue.pop(), pivot_loc = index_queue.front()) {
-        Rational pivot = _matrix->at(pivot_loc, pivot_loc).value();
+        double pivot = _matrix->at(pivot_loc, pivot_loc).value();
         determinant *= pivot; // step 3
         if (pivot == 0) {
             if (!visited_indexes.count(pivot_loc)) {
@@ -212,7 +212,7 @@ void Matrix::inverse() {
         for (std::size_t pivot_column = 0; pivot_column < dim; pivot_column++) {
             _matrix->modify(pivot_column, pivot_loc,
                             _matrix->at(pivot_column, pivot_loc).value() /
-                                (Rational(-1) * pivot));
+                                (-pivot));
         }
         // step 7
         for (std::size_t j = 0; j < dim; j++) {
@@ -232,7 +232,7 @@ void Matrix::inverse() {
                             _matrix->at(pivot_loc, pivot_row).value() / pivot);
         }
         _matrix->modify(pivot_loc, pivot_loc,
-                        Rational(1) / pivot); // step 8 / 9
+                        1 / pivot); // step 8 / 9
     }
 
     for (const auto & [first_row, second_row] : row_swap_vec) {
@@ -245,7 +245,7 @@ void Matrix::inverse() {
     }
 }
 
-std::optional<Rational> Matrix::det() {
+std::optional<double> Matrix::det() {
     if (rows() != columns()) {
         return std::nullopt;
     }
@@ -256,7 +256,7 @@ std::optional<Rational> Matrix::det() {
     return _det;
 }
 
-std::optional<Rational> Matrix::det() const {
+std::optional<double> Matrix::det() const {
     if (rows() != columns()) {
         return std::nullopt;
     }
@@ -291,10 +291,10 @@ void Matrix::gem() {
     gem_row_elim();
 }
 
-std::optional<Rational> Matrix::calc_det() const {
+std::optional<double> Matrix::calc_det() const {
     Matrix copied_matrix(*this);
 
-    std::vector<Rational> division_vec;
+    std::vector<double> division_vec;
     copied_matrix.gem_swap_rows(
         [&](std::size_t, std::size_t) { division_vec.emplace_back(-1); });
 
@@ -302,7 +302,7 @@ std::optional<Rational> Matrix::calc_det() const {
         division_vec.emplace_back(copied_matrix._matrix->at(i, i).value());
     });
 
-    Rational det = 1;
+    double det = 1;
     for (std::size_t i = 0; i < rows(); i++) {
         det *= copied_matrix._matrix->at(i, i).value();
     }

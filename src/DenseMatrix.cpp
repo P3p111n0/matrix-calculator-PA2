@@ -1,7 +1,7 @@
 #include "DenseMatrix.h"
 
 class DenseMatrixIterator : public AbstractMatrixIterator {
-    using DenseMatrixContainer = std::vector<std::vector<Rational>>;
+    using DenseMatrixContainer = std::vector<std::vector<double>>;
 
   public:
     DenseMatrixIterator(const DenseMatrix * ptr, std::size_t row,
@@ -48,7 +48,7 @@ DenseMatrix::DenseMatrix(std::size_t row, std::size_t col)
 }
 
 DenseMatrix::DenseMatrix(
-    std::initializer_list<std::initializer_list<Rational>> init)
+    std::initializer_list<std::initializer_list<double>> init)
     : MatrixMemoryRepr(init.size(), init.size() ? init.begin()->size() : 0),
       _data(init.size()) {
 
@@ -70,7 +70,7 @@ DenseMatrix::DenseMatrix(
 
 MatrixMemoryRepr * DenseMatrix::clone() const { return new DenseMatrix(*this); }
 
-std::optional<Rational> DenseMatrix::at(std::size_t row,
+std::optional<double> DenseMatrix::at(std::size_t row,
                                         std::size_t column) const {
     if (row >= _rows || column >= _columns) {
         return std::nullopt;
@@ -79,7 +79,7 @@ std::optional<Rational> DenseMatrix::at(std::size_t row,
 }
 
 void DenseMatrix::add(std::size_t row, std::size_t column,
-                      const Rational & val) {
+                      double val) {
     if (row >= _rows || column >= _columns) {
         throw std::out_of_range("Add: index of out bounds");
     }
@@ -87,7 +87,7 @@ void DenseMatrix::add(std::size_t row, std::size_t column,
 }
 
 void DenseMatrix::modify(std::size_t row, std::size_t column,
-                         const Rational & new_val) {
+                         double new_val) {
     if (row >= _rows || column >= _columns) {
         throw std::out_of_range("Modify: index out of bounds");
     }

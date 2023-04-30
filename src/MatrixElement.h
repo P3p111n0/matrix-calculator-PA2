@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Rational.h"
+#include <cstdlib>
 
 struct Position {
     Position() = delete;
@@ -14,8 +14,8 @@ struct Position {
 
 struct MatrixElement {
     MatrixElement() = delete;
-    MatrixElement(std::size_t r, std::size_t col, const Rational & val)
+    MatrixElement(std::size_t r, std::size_t col, const double & val)
         : position(r, col), value(val) {}
     Position position;
-    Rational value;
+    double value;
 };

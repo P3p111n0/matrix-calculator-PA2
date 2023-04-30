@@ -1,7 +1,6 @@
 #pragma once
 
 #include "MatrixMemoryRepr.h"
-#include "Rational.h"
 #include <initializer_list>
 #include <memory>
 #include <optional>
@@ -11,7 +10,7 @@
 class Matrix {
   public:
     Matrix(std::size_t, std::size_t);
-    Matrix(std::initializer_list<std::initializer_list<Rational>>);
+    Matrix(std::initializer_list<std::initializer_list<double>>);
     Matrix(const Matrix &);
     Matrix(Matrix &&) noexcept;
 
@@ -21,7 +20,7 @@ class Matrix {
     Matrix operator+(const Matrix &) const;
     Matrix operator-(const Matrix &) const;
     Matrix operator*(const Matrix &) const;
-    friend Matrix operator*(const Rational &, const Matrix &);
+    friend Matrix operator*(double, const Matrix &);
 
     IteratorWrapper begin() const;
     IteratorWrapper end() const;
@@ -33,8 +32,8 @@ class Matrix {
     void unite(const Matrix &);
     void cut(std::size_t);
     void inverse();
-    std::optional<Rational> det();
-    std::optional<Rational> det() const;
+    std::optional<double> det();
+    std::optional<double> det() const;
     std::size_t rank();
     std::size_t rank() const;
     void gem();
@@ -43,14 +42,14 @@ class Matrix {
 
   private:
     std::unique_ptr<MatrixMemoryRepr> _matrix;
-    std::optional<Rational> _det;
+    std::optional<double> _det;
     std::optional<std::size_t> _rank;
 
     void gem_swap_rows(std::function<void(std::size_t, std::size_t)> &&);
     void gem_row_elim(std::function<void(std::size_t, std::size_t)> &&);
 
-    std::optional<Rational> calc_det() const;
+    std::optional<double> calc_det() const;
     std::size_t calc_rank() const;
 
-    static Rational value_ratio;
+    static double value_ratio;
 };

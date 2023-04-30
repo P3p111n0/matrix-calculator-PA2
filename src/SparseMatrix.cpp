@@ -1,10 +1,9 @@
 #include "SparseMatrix.h"
 #include "MatrixElement.h"
-#include "Rational.h"
 
 class SparseMatrixIterator : public AbstractMatrixIterator {
     using MapIterator =
-        std::map<Position, Rational>::const_iterator;
+        std::map<Position, double>::const_iterator;
 
   public:
     SparseMatrixIterator(const SparseMatrix * ptr,
@@ -49,7 +48,7 @@ SparseMatrix::SparseMatrix(std::size_t r, std::size_t c)
     : MatrixMemoryRepr(r, c) {}
 
 SparseMatrix::SparseMatrix(
-    std::initializer_list<std::initializer_list<Rational>> init_list)
+    std::initializer_list<std::initializer_list<double>> init_list)
     : MatrixMemoryRepr(init_list.size(),
                        init_list.size() ? init_list.begin()->size() : 0) {
 
@@ -74,7 +73,7 @@ MatrixMemoryRepr * SparseMatrix::clone() const {
     return new SparseMatrix(*this);
 }
 
-std::optional<Rational> SparseMatrix::at(std::size_t row,
+std::optional<double> SparseMatrix::at(std::size_t row,
                                          std::size_t column) const {
     if (row >= _rows || column >= _columns) {
         return std::nullopt;
@@ -86,7 +85,7 @@ std::optional<Rational> SparseMatrix::at(std::size_t row,
 }
 
 void SparseMatrix::add(std::size_t row, std::size_t column,
-                       const Rational & val) {
+                       double val) {
     if (row >= _rows || column >= _columns) {
         throw std::out_of_range("Add: index out of bounds");
     }
@@ -94,7 +93,7 @@ void SparseMatrix::add(std::size_t row, std::size_t column,
 }
 
 void SparseMatrix::modify(std::size_t row, std::size_t column,
-                          const Rational & new_val) {
+                          double new_val) {
     if (row >= _rows || column >= _columns) {
         throw std::out_of_range("Modify: index out of bounds");
     }
@@ -125,11 +124,11 @@ void SparseMatrix::print(std::ostream & os) const {
         os << "[ ";
         for (std::size_t j = 0; j < _columns - 1; j++) {
             auto elem = _data.find({i, j});
-            Rational val = elem == _data.end() ? 0 : elem->second;
+            double val = elem == _data.end() ? 0 : elem->second;
             os << val << ", ";
         }
         auto last_elem = _data.find({i, _columns - 1});
-        Rational last_val = last_elem == _data.end() ? 0 : last_elem->second;
+        double last_val = last_elem == _data.end() ? 0 : last_elem->second;
         os << last_val << " ]";
         if (i != _rows - 1) {
             os << std::endl;
