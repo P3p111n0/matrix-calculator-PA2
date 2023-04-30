@@ -18,7 +18,7 @@ class DenseMatrixIterator : public AbstractMatrixIterator {
     MatrixElement operator*() const override {
         return {_row, _column, _data[_row][_column]};
     }
-    std::size_t operator-(const AbstractMatrixIterator & other) const override {
+    std::size_t distance(const AbstractMatrixIterator & other) const override {
         DenseMatrixIterator it_copy(*this);
         std::size_t result = 0;
         while (it_copy != other && _row < _matrix_rows) {

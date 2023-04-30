@@ -7,8 +7,8 @@ void IteratorWrapper::operator++() { ++(*_iterator); }
 
 MatrixElement IteratorWrapper::operator*() const { return **_iterator; }
 
-std::size_t IteratorWrapper::operator-(const IteratorWrapper & other) const {
-    return *_iterator - *(other._iterator);
+std::size_t IteratorWrapper::distance(const IteratorWrapper & other) const {
+    return _iterator->distance(*other._iterator);
 }
 
 bool IteratorWrapper::operator==(const IteratorWrapper & other) const {

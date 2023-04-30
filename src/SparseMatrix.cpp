@@ -29,7 +29,7 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
         auto & [pos, value] = *_it;
         return {pos.row, pos.column, value};
     }
-    std::size_t operator-(const AbstractMatrixIterator & other) const override {
+    std::size_t distance(const AbstractMatrixIterator & other) const override {
         SparseMatrixIterator it_copy(*this);
         std::size_t result = 0;
         while (it_copy != other && _row < _ptr->rows()) {

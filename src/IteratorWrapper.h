@@ -8,7 +8,7 @@ class IteratorWrapper {
     IteratorWrapper(AbstractMatrixIterator *);
     void operator++();
     MatrixElement operator*() const;
-    std::size_t operator-(const IteratorWrapper &) const;
+    std::size_t distance(const IteratorWrapper &) const;
     bool operator==(const IteratorWrapper &) const;
     bool operator!=(const IteratorWrapper &) const;
 

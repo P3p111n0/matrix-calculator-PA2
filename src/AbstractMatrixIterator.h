@@ -11,7 +11,7 @@ class AbstractMatrixIterator {
     virtual MatrixElement operator*() const = 0;
     bool operator==(const AbstractMatrixIterator &) const;
     bool operator!=(const AbstractMatrixIterator &) const;
-    virtual std::size_t operator-(const AbstractMatrixIterator &) const = 0;
+    virtual std::size_t distance(const AbstractMatrixIterator &) const = 0;
 
     std::size_t get_matrix_rows() const;
     std::size_t get_matrix_columns() const;
