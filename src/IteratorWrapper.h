@@ -11,6 +11,10 @@ class IteratorWrapper {
     std::size_t operator-(const IteratorWrapper &) const;
     bool operator==(const IteratorWrapper &) const;
     bool operator!=(const IteratorWrapper &) const;
+
+    std::size_t get_matrix_rows() const;
+    std::size_t get_matrix_columns() const;
+
   private:
     std::unique_ptr<AbstractMatrixIterator> _iterator;
 };

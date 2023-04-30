@@ -1,7 +1,7 @@
 #pragma once
 
-#include "MatrixElement.h"
 #include "MatrixDimensions.h"
+#include "MatrixElement.h"
 
 class AbstractMatrixIterator {
   public:
@@ -12,6 +12,10 @@ class AbstractMatrixIterator {
     bool operator==(const AbstractMatrixIterator &) const;
     bool operator!=(const AbstractMatrixIterator &) const;
     virtual std::size_t operator-(const AbstractMatrixIterator &) const = 0;
+
+    std::size_t get_matrix_rows() const;
+    std::size_t get_matrix_columns() const;
+
   protected:
     const MatrixDimensions * _ptr;
     std::size_t _row;
