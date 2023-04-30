@@ -42,11 +42,23 @@ void Matrix::gem_row_elim(std::function<void(std::size_t, std::size_t)> &&
     }
 }
 
-double Matrix::value_ratio = 2/3.0;
+void Matrix::optimize() {
+    auto new_ptr = _factory.convert(_matrix.get());
+    if (new_ptr == _matrix.get()){
+        return;
+    }
+    _matrix.reset(new_ptr);
+}
 
-Matrix::Matrix(std::size_t, std::size_t) {}
+Matrix::Matrix(std::size_t rows, std::size_t columns) {
+    _matrix = std::unique_ptr<MatrixMemoryRepr>(
+        _factory.get_initial_repr(rows, columns));
+}
 
-Matrix::Matrix(std::initializer_list<std::initializer_list<double>>) {}
+Matrix::Matrix(std::initializer_list<std::initializer_list<double>> init) {
+    _matrix =
+        std::unique_ptr<MatrixMemoryRepr>(_factory.get_initial_repr(init));
+}
 
 Matrix::Matrix(const Matrix & src)
     : _matrix(src._matrix->clone()), _det(src._det), _rank(src._rank) {}
@@ -81,6 +93,7 @@ Matrix Matrix::operator+(const Matrix & other) const {
     for (const auto & [pos, val] : other) {
         result._matrix->add(pos.row, pos.column, val);
     }
+    result.optimize();
     return result;
 }
 
@@ -93,6 +106,7 @@ Matrix Matrix::operator-(const Matrix & other) const {
     for (const auto & [pos, val] : other) {
         result._matrix->add(pos.row, pos.column, val * -1);
     }
+    result.optimize();
     return result;
 }
 
@@ -113,7 +127,7 @@ Matrix Matrix::operator*(const Matrix & other) const {
             result._matrix->modify(i, j, result_element);
         }
     }
-
+    result.optimize();
     return result;
 }
 
@@ -123,6 +137,7 @@ Matrix operator*(double scalar, const Matrix & mx) {
         double new_value = val * scalar;
         result._matrix->modify(pos.row, pos.column, new_value);
     }
+    result.optimize();
     return result;
 }
 
@@ -153,6 +168,7 @@ void Matrix::unite(const Matrix & other) {
     for (const auto & [pos, val] : other) {
         united._matrix->modify(pos.row + rows(), pos.column, val);
     }
+    united.optimize();
     _matrix = std::move(united._matrix);
 }
 
@@ -243,6 +259,7 @@ void Matrix::inverse() {
     if (is_transposed) {
         transpose();
     }
+    optimize();
 }
 
 std::optional<double> Matrix::det() {
@@ -289,6 +306,7 @@ std::ostream & operator<<(std::ostream & os, const Matrix & mx) {
 void Matrix::gem() {
     gem_swap_rows();
     gem_row_elim();
+    optimize();
 }
 
 std::optional<double> Matrix::calc_det() const {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MatrixMemoryRepr.h"
+#include "MatrixFactory.h"
 #include <initializer_list>
 #include <memory>
 #include <optional>
@@ -44,12 +45,12 @@ class Matrix {
     std::unique_ptr<MatrixMemoryRepr> _matrix;
     std::optional<double> _det;
     std::optional<std::size_t> _rank;
+    MatrixFactory _factory;
 
     void gem_swap_rows(std::function<void(std::size_t, std::size_t)> &&);
     void gem_row_elim(std::function<void(std::size_t, std::size_t)> &&);
+    void optimize();
 
     std::optional<double> calc_det() const;
     std::size_t calc_rank() const;
-
-    static double value_ratio;
 };
