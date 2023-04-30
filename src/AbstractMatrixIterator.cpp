@@ -1,6 +1,6 @@
 #include "AbstractMatrixIterator.h"
 
-AbstractMatrixIterator::AbstractMatrixIterator(const MatrixMemoryRepr * ptr,
+AbstractMatrixIterator::AbstractMatrixIterator(const MatrixDimensions * ptr,
                                                std::size_t row,
                                                std::size_t column)
     : _ptr(ptr), _row(row), _column(column) {}

@@ -1,13 +1,11 @@
 #pragma once
 
 #include "MatrixElement.h"
-
-// todo: fix forward declaration
-class MatrixMemoryRepr;
+#include "MatrixDimensions.h"
 
 class AbstractMatrixIterator {
   public:
-    AbstractMatrixIterator(const MatrixMemoryRepr *, std::size_t, std::size_t);
+    AbstractMatrixIterator(const MatrixDimensions *, std::size_t, std::size_t);
     virtual ~AbstractMatrixIterator() = default;
     virtual void operator++() = 0;
     virtual MatrixElement operator*() const = 0;
@@ -15,7 +13,7 @@ class AbstractMatrixIterator {
     bool operator!=(const AbstractMatrixIterator &) const;
     virtual std::size_t operator-(const AbstractMatrixIterator &) const = 0;
   protected:
-    const MatrixMemoryRepr * _ptr;
+    const MatrixDimensions * _ptr;
     std::size_t _row;
     std::size_t _column;
 };

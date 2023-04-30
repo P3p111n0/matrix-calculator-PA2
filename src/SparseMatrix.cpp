@@ -9,8 +9,8 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
     SparseMatrixIterator(const SparseMatrix * ptr,
                          const MapIterator & map_iterator)
         : AbstractMatrixIterator(
-              ptr,
-              map_iterator == ptr->_data.end() ? ptr->_rows
+              &ptr->_dimensions,
+              map_iterator == ptr->_data.end() ? ptr->_dimensions.rows()
                                                : map_iterator->first.row,
               map_iterator == ptr->_data.end() ? 0 : map_iterator->first.column),
           _it(map_iterator), _end(ptr->_data.end()) {}
@@ -61,7 +61,7 @@ SparseMatrix::SparseMatrix(
             }
             ++col;
         }
-        if (col != _columns) {
+        if (col != _dimensions.columns()) {
             throw std::invalid_argument(
                 "Column size mismatch in initializer list.");
         }
@@ -75,7 +75,7 @@ MatrixMemoryRepr * SparseMatrix::clone() const {
 
 std::optional<double> SparseMatrix::at(std::size_t row,
                                          std::size_t column) const {
-    if (row >= _rows || column >= _columns) {
+    if (row >= _dimensions.rows() || column >= _dimensions.columns()) {
         return std::nullopt;
     }
     if (!_data.count({row, column})) {
@@ -86,7 +86,7 @@ std::optional<double> SparseMatrix::at(std::size_t row,
 
 void SparseMatrix::add(std::size_t row, std::size_t column,
                        double val) {
-    if (row >= _rows || column >= _columns) {
+    if (row >= _dimensions.rows() || column >= _dimensions.columns()) {
         throw std::out_of_range("Add: index out of bounds");
     }
     _data[{row, column}] += val;
@@ -94,7 +94,7 @@ void SparseMatrix::add(std::size_t row, std::size_t column,
 
 void SparseMatrix::modify(std::size_t row, std::size_t column,
                           double new_val) {
-    if (row >= _rows || column >= _columns) {
+    if (row >= _dimensions.rows() || column >= _dimensions.columns()) {
         throw std::out_of_range("Modify: index out of bounds");
     }
     if (new_val != 0) {
@@ -104,7 +104,7 @@ void SparseMatrix::modify(std::size_t row, std::size_t column,
 
 void SparseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
     std::vector<MatrixElement> swap_elements;
-    if (f_row >= _rows || s_row >= _rows) {
+    if (f_row >= _dimensions.rows() || s_row >= _dimensions.columns()) {
         throw std::out_of_range("Swap_rows: index out of range");
     }
     for (const auto & [key, value] : _data) {
@@ -120,17 +120,17 @@ void SparseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
 }
 
 void SparseMatrix::print(std::ostream & os) const {
-    for (std::size_t i = 0; i < _rows; i++) {
+    for (std::size_t i = 0; i < _dimensions.rows(); i++) {
         os << "[ ";
-        for (std::size_t j = 0; j < _columns - 1; j++) {
+        for (std::size_t j = 0; j < _dimensions.columns() - 1; j++) {
             auto elem = _data.find({i, j});
             double val = elem == _data.end() ? 0 : elem->second;
             os << val << ", ";
         }
-        auto last_elem = _data.find({i, _columns - 1});
+        auto last_elem = _data.find({i, _dimensions.columns() - 1});
         double last_val = last_elem == _data.end() ? 0 : last_elem->second;
         os << last_val << " ]";
-        if (i != _rows - 1) {
+        if (i != _dimensions.rows() - 1) {
             os << std::endl;
         }
     }

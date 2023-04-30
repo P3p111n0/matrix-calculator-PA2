@@ -4,6 +4,7 @@
 #include <iostream>
 #include <optional>
 #include <vector>
+#include "MatrixDimensions.h"
 #include "IteratorWrapper.h"
 
 class MatrixMemoryRepr {
@@ -24,7 +25,6 @@ class MatrixMemoryRepr {
     virtual IteratorWrapper end() const = 0;
 
   protected:
-    std::size_t _rows;
-    std::size_t _columns;
+    MatrixDimensions _dimensions;
     virtual void print(std::ostream &) const = 0;
 };
