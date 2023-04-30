@@ -44,7 +44,7 @@ void Matrix::gem_row_elim(std::function<void(std::size_t, std::size_t)> &&
 
 void Matrix::optimize() {
     auto new_ptr = _factory.convert(_matrix.get());
-    if (new_ptr == _matrix.get()){
+    if (new_ptr == _matrix.get()) {
         return;
     }
     _matrix.reset(new_ptr);
@@ -172,7 +172,26 @@ void Matrix::unite(const Matrix & other) {
     _matrix = std::move(united._matrix);
 }
 
-void Matrix::cut(std::size_t, std::size_t, std::size_t, std::size_t) {}
+void Matrix::cut(std::size_t new_size_rows, std::size_t new_size_columns,
+                 std::size_t offset_rows, std::size_t offset_columns) {
+    if (!new_size_rows || !new_size_columns) {
+        throw std::invalid_argument("Cut: invalid new dimensions.");
+    }
+    if (new_size_rows + offset_rows > rows() ||
+        new_size_columns + offset_columns > columns()) {
+        throw std::invalid_argument("Cut: invalid new dimensions or offset.");
+    }
+
+    Matrix result(new_size_rows, new_size_columns);
+    for (std::size_t i = 0; i < new_size_rows; i++) {
+        for (std::size_t j = 0; j < new_size_columns; j++) {
+            result._matrix->modify(
+                i, j, _matrix->at(offset_rows + i, offset_columns + j).value());
+        }
+    }
+    _matrix = std::move(result._matrix);
+    optimize();
+}
 
 void Matrix::inverse() {
     if (rows() != columns()) {
@@ -326,7 +345,7 @@ std::optional<double> Matrix::calc_det() const {
     }
 
     for (const auto & i : division_vec) {
-        if (i == 0){
+        if (i == 0) {
             return 0;
         }
         det /= i;
