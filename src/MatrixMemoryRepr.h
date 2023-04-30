@@ -27,7 +27,8 @@ class MatrixMemoryRepr {
     /**
      * @brief Returns a pointer to a dynamically allocated copy of the matrix, on
      *        which this method was called.
-     * @return A raw pointer to the copy.
+     * @return A raw pointer to the copy. It is up to the programmer to free
+     *         this pointer.
      */
     virtual MatrixMemoryRepr * clone() const = 0;
 
