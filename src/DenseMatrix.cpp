@@ -6,8 +6,9 @@ class DenseMatrixIterator : public AbstractMatrixIterator {
   public:
     DenseMatrixIterator(const DenseMatrix * ptr, std::size_t row,
                         std::size_t column)
-        : AbstractMatrixIterator(&ptr->_dimensions, row, column), _data(ptr->_data),
-          _matrix_rows(ptr->_dimensions.rows()), _matrix_columns(ptr->_dimensions.columns()) {}
+        : AbstractMatrixIterator(&ptr->_dimensions, row, column),
+          _data(ptr->_data), _matrix_rows(ptr->_dimensions.rows()),
+          _matrix_columns(ptr->_dimensions.columns()) {}
     void operator++() override {
         next_element();
         while (_row < _matrix_rows && _data[_row][_column] == 0) {
@@ -68,26 +69,37 @@ DenseMatrix::DenseMatrix(
     }
 }
 
+DenseMatrix::DenseMatrix(IteratorWrapper begin, IteratorWrapper end)
+    : MatrixMemoryRepr(begin.get_matrix_rows(), begin.get_matrix_columns()), _data(_dimensions.rows()) {
+
+    for (auto & column : _data){
+        column.resize(_dimensions.columns());
+    }
+
+    for (; begin != end; ++begin){
+        const auto & [pos, val] = *begin;
+        _data[pos.row][pos.column] = val;
+    }
+}
+
 MatrixMemoryRepr * DenseMatrix::clone() const { return new DenseMatrix(*this); }
 
 std::optional<double> DenseMatrix::at(std::size_t row,
-                                        std::size_t column) const {
+                                      std::size_t column) const {
     if (row >= _dimensions.rows() || column >= _dimensions.columns()) {
         return std::nullopt;
     }
     return _data[row][column];
 }
 
-void DenseMatrix::add(std::size_t row, std::size_t column,
-                      double val) {
+void DenseMatrix::add(std::size_t row, std::size_t column, double val) {
     if (row >= _dimensions.rows() || column >= _dimensions.columns()) {
         throw std::out_of_range("Add: index of out bounds");
     }
     _data[row][column] += val;
 }
 
-void DenseMatrix::modify(std::size_t row, std::size_t column,
-                         double new_val) {
+void DenseMatrix::modify(std::size_t row, std::size_t column, double new_val) {
     if (row >= _dimensions.rows() || column >= _dimensions.columns()) {
         throw std::out_of_range("Modify: index out of bounds");
     }
@@ -102,9 +114,11 @@ void DenseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
 }
 
 void DenseMatrix::print(std::ostream & os) const {
-    for (std::size_t row_index = 0; row_index < _dimensions.rows(); row_index++) {
+    for (std::size_t row_index = 0; row_index < _dimensions.rows();
+         row_index++) {
         os << "[ ";
-        for (std::size_t val_index = 0; val_index < _dimensions.columns() - 1; val_index++) {
+        for (std::size_t val_index = 0; val_index < _dimensions.columns() - 1;
+             val_index++) {
             os << _data[row_index][val_index] << ", ";
         }
         os << _data[row_index][_dimensions.columns() - 1] << " ]";

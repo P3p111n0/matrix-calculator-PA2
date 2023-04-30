@@ -2,8 +2,7 @@
 #include "MatrixElement.h"
 
 class SparseMatrixIterator : public AbstractMatrixIterator {
-    using MapIterator =
-        std::map<Position, double>::const_iterator;
+    using MapIterator = std::map<Position, double>::const_iterator;
 
   public:
     SparseMatrixIterator(const SparseMatrix * ptr,
@@ -12,11 +11,12 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
               &ptr->_dimensions,
               map_iterator == ptr->_data.end() ? ptr->_dimensions.rows()
                                                : map_iterator->first.row,
-              map_iterator == ptr->_data.end() ? 0 : map_iterator->first.column),
+              map_iterator == ptr->_data.end() ? 0
+                                               : map_iterator->first.column),
           _it(map_iterator), _end(ptr->_data.end()) {}
     void operator++() override {
         ++_it;
-        if (_it == _end){
+        if (_it == _end) {
             _row = _ptr->rows();
             _column = 0;
             return;
@@ -69,12 +69,21 @@ SparseMatrix::SparseMatrix(
     }
 }
 
+SparseMatrix::SparseMatrix(IteratorWrapper begin, IteratorWrapper end)
+    : MatrixMemoryRepr(begin.get_matrix_rows(), begin.get_matrix_columns()) {
+
+    for (; begin != end; ++begin){
+        const auto & [pos, val] = *begin;
+        _data[pos] = val;
+    }
+}
+
 MatrixMemoryRepr * SparseMatrix::clone() const {
     return new SparseMatrix(*this);
 }
 
 std::optional<double> SparseMatrix::at(std::size_t row,
-                                         std::size_t column) const {
+                                       std::size_t column) const {
     if (row >= _dimensions.rows() || column >= _dimensions.columns()) {
         return std::nullopt;
     }
@@ -84,16 +93,14 @@ std::optional<double> SparseMatrix::at(std::size_t row,
     return _data.at({row, column});
 }
 
-void SparseMatrix::add(std::size_t row, std::size_t column,
-                       double val) {
+void SparseMatrix::add(std::size_t row, std::size_t column, double val) {
     if (row >= _dimensions.rows() || column >= _dimensions.columns()) {
         throw std::out_of_range("Add: index out of bounds");
     }
     _data[{row, column}] += val;
 }
 
-void SparseMatrix::modify(std::size_t row, std::size_t column,
-                          double new_val) {
+void SparseMatrix::modify(std::size_t row, std::size_t column, double new_val) {
     if (row >= _dimensions.rows() || column >= _dimensions.columns()) {
         throw std::out_of_range("Modify: index out of bounds");
     }
@@ -113,8 +120,7 @@ void SparseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
         }
     }
     for (const auto & [pos, val] : swap_elements) {
-        Position new_pos = {pos.row == f_row ? s_row : f_row,
-                            pos.column};
+        Position new_pos = {pos.row == f_row ? s_row : f_row, pos.column};
         _data[new_pos] = val;
     }
 }
