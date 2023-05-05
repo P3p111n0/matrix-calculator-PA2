@@ -1,0 +1,103 @@
+Maticová kalkulačka
+Autor: Josef Melcr
+---------------------
+
+Původní zadání z Progtestu: 
+-----------------------------
+
+Vaším úkolem je vytvořit kalkulačku pro práci s maticemi. Jednotlivé matice a výsledky operací je možné ukládat do proměnných a tyto proměnné následně využívat v dalších výpočtech.
+
+Kalkulačka musí implementovat následující funkcionality:
+
+    Práce s maticemi libovolné velikosti (především načtení a vypsání proměnných).
+
+    Základní operace: sčítání, odčítání, násobení a transpozice.
+
+    Sloučení matic (př. matice 3x3 sloučeno s 3x3 ⇒ matice 6x3) a oříznutí (př. matice 6x6 oříznuta na 3x3 v offsetu 0x0 ⇒ levá polovina matice 3x3).
+
+    PVýpočet inverzní matice pro čtvercové matice.
+
+    Funkce pro výpočet determinantu, určení hodnosti a provedení Gaussovy eliminační metody.
+
+    Stav kalkulačky (tedy její proměnné) je možné uložit do souboru v textově čitelné formě. Stejně tak je potom možné tento stav ze souboru obnovit.
+
+    Uložení v rámci proměnných (a souboru) musí být paměťově efektivní. Při ukládání proměnné do paměti se musí určit typ dané matice. 
+    Rozlišujte alespoň řídké matice (obsahují především nulové hodnoty, př. jednotková matice) a husté matice (opak řídkých, př. hodnota prvku v matici je rovna jeho součtu jeho indexů) 
+    a podle toho určete efektivní reprezentaci.
+
+Dále aplikace musí zpracovávat výrazy dle jednoho z následujících principů:
+
+    Základní operace (alespoň sčítání, odčítání a násobení) musí jít vnořovat pomocí závorek (př. (Z = [[1, 0], [0, 1]] + X) * Y). 
+    Funkce a složitější operace mohou fungovat formou individuálních příkazů bez dalšího skládání (př. A = GAUSS X).
+
+    Pro zapisování výrazů využijte prefixový (nebo postfixový) zápis, mají tu výhodu, že nevyžadují závorky a snáze se zpracovávají. 
+    V tomto případě však veškeré operace a funkce musí jít zapsat v jednom výrazu (př. A = GAUSS MUL Y ADD [[1, 0], [0, 1]] X).
+
+Ukázka běhu programu: (nezávazný příklad)
+
+IMPORT memory.matx
+X = DET [[1, 7], [3, 2]]
+SCAN Y
+// input from user …
+Z = X * (Y + [[1, 0], [0, 1]])
+A = GEM Z
+PRINT A
+EXPORT memory.matx
+
+Kde lze využít polymorfismus? (doporučené)
+
+    reprezentace matice: jednotková, řídká, hustá, …
+
+    operace: sčítání, odčítání, násobení, …
+
+    formáty exportu: textový, binární, …
+
+    uživatelské rozhraní: konzole, ncurses, SDL, OpenGL (různé varianty), …
+
+-------------------------
+Mnou upravené zadání:
+-------------------------
+
+Vaším úkolem je vytvořit kalkulačku pro práci s maticemi. Jednotlivé matice a výsledky operací je možné ukládat do proměnných a tyto proměnné následně využívat v dalších výpočtech.
+
+Kalkulačka implementuje následující funkcionality:
+
+    Matice budou obsahovat prvky typu double, neboť pro výpočet inverzních matic je třeba desetinných čísel.
+
+    Práce s maticemi libovolné velikosti (především načtení a vypsání proměnných).
+
+    Základní operace: sčítání, odčítání, násobení a transpozice.
+
+    Sloučení matic (př. matice 3x3 sloučeno s 3x3 ⇒ matice 6x3) a oříznutí (př. matice 6x6 oříznuta na 3x3 v offsetu 0x0 ⇒ levá polovina matice 3x3).
+
+    Výpočet inverzní matice pro čtvercové matice.
+
+    Funkce pro výpočet determinantu, určení hodnosti a provedení Gaussovy eliminační metody.
+
+    Stav kalkulačky (tedy její proměnné) je možné uložit do souboru v textově čitelné formě. Stejně tak je potom možné tento stav ze souboru obnovit.
+
+    Uložení v rámci proměnných (a souboru) je paměťově efektivní. Při ukládání proměnné je vždy určen typ dané matice. 
+    Kalkulačka rozlišuje řídké a husté matice (podle počtu nul v matici, poměr nul vůči celkovému počtu prvků matice je určen poměrem v konfiguračním souboru)
+
+    Základní operace (alespoň sčítání, odčítání a násobení) lze vnořovat pomocí závorek (př. (Z = [[1, 0], [0, 1]] + X) * Y). 
+    Funkce a složitější operace mohou fungovat formou individuálních příkazů bez dalšího skládání (př. A = GAUSS X).
+
+Ukázka běhu programu: 
+
+IMPORT memory.matx
+X = DET [[1, 7], [3, 2]]
+SCAN Y
+// input from user …
+Z = X * (Y + [[1, 0], [0, 1]])
+A = GEM Z
+PRINT A
+EXPORT memory.matx
+
+Kde je využitý polymorfismus?
+
+    reprezentace matice: řídká, hustá. S touto reprezentací dále pracuje třída Matrix, která nad reprezentacemi implementuje maticové operace, 
+			 jako je sčítání, násobení a tak dále.
+
+    maticové iterátory (iterátor pro řídkou matici, pro hustou matici): Iterátory jsou využity pro jednoduchou práci s maticemi, kde nás zajímají
+									pouze nenulové prvky (např. přičtení jedné matice k druhé). Práci s iterátory
+									implementuje třída IteratorWrapper.
