@@ -205,22 +205,6 @@ void Matrix::inverse() {
     std::set<std::size_t> visited_indexes;
     double determinant = 1;
     std::size_t dim = rows();
-    bool is_transposed = false;
-
-    // check, if matrix should be transposed
-    std::size_t missing_diagonal_el = 0;
-    for (std::size_t i = 0; i < dim; i++) {
-        if (_matrix->at(i, i).value() == 0) {
-            missing_diagonal_el++;
-            continue;
-        }
-        break;
-    }
-
-    if (missing_diagonal_el == dim) {
-        transpose();
-        is_transposed = true;
-    }
 
     for (std::size_t i = 0; i < dim; i++) {
         index_queue.emplace(i);
@@ -275,9 +259,6 @@ void Matrix::inverse() {
     }
 
     _det = determinant;
-    if (is_transposed) {
-        transpose();
-    }
     optimize();
 }
 
