@@ -94,6 +94,8 @@ Matrix Matrix::operator+(const Matrix & other) const {
         result._matrix->add(pos.row, pos.column, val);
     }
     result.optimize();
+    result._det.reset();
+    result._rank.reset();
     return result;
 }
 
@@ -107,6 +109,8 @@ Matrix Matrix::operator-(const Matrix & other) const {
         result._matrix->add(pos.row, pos.column, val * -1);
     }
     result.optimize();
+    result._det.reset();
+    result._rank.reset();
     return result;
 }
 
@@ -128,6 +132,8 @@ Matrix Matrix::operator*(const Matrix & other) const {
         }
     }
     result.optimize();
+    result._det.reset();
+    result._rank.reset();
     return result;
 }
 
@@ -138,6 +144,8 @@ Matrix operator*(double scalar, const Matrix & mx) {
         result._matrix->modify(pos.row, pos.column, new_value);
     }
     result.optimize();
+    result._det.reset();
+    result._rank.reset();
     return result;
 }
 
@@ -169,6 +177,8 @@ void Matrix::unite(const Matrix & other) {
         united._matrix->modify(pos.row + rows(), pos.column, val);
     }
     united.optimize();
+    _det.reset();
+    _rank.reset();
     _matrix = std::move(united._matrix);
 }
 
@@ -190,6 +200,8 @@ void Matrix::cut(std::size_t new_size_rows, std::size_t new_size_columns,
         }
     }
     _matrix = std::move(result._matrix);
+    _det.reset();
+    _rank.reset();
     optimize();
 }
 
@@ -259,6 +271,7 @@ void Matrix::inverse() {
     }
 
     _det = determinant;
+    _rank = dim;
     optimize();
 }
 
@@ -307,6 +320,7 @@ void Matrix::gem() {
     gem_swap_rows();
     gem_row_elim();
     optimize();
+    _det.reset();
 }
 
 std::optional<double> Matrix::calc_det() const {
