@@ -270,7 +270,7 @@ void Matrix::inverse() {
         _matrix->swap_rows(first_row, second_row);
     }
 
-    _det = determinant;
+    _det = 1/determinant;
     _rank = dim;
     optimize();
 }
