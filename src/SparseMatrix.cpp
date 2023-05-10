@@ -130,11 +130,16 @@ void SparseMatrix::print(std::ostream & os) const {
         os << "[ ";
         for (std::size_t j = 0; j < _dimensions.columns() - 1; j++) {
             auto elem = _data.find({i, j});
-            double val = elem == _data.end() ? 0 : elem->second;
+            double val = elem == _data.end()
+                             ? 0
+                             : (elem->second == 0 ? 0 : elem->second);
             os << val << ", ";
         }
         auto last_elem = _data.find({i, _dimensions.columns() - 1});
-        double last_val = last_elem == _data.end() ? 0 : last_elem->second;
+        double last_val =
+            last_elem == _data.end()
+                ? 0
+                : (last_elem->second == 0 ? 0 : last_elem->second);
         os << last_val << " ]";
         if (i != _dimensions.rows() - 1) {
             os << std::endl;

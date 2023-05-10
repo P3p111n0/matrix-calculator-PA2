@@ -120,9 +120,15 @@ void DenseMatrix::print(std::ostream & os) const {
         os << "[ ";
         for (std::size_t val_index = 0; val_index < _dimensions.columns() - 1;
              val_index++) {
-            os << _data[row_index][val_index] << ", ";
+            double val = _data[row_index][val_index] == 0
+                             ? 0
+                             : _data[row_index][val_index];
+            os << val << ", ";
         }
-        os << _data[row_index][_dimensions.columns() - 1] << " ]";
+        double last_val = _data[row_index][_dimensions.columns() - 1] == 0
+                              ? 0
+                              : _data[row_index][_dimensions.columns() - 1];
+        os << last_val << " ]";
         if (row_index != _dimensions.rows() - 1) {
             os << std::endl;
         }
