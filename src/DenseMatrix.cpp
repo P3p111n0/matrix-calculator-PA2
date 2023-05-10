@@ -1,45 +1,9 @@
 #include "DenseMatrix.h"
-
-class DenseMatrixIterator : public AbstractMatrixIterator {
-    using DenseMatrixContainer = std::vector<std::vector<double>>;
-
-  public:
-    DenseMatrixIterator(const DenseMatrix * ptr, std::size_t row,
-                        std::size_t column)
-        : AbstractMatrixIterator(&ptr->_dimensions, row, column),
-          _data(ptr->_data), _matrix_rows(ptr->_dimensions.rows()),
-          _matrix_columns(ptr->_dimensions.columns()) {}
-    void operator++() override {
-        next_element();
-        while (_row < _matrix_rows && _data[_row][_column] == 0) {
-            next_element();
-        }
-    }
-    MatrixElement operator*() const override {
-        return {_row, _column, _data[_row][_column]};
-    }
-    std::size_t distance(const AbstractMatrixIterator & other) const override {
-        DenseMatrixIterator it_copy(*this);
-        std::size_t result = 0;
-        while (it_copy != other && _row < _matrix_rows) {
-            ++it_copy;
-            ++result;
-        }
-        return result;
-    }
-
-  private:
-    const DenseMatrixContainer & _data;
-    std::size_t _matrix_rows;
-    std::size_t _matrix_columns;
-    void next_element() {
-        ++_column;
-        if (_column >= _matrix_columns) {
-            ++_row;
-            _column = 0;
-        }
-    }
-};
+#include "IteratorWrapper.h"
+#include "DenseMatrixIterator.h"
+#include "MatrixDimensions.h"
+#include "MatrixMemoryRepr.h"
+#include <vector>
 
 DenseMatrix::DenseMatrix(std::size_t row, std::size_t col)
     : MatrixMemoryRepr(row, col), _data(row) {
