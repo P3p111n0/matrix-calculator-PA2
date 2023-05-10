@@ -4,6 +4,7 @@
 
 class MatrixFactory {
   public:
+    MatrixFactory() = delete;
     MatrixFactory(double);
     MatrixMemoryRepr * get_initial_repr(std::size_t, std::size_t) const;
     MatrixMemoryRepr * get_initial_repr(
