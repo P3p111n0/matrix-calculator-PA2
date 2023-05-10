@@ -7,6 +7,10 @@
 
 DenseMatrix::DenseMatrix(std::size_t row, std::size_t col)
     : MatrixMemoryRepr(row, col), _data(row) {
+    if (!_dimensions.rows() || !_dimensions.columns()){
+        throw std::invalid_argument("Invalid matrix dimensions.");
+    }
+
     for (auto & vec : _data) {
         vec.resize(col);
     }
@@ -16,6 +20,9 @@ DenseMatrix::DenseMatrix(
     std::initializer_list<std::initializer_list<double>> init)
     : MatrixMemoryRepr(init.size(), init.size() ? init.begin()->size() : 0),
       _data(init.size()) {
+    if (!_dimensions.rows() || !_dimensions.columns()){
+        throw std::invalid_argument("Invalid initializer list dimensions.");
+    }
 
     std::size_t row = 0;
     for (const auto & list : init) {

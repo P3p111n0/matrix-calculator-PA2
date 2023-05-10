@@ -3,12 +3,20 @@
 #include "SparseMatrixIterator.h"
 
 SparseMatrix::SparseMatrix(std::size_t r, std::size_t c)
-    : MatrixMemoryRepr(r, c) {}
+    : MatrixMemoryRepr(r, c) {
+    if (!_dimensions.rows() || !_dimensions.columns()){
+        throw std::invalid_argument("Invalid matrix dimensions.");
+    }
+
+}
 
 SparseMatrix::SparseMatrix(
     std::initializer_list<std::initializer_list<double>> init_list)
     : MatrixMemoryRepr(init_list.size(),
                        init_list.size() ? init_list.begin()->size() : 0) {
+    if (!_dimensions.rows() || !_dimensions.columns()){
+        throw std::invalid_argument("Invalid dimensions of an initializer list.");
+    }
 
     std::size_t row = 0;
     for (const auto & list : init_list) {

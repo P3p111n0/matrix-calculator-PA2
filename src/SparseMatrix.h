@@ -15,6 +15,7 @@ class SparseMatrix : public MatrixMemoryRepr {
      *        provided dimensions.
      * @param rows The amount of desired rows.
      * @param columns The amount of desired columns.
+     * @throws std::invalid_argument if rows or columns are equal to zero.
      */
     SparseMatrix(size_t rows, size_t columns);
 
@@ -27,12 +28,16 @@ class SparseMatrix : public MatrixMemoryRepr {
      * @param initializerList An initializer list of values to load into
      *                        the matrix.
      * @throws std::invalid_argument if the amount of columns is not consistent
-     *                               across all rows.
+     *                               across all rows or if the initializer list
+     *                               has zero rows or columns.
      */
     SparseMatrix(std::initializer_list<std::initializer_list<double>> initializerList);
 
     /**
      * @brief Creates a sparse matrix from a range determined by two iterators.
+     *        No checks are performed on the range, so if the given range
+     *        contains elements of a dense matrix, the resulting representation
+     *        may not be effective.
      * @param begin The beginning of the given range.
      * @param end End of the given range.
      */
@@ -59,6 +64,8 @@ class SparseMatrix : public MatrixMemoryRepr {
     /**
      * @brief Increases the element's value at the given indices by @value
      *        using operator+. Standard zero-based indexing is presumed.
+     *        No guarantees are provided regarding memory efficiency when using
+     *        this method.
      * @param row Row of the element in question.
      * @param column Column of the element in question.
      * @param value The value to add to the given element.
@@ -69,7 +76,10 @@ class SparseMatrix : public MatrixMemoryRepr {
 
     /**
      * @brief Changes the element at the given indices to @value. Standard
-     *        zero-based indexing is presumed.
+     *        zero-based indexing is presumed. Memory efficiency cannot be
+     *        guaranteed when using this method. If the represented matrix
+     *        becomes a dense one because of this method, this event won't be
+     *        recognized and the representation will be inefficient.
      * @param row Row of the given element.
      * @param column Column of the given element.
      * @param value Value, which will replace the element at the given indices.
@@ -81,8 +91,8 @@ class SparseMatrix : public MatrixMemoryRepr {
     /**
      * @brief Swaps elements in @first_row and @second_row. Standard zero-based
      *        indexing is presumed.
-     * @param first_row Index of the row to swap with @second_row.
-     * @param second_row Index of the row to swap with @first_row.
+     * @param first_row Index of the row to swap with second_row.
+     * @param second_row Index of the row to swap with first_row.
      * @throws std::out_of_range If at least one the indices exceeds the
      *                           dimensions of the matrix.
      */
@@ -105,7 +115,7 @@ class SparseMatrix : public MatrixMemoryRepr {
 
     /**
      * @brief Returns an iterator past the last non-zero element of the matrix.
-     * @return An iterator past the last non-zero element of the matrix.
+     * @return An iterator past the last element of the matrix.
      */
     IteratorWrapper end() const override;
 
