@@ -50,27 +50,28 @@ void Matrix::optimize() {
     _matrix.reset(new_ptr);
 }
 
-Matrix::Matrix(std::size_t rows, std::size_t columns) {
+Matrix::Matrix(std::size_t rows, std::size_t columns, MatrixFactory factory) : _factory(factory) {
     _matrix = std::unique_ptr<MatrixMemoryRepr>(
         _factory.get_initial_repr(rows, columns));
 }
 
-Matrix::Matrix(std::initializer_list<std::initializer_list<double>> init) {
+Matrix::Matrix(std::initializer_list<std::initializer_list<double>> init, MatrixFactory factory) : _factory(factory){
     _matrix =
         std::unique_ptr<MatrixMemoryRepr>(_factory.get_initial_repr(init));
 }
 
 Matrix::Matrix(const Matrix & src)
-    : _matrix(src._matrix->clone()), _det(src._det), _rank(src._rank) {}
+    : _matrix(src._matrix->clone()), _det(src._det), _rank(src._rank), _factory(src._factory) {}
 
 Matrix::Matrix(Matrix && src) noexcept
-    : _matrix(std::move(src._matrix)), _det(src._det), _rank(src._rank) {}
+    : _matrix(std::move(src._matrix)), _det(src._det), _rank(src._rank), _factory(src._factory) {}
 
 Matrix & Matrix::operator=(const Matrix & src) {
     if (this != &src) {
         _matrix = std::unique_ptr<MatrixMemoryRepr>(src._matrix->clone());
         _det = src._det;
         _rank = src._rank;
+        _factory = src._factory;
     }
     return *this;
 }
@@ -80,6 +81,7 @@ Matrix & Matrix::operator=(Matrix && src) noexcept {
         _matrix = std::move(src._matrix);
         _det = src._det;
         _rank = src._rank;
+        _factory = src._factory;
     }
     return *this;
 }
@@ -119,7 +121,7 @@ Matrix Matrix::operator*(const Matrix & other) const {
         throw std::invalid_argument(
             "Matrix multiplication: invalid matrix dimensions.");
     }
-    Matrix result(rows(), other.columns());
+    Matrix result(rows(), other.columns(), _factory);
 
     for (std::size_t i = 0; i < result.rows(); i++) {
         for (std::size_t j = 0; j < result.columns(); j++) {
@@ -158,7 +160,7 @@ IteratorWrapper Matrix::begin() const { return _matrix->begin(); }
 IteratorWrapper Matrix::end() const { return _matrix->end(); }
 
 void Matrix::transpose() {
-    Matrix transposed(columns(), rows());
+    Matrix transposed(columns(), rows(), _factory);
     for (const auto & [pos, val] : *this) {
         transposed._matrix->modify(pos.column, pos.row, val);
     }
@@ -169,7 +171,7 @@ void Matrix::unite(const Matrix & other) {
     if (columns() != other.columns()) {
         throw std::invalid_argument("Unite: matrix dimension mismatch");
     }
-    Matrix united(rows() + other.rows(), columns());
+    Matrix united(rows() + other.rows(), columns(), _factory);
     for (const auto & [pos, val] : *this) {
         united._matrix->modify(pos.row, pos.column, val);
     }
@@ -192,7 +194,7 @@ void Matrix::cut(std::size_t new_size_rows, std::size_t new_size_columns,
         throw std::invalid_argument("Cut: invalid new dimensions or offset.");
     }
 
-    Matrix result(new_size_rows, new_size_columns);
+    Matrix result(new_size_rows, new_size_columns, _factory);
     for (std::size_t i = 0; i < new_size_rows; i++) {
         for (std::size_t j = 0; j < new_size_columns; j++) {
             result._matrix->modify(

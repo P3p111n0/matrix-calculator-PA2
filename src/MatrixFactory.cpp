@@ -2,6 +2,8 @@
 #include "DenseMatrix.h"
 #include "SparseMatrix.h"
 
+MatrixFactory::MatrixFactory(double ratio) : _ratio(ratio) {}
+
 MatrixMemoryRepr * MatrixFactory::get_initial_repr(std::size_t rows,
                                                    std::size_t columns) const {
     return new SparseMatrix(rows, columns);
@@ -12,7 +14,7 @@ MatrixMemoryRepr * MatrixFactory::get_initial_repr(
 
     std::size_t rows = initializer.size();
     std::size_t columns = rows ? initializer.begin()->size() : 0;
-    double zeroes_to_be_sparse = rows * columns * ratio;
+    double zeroes_to_be_sparse = rows * columns * _ratio;
 
     std::size_t zero_count = 0;
     for (const auto & row : initializer){
@@ -32,11 +34,11 @@ MatrixMemoryRepr * MatrixFactory::get_initial_repr(
 }
 
 MatrixMemoryRepr * MatrixFactory::convert(MatrixMemoryRepr * mx) const {
-    if (mx->is_efficient(ratio)){
+    if (mx->is_efficient(_ratio)){
         return mx;
     }
     std::size_t non_zero_values = mx->begin().distance(mx->end());
-    std::size_t ratio_to_be_dense = (1 - ratio) * mx->rows() * mx->columns();
+    std::size_t ratio_to_be_dense = (1 - _ratio) * mx->rows() * mx->columns();
     if (non_zero_values <= ratio_to_be_dense){
         return new SparseMatrix(mx->begin(), mx->end());
     }
