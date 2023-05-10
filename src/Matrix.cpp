@@ -117,6 +117,14 @@ Matrix Matrix::operator-(const Matrix & other) const {
 }
 
 Matrix Matrix::operator*(const Matrix & other) const {
+    if (rows() == 1 && columns() == 1){
+        return _matrix->at(0, 0).value() * other;
+    }
+
+    if (other.rows() == 1 && other.columns() == 1){
+        return other._matrix->at(0, 0).value() * *this;
+    }
+
     if (columns() != other.rows()) {
         throw std::invalid_argument(
             "Matrix multiplication: invalid matrix dimensions.");
