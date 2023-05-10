@@ -7,6 +7,9 @@ class Configurator {
   public:
     Configurator(std::ostream *);
 
+    double ratio() const { return _ratio; }
+    std::size_t input_length() const { return _max_len; }
+
     void load_config(const char *);
   private:
     double _ratio;
