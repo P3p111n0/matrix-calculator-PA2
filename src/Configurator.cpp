@@ -6,6 +6,10 @@
 #include <string>
 
 Configurator::Configurator(std::ostream * stream) : _stream(stream) {
+    if (!_stream){
+        // this shouldn't happen
+        throw std::invalid_argument("Invalid pointer in Configurator");
+    }
     set_defaults();
 }
 
