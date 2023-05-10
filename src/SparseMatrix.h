@@ -30,12 +30,63 @@ class SparseMatrix : public MatrixMemoryRepr {
      *                               across all rows.
      */
     SparseMatrix(std::initializer_list<std::initializer_list<double>> initializerList);
-    SparseMatrix(IteratorWrapper, IteratorWrapper);
+
+    /**
+     * @brief Creates a sparse matrix from a range determined by two iterators.
+     * @param begin The beginning of the given range.
+     * @param end End of the given range.
+     */
+    SparseMatrix(IteratorWrapper begin, IteratorWrapper end);
+
+    /**
+     * @brief Returns a pointer to a dynamically allocated copy of the matrix.
+     *        It is the programmer's responsibility to free this pointer.
+     * @return A pointer to the dynamically allocated copy.
+     */
     MatrixMemoryRepr * clone() const override;
-    std::optional<double> at(std::size_t, std::size_t) const override;
-    void add(std::size_t, std::size_t, double) override;
-    void modify(std::size_t, std::size_t, double) override;
-    void swap_rows(std::size_t, std::size_t) override;
+
+    /**
+     * @brief Returns the element at the given indices, or an empty optional
+     *        object, if the indices exceed the dimensions of the matrix.
+     *        Standard zero-based indexing is presumed.
+     * @param row Row of the element in question.
+     * @param column Column of the element in question.
+     * @return Value at the given indices, or an empty optional object, if the
+     *         indices exceed the dimensions of the matrix.
+     */
+    std::optional<double> at(std::size_t row, std::size_t column) const override;
+
+    /**
+     * @brief Increases the element's value at the given indices by @value
+     *        using operator+. Standard zero-based indexing is presumed.
+     * @param row Row of the element in question.
+     * @param column Column of the element in question.
+     * @param value The value to add to the given element.
+     * @throws std::out_of_range if the indices exceed the dimensions of the
+     *                           matrix.
+     */
+    void add(std::size_t row, std::size_t column, double value) override;
+
+    /**
+     * @brief Changes the element at the given indices to @value. Standard
+     *        zero-based indexing is presumed.
+     * @param row Row of the given element.
+     * @param column Column of the given element.
+     * @param value Value, which will replace the element at the given indices.
+     * @throws std::out_of_range if the indices exceed the dimensions of the
+     *                           matrix.
+     */
+    void modify(std::size_t row, std::size_t column, double value) override;
+
+    /**
+     * @brief Swaps elements in @first_row and @second_row. Standard zero-based
+     *        indexing is presumed.
+     * @param first_row Index of the row to swap with @second_row.
+     * @param second_row Index of the row to swap with @first_row.
+     * @throws std::out_of_range If at least one the indices exceeds the
+     *                           dimensions of the matrix.
+     */
+    void swap_rows(std::size_t first_row, std::size_t second_row) override;
 
     /**
      * @brief Determines, whether the representation as a sparse matrix is
@@ -45,11 +96,27 @@ class SparseMatrix : public MatrixMemoryRepr {
      *         zeroes, false otherwise.
      */
     bool is_efficient(double ratio) const override;
+
+    /**
+     * @brief Returns an iterator to the first non-zero element of the matrix.
+     * @return An iterator to the first non-zero element of the matrix.
+     */
     IteratorWrapper begin() const override;
+
+    /**
+     * @brief Returns an iterator past the last non-zero element of the matrix.
+     * @return An iterator past the last non-zero element of the matrix.
+     */
     IteratorWrapper end() const override;
 
   protected:
-    void print(std::ostream &) const override;
+
+    /**
+     * @brief Prints the matrix to the provided output stream in a bracket
+     *        format. No whitespace is printed at the end of the matrix.
+     * @param os Stream to print the matrix into.
+     */
+    void print(std::ostream & os) const override;
 
   private:
 
