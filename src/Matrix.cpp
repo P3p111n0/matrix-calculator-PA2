@@ -1,4 +1,6 @@
 #include "Matrix.h"
+#include "MatrixFactory.h"
+#include "MatrixMemoryRepr.h"
 #include <queue>
 #include <set>
 
@@ -50,21 +52,37 @@ void Matrix::optimize() {
     _matrix.reset(new_ptr);
 }
 
-Matrix::Matrix(std::size_t rows, std::size_t columns, MatrixFactory factory) : _factory(factory) {
+Matrix::Matrix(std::size_t rows, std::size_t columns, MatrixFactory factory)
+    : _factory(factory) {
     _matrix = std::unique_ptr<MatrixMemoryRepr>(
         _factory.get_initial_repr(rows, columns));
 }
 
-Matrix::Matrix(std::initializer_list<std::initializer_list<double>> init, MatrixFactory factory) : _factory(factory){
+Matrix::Matrix(std::initializer_list<std::initializer_list<double>> init,
+               MatrixFactory factory)
+    : _factory(factory) {
     _matrix =
         std::unique_ptr<MatrixMemoryRepr>(_factory.get_initial_repr(init));
 }
 
+Matrix::Matrix(const std::vector<std::vector<double>> & vec,
+               MatrixFactory factory)
+    : _factory(factory) {
+
+    _matrix = std::unique_ptr<MatrixMemoryRepr>(_factory.get_initial_repr(vec));
+}
+
+Matrix::Matrix(double val, MatrixFactory factory) : _factory(factory) {
+    _matrix = std::unique_ptr<MatrixMemoryRepr>(_factory.get_initial_repr(val));
+}
+
 Matrix::Matrix(const Matrix & src)
-    : _matrix(src._matrix->clone()), _det(src._det), _rank(src._rank), _factory(src._factory) {}
+    : _matrix(src._matrix->clone()), _det(src._det), _rank(src._rank),
+      _factory(src._factory) {}
 
 Matrix::Matrix(Matrix && src) noexcept
-    : _matrix(std::move(src._matrix)), _det(src._det), _rank(src._rank), _factory(src._factory) {}
+    : _matrix(std::move(src._matrix)), _det(src._det), _rank(src._rank),
+      _factory(src._factory) {}
 
 Matrix & Matrix::operator=(const Matrix & src) {
     if (this != &src) {
@@ -117,11 +135,11 @@ Matrix Matrix::operator-(const Matrix & other) const {
 }
 
 Matrix Matrix::operator*(const Matrix & other) const {
-    if (rows() == 1 && columns() == 1){
+    if (rows() == 1 && columns() == 1) {
         return _matrix->at(0, 0).value() * other;
     }
 
-    if (other.rows() == 1 && other.columns() == 1){
+    if (other.rows() == 1 && other.columns() == 1) {
         return other._matrix->at(0, 0).value() * *this;
     }
 
@@ -280,7 +298,7 @@ void Matrix::inverse() {
         _matrix->swap_rows(first_row, second_row);
     }
 
-    _det = 1/determinant;
+    _det = 1 / determinant;
     _rank = dim;
     optimize();
 }
