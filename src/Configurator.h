@@ -5,7 +5,7 @@
 
 class Configurator {
   public:
-    Configurator(std::ostream *);
+    Configurator(std::ostream &);
 
     double ratio() const { return _ratio; }
     std::size_t input_length() const { return _max_len; }
@@ -14,7 +14,7 @@ class Configurator {
   private:
     double _ratio;
     std::size_t _max_len;
-    std::ostream * _stream;
+    std::ostream & _stream;
 
     void error_and_reset(std::ostream &);
     void print_defaults(std::ostream &) const;

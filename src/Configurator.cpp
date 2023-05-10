@@ -5,20 +5,16 @@
 #include <sstream>
 #include <string>
 
-Configurator::Configurator(std::ostream * stream) : _stream(stream) {
-    if (!_stream){
-        // this shouldn't happen
-        throw std::invalid_argument("Invalid pointer in Configurator");
-    }
+Configurator::Configurator(std::ostream & stream) : _stream(stream) {
     set_defaults();
 }
 
 void Configurator::load_config(const char * file_name) {
     std::ifstream file(file_name);
     if (!file.is_open()) {
-        *_stream << "Couldn't open configuration file, defaulting to: "
+        _stream << "Couldn't open configuration file, defaulting to: "
                  << std::endl;
-        print_defaults(*_stream);
+        print_defaults(_stream);
         return;
     }
 
@@ -32,7 +28,7 @@ void Configurator::load_config(const char * file_name) {
 
         // 2 is the minimal line length
         if (line.length() < 2) {
-            syntax_error(*_stream);
+            syntax_error(_stream);
             return;
         }
 
@@ -46,10 +42,10 @@ void Configurator::load_config(const char * file_name) {
         line_stream >> config_val;
 
         if (set_values.count(config_val)){
-            *_stream << "Multiple definitions of: " << config_val << std::endl;
-            *_stream << "Defaulting to: " << std::endl;
+            _stream << "Multiple definitions of: " << config_val << std::endl;
+            _stream << "Defaulting to: " << std::endl;
             set_defaults();
-            print_defaults(*_stream);
+            print_defaults(_stream);
             return;
         }
 
@@ -61,7 +57,7 @@ void Configurator::load_config(const char * file_name) {
 
             line_stream >> symbol;
             if (symbol != '=' || line_stream.bad()) {
-                error_and_reset(*_stream);
+                error_and_reset(_stream);
                 return;
             }
 
@@ -69,12 +65,12 @@ void Configurator::load_config(const char * file_name) {
 
             line_stream >> symbol;
             if (symbol != '/' || line_stream.bad()) {
-                error_and_reset(*_stream);
+                error_and_reset(_stream);
                 return;
             }
             line_stream >> denominator;
             if (line_stream.bad()) {
-                error_and_reset(*_stream);
+                error_and_reset(_stream);
                 return;
             }
 
@@ -88,13 +84,13 @@ void Configurator::load_config(const char * file_name) {
 
             line_stream >> symbol;
             if (symbol != '=' || line_stream.bad()){
-                error_and_reset(*_stream);
+                error_and_reset(_stream);
                 return;
             }
 
             line_stream >> new_len;
             if (line_stream.bad()){
-                error_and_reset(*_stream);
+                error_and_reset(_stream);
                 return;
             }
 
@@ -102,14 +98,14 @@ void Configurator::load_config(const char * file_name) {
             continue;
         }
 
-        *_stream << "Unknown parameter: " << config_val << std::endl;
-        *_stream << "Defaulting to: " << std::endl;
+        _stream << "Unknown parameter: " << config_val << std::endl;
+        _stream << "Defaulting to: " << std::endl;
         set_defaults();
-        print_defaults(*_stream);
+        print_defaults(_stream);
         return;
     }
 
-    *_stream << "Config file: OK" << std::endl;
+    _stream << "Config file: OK" << std::endl;
 }
 
 void Configurator::error_and_reset(std::ostream & os) {
