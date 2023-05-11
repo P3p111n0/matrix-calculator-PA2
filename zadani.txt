@@ -82,6 +82,10 @@ Kalkulačka implementuje následující funkcionality:
     Základní operace (alespoň sčítání, odčítání a násobení) lze vnořovat pomocí závorek (př. (Z = [[1, 0], [0, 1]] + X) * Y). 
     Funkce a složitější operace mohou fungovat formou individuálních příkazů bez dalšího skládání (př. A = GAUSS X).
 
+    Kalkulačka se bude vypisovat do konzole, bez využití grafických knihoven.
+
+    Kalkulačka se bude exportovat pouze do textového formátu.
+
 Ukázka běhu programu: 
 
 IMPORT memory.matx
