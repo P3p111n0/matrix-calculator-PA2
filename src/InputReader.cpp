@@ -69,7 +69,7 @@ bool InputReader::parse_input(
 
     std::getline(_stream, line);
     if (line.length() > _max_len) {
-        throw std::invalid_argument("Max input length exceeded");
+        throw std::runtime_error("Max input length exceeded");
     }
 
     std::stringstream line_stream(line);
@@ -95,7 +95,7 @@ bool InputReader::parse_input(
         // token is a single argument function
         if (FUNCTION_LOOKUP.count(token)) {
             if (operator_stack.size() > 1) {
-                throw std::invalid_argument(
+                throw std::runtime_error(
                     "Functions cannot be used in compound expressions.");
             }
             operator_stack.push(token);
@@ -108,18 +108,18 @@ bool InputReader::parse_input(
 
         if (token == ")") {
             if (operator_stack.empty()) {
-                throw std::invalid_argument("Parenthesis mismatch on input");
+                throw std::runtime_error("Parenthesis mismatch on input");
             }
             while (operator_stack.top() != "(") {
                 output_queue.push(operator_stack.top());
                 operator_stack.pop();
                 if (operator_stack.empty()) {
-                    throw std::invalid_argument("Parenthesis mismatch on input");
+                    throw std::runtime_error("Parenthesis mismatch on input");
                 }
             }
 
             if (!operator_stack.empty() && operator_stack.top() != "(") {
-                throw std::invalid_argument("Parenthesis mismatch on input");
+                throw std::runtime_error("Parenthesis mismatch on input");
             }
             operator_stack.pop();
 
@@ -143,7 +143,7 @@ bool InputReader::parse_input(
 
     while (!operator_stack.empty()) {
         if (operator_stack.top() == "(" || operator_stack.top() == ")") {
-            throw std::invalid_argument("Parenthesis mismatch on input");
+            throw std::runtime_error("Parenthesis mismatch on input");
         }
         output_queue.push(operator_stack.top());
         operator_stack.pop();
@@ -160,7 +160,7 @@ Matrix InputReader::load_matrix() const {
         std::vector<double> row;
         _stream >> c;
         if (c != '['){
-            throw std::invalid_argument("Matrix parse error.");
+            throw std::runtime_error("Matrix parse error.");
         }
         while (c != ']'){
             double val;
@@ -170,11 +170,11 @@ Matrix InputReader::load_matrix() const {
             if (c == ',' || c == ']'){
                 continue;
             }
-            throw std::invalid_argument("Matrix parse error.");
+            throw std::runtime_error("Matrix parse error.");
         }
 
         if (!mx.empty() && mx.back().size() != row.size()){
-            throw std::invalid_argument("Matrix parse error.");
+            throw std::runtime_error("Matrix parse error.");
         }
 
         _stream >> c;
@@ -182,7 +182,7 @@ Matrix InputReader::load_matrix() const {
             mx.emplace_back(row);
             continue;
         }
-        throw std::invalid_argument("Matrix parse error.");
+        throw std::runtime_error("Matrix parse error.");
     }
 
     return {mx, _factory};
