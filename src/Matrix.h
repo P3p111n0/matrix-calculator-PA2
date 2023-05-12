@@ -13,7 +13,7 @@ class Matrix {
   public:
     Matrix(std::size_t, std::size_t, MatrixFactory);
     Matrix(std::initializer_list<std::initializer_list<double>>, MatrixFactory);
-    Matrix(const std::vector<std::vector<double>> &, MatrixFactory);
+    Matrix(const MatrixMemoryRepr &, MatrixFactory);
     Matrix(double, MatrixFactory);
     Matrix(const Matrix &);
     Matrix(Matrix &&) noexcept;

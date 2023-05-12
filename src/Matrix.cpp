@@ -65,11 +65,9 @@ Matrix::Matrix(std::initializer_list<std::initializer_list<double>> init,
         std::unique_ptr<MatrixMemoryRepr>(_factory.get_initial_repr(init));
 }
 
-Matrix::Matrix(const std::vector<std::vector<double>> & vec,
-               MatrixFactory factory)
-    : _factory(factory) {
-
-    _matrix = std::unique_ptr<MatrixMemoryRepr>(_factory.get_initial_repr(vec));
+Matrix::Matrix(const MatrixMemoryRepr & repr, MatrixFactory factory)
+    : _matrix(repr.clone()), _factory(factory) {
+    optimize();
 }
 
 Matrix::Matrix(double val, MatrixFactory factory) : _factory(factory) {
