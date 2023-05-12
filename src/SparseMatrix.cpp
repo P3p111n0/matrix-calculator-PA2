@@ -1,21 +1,22 @@
 #include "SparseMatrix.h"
+#include "MatrixDimensions.h"
 #include "MatrixElement.h"
 #include "SparseMatrixIterator.h"
 
 SparseMatrix::SparseMatrix(std::size_t r, std::size_t c)
     : MatrixMemoryRepr(r, c) {
-    if (!_dimensions.rows() || !_dimensions.columns()){
+    if (!_dimensions.rows() || !_dimensions.columns()) {
         throw std::invalid_argument("Invalid matrix dimensions.");
     }
-
 }
 
 SparseMatrix::SparseMatrix(
     std::initializer_list<std::initializer_list<double>> init_list)
     : MatrixMemoryRepr(init_list.size(),
                        init_list.size() ? init_list.begin()->size() : 0) {
-    if (!_dimensions.rows() || !_dimensions.columns()){
-        throw std::invalid_argument("Invalid dimensions of an initializer list.");
+    if (!_dimensions.rows() || !_dimensions.columns()) {
+        throw std::invalid_argument(
+            "Invalid dimensions of an initializer list.");
     }
 
     std::size_t row = 0;
@@ -89,6 +90,11 @@ void SparseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
         Position new_pos = {pos.row == f_row ? s_row : f_row, pos.column};
         _data[new_pos] = val;
     }
+}
+
+void SparseMatrix::add_row() {
+    _dimensions =
+        MatrixDimensions(_dimensions.rows() + 1, _dimensions.columns());
 }
 
 void SparseMatrix::print(std::ostream & os) const {

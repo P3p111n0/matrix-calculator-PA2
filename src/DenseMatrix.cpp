@@ -1,13 +1,13 @@
 #include "DenseMatrix.h"
-#include "IteratorWrapper.h"
 #include "DenseMatrixIterator.h"
+#include "IteratorWrapper.h"
 #include "MatrixDimensions.h"
 #include "MatrixMemoryRepr.h"
 #include <vector>
 
 DenseMatrix::DenseMatrix(std::size_t row, std::size_t col)
     : MatrixMemoryRepr(row, col), _data(row) {
-    if (!_dimensions.rows() || !_dimensions.columns()){
+    if (!_dimensions.rows() || !_dimensions.columns()) {
         throw std::invalid_argument("Invalid matrix dimensions.");
     }
 
@@ -20,7 +20,7 @@ DenseMatrix::DenseMatrix(
     std::initializer_list<std::initializer_list<double>> init)
     : MatrixMemoryRepr(init.size(), init.size() ? init.begin()->size() : 0),
       _data(init.size()) {
-    if (!_dimensions.rows() || !_dimensions.columns()){
+    if (!_dimensions.rows() || !_dimensions.columns()) {
         throw std::invalid_argument("Invalid initializer list dimensions.");
     }
 
@@ -83,6 +83,15 @@ void DenseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
         throw std::out_of_range("Swap_rows: index out of range");
     }
     std::swap(_data[f_row], _data[s_row]);
+}
+
+void DenseMatrix::add_row() {
+    _dimensions =
+        MatrixDimensions(_dimensions.rows() + 1, _dimensions.columns());
+
+    std::vector<double> new_row(_dimensions.columns());
+    new_row.assign(new_row.size(), 0);
+    _data.emplace_back(new_row);
 }
 
 void DenseMatrix::print(std::ostream & os) const {
