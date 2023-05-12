@@ -1,19 +1,7 @@
 #include "MatrixFactory.h"
 #include "DenseMatrix.h"
-#include "DenseMatrixIterator.h"
-#include "IteratorWrapper.h"
-#include "MatrixDimensions.h"
 #include "SparseMatrix.h"
 #include <vector>
-
-struct MatrixSpoofer {
-    MatrixSpoofer(MatrixDimensions dims,
-                  const std::vector<std::vector<double>> & vec)
-        : _dimensions(dims), _data(vec) {}
-    MatrixSpoofer(const MatrixSpoofer &) = delete;
-    MatrixDimensions _dimensions;
-    const std::vector<std::vector<double>> & _data;
-};
 
 MatrixFactory::MatrixFactory(double ratio) : _ratio(ratio) {}
 
@@ -55,25 +43,6 @@ MatrixMemoryRepr * MatrixFactory::get_initial_repr(double val) const {
     SparseMatrix * repr = new SparseMatrix(1, 1);
     repr->modify(0, 0, val);
     return repr;
-}
-
-MatrixMemoryRepr *
-MatrixFactory::get_initial_repr(const std::vector<std::vector<double>> & vec) const {
-    bool matrix_is_sparse = is_sparse(vec, _ratio);
-
-    std::size_t rows = vec.size();
-    std::size_t columns = vec.empty() ? 0 : vec.begin()->size();
-
-    MatrixSpoofer mx({rows, columns}, vec);
-    DenseMatrix * spoofing_pointer = reinterpret_cast<DenseMatrix*>(&mx);
-    IteratorWrapper begin(new DenseMatrixIterator(spoofing_pointer, 0, 0));
-    IteratorWrapper end(new DenseMatrixIterator(spoofing_pointer, rows, 0));
-
-    if (matrix_is_sparse){
-        return new SparseMatrix(std::move(begin), std::move(end));
-    }
-
-    return new DenseMatrix(std::move(begin), std::move(end));
 }
 
 MatrixMemoryRepr * MatrixFactory::convert(MatrixMemoryRepr * mx) const {
