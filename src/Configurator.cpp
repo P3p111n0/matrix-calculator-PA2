@@ -1,8 +1,10 @@
 #include "Configurator.h"
+#include <filesystem>
 #include <fstream>
 #include <ostream>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 Configurator::Configurator(std::ostream & stream) : _stream(stream) {
@@ -10,10 +12,17 @@ Configurator::Configurator(std::ostream & stream) : _stream(stream) {
 }
 
 void Configurator::load_config(const char * file_name) {
+    if (!std::filesystem::is_regular_file(file_name)) {
+        _stream << "Provided config file is not a regular file, defaulting to: "
+                << std::endl;
+        set_defaults();
+        print_defaults(_stream);
+        return;
+    }
     std::ifstream file(file_name);
     if (!file.is_open()) {
         _stream << "Couldn't open configuration file, defaulting to: "
-                 << std::endl;
+                << std::endl;
         print_defaults(_stream);
         return;
     }
@@ -22,7 +31,7 @@ void Configurator::load_config(const char * file_name) {
 
     std::string line;
     while (std::getline(file, line)) {
-        if (line.empty()){
+        if (line.empty()) {
             continue;
         }
 
@@ -41,7 +50,7 @@ void Configurator::load_config(const char * file_name) {
         std::string config_val;
         line_stream >> config_val;
 
-        if (set_values.count(config_val)){
+        if (set_values.count(config_val)) {
             _stream << "Multiple definitions of: " << config_val << std::endl;
             _stream << "Defaulting to: " << std::endl;
             set_defaults();
@@ -78,18 +87,18 @@ void Configurator::load_config(const char * file_name) {
             continue;
         }
 
-        if (config_val == "MAX_INPUT_LEN"){
+        if (config_val == "MAX_INPUT_LEN") {
             char symbol;
             std::size_t new_len;
 
             line_stream >> symbol;
-            if (symbol != '=' || line_stream.bad()){
+            if (symbol != '=' || line_stream.bad()) {
                 error_and_reset(_stream);
                 return;
             }
 
             line_stream >> new_len;
-            if (line_stream.bad()){
+            if (line_stream.bad()) {
                 error_and_reset(_stream);
                 return;
             }
@@ -114,8 +123,7 @@ void Configurator::error_and_reset(std::ostream & os) {
 }
 
 void Configurator::syntax_error(std::ostream & os) const {
-    os << "Syntax error in configuration file, defaulting to:"
-             << std::endl;
+    os << "Syntax error in configuration file, defaulting to:" << std::endl;
     print_defaults(os);
 }
 
@@ -125,6 +133,6 @@ void Configurator::print_defaults(std::ostream & os) const {
 }
 
 void Configurator::set_defaults() {
-    _ratio = 2/3.0;
+    _ratio = 2 / 3.0;
     _max_len = 200;
 }
