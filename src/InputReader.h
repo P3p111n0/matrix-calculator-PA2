@@ -8,6 +8,7 @@
 #include <unordered_map>
 
 class InputReader {
+  public:
     InputReader(std::istream &, std::size_t, const MatrixFactory &);
 
     bool read_input(std::unordered_map<std::string, Matrix> &) const;
