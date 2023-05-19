@@ -77,6 +77,8 @@ bool InputReader::parse_input(
         std::string token;
 
         if (line_stream.peek() == '['){
+            char c;
+            _stream >> c;
             Matrix parsed_matrix = load_matrix();
             std::string new_name = TMP_NAME;
             new_name += std::to_string(variables.size());
@@ -155,7 +157,6 @@ bool InputReader::parse_input(
 Matrix InputReader::load_matrix() const {
     char c;
     std::vector<std::vector<double>> mx;
-    _stream >> c;
     while(_stream.peek() != ']'){
         std::vector<double> row;
         _stream >> c;
