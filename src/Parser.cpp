@@ -57,12 +57,14 @@ static const std::unordered_map<std::string, OperatorPriority> PRIORITY_LOOKUP{
     {"PRINT", OperatorPriority::PRINT},
     {"SCAN", OperatorPriority::SCAN}};
 
-Parser::Parser(std::istream & stream, std::size_t max_input_len, const MatrixFactory & factory)
+Parser::Parser(std::istream & stream, std::size_t max_input_len,
+               const MatrixFactory & factory)
     : _stream(stream), _max_len(max_input_len), _factory(factory) {}
 
-std::shared_ptr<std::queue<std::string>> Parser::parse_input(
-    std::unordered_map<std::string, Matrix> & variables) const {
-    std::shared_ptr<std::queue<std::string>> output_queue_pointer = std::make_shared<std::queue<std::string>>();
+std::shared_ptr<std::queue<std::string>>
+Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
+    std::shared_ptr<std::queue<std::string>> output_queue_pointer =
+        std::make_shared<std::queue<std::string>>();
     auto & output_queue = *output_queue_pointer;
     std::stack<std::string> operator_stack;
     std::string line;
@@ -73,11 +75,10 @@ std::shared_ptr<std::queue<std::string>> Parser::parse_input(
     }
 
     std::stringstream line_stream(line);
-    while (!line_stream.eof()) {
-        line_stream >> std::ws;
+    while (line_stream >> std::ws && !line_stream.eof()) {
         std::string token;
 
-        if (line_stream.peek() == '['){
+        if (line_stream.peek() == '[') {
             char c;
             line_stream >> c;
             Matrix parsed_matrix = load_matrix(line_stream);
@@ -89,10 +90,6 @@ std::shared_ptr<std::queue<std::string>> Parser::parse_input(
         }
 
         line_stream >> token;
-
-        if (line_stream.eof()){
-            break;
-        }
 
         // token is a variable
         if (variables.count(token)) {
@@ -177,34 +174,46 @@ std::shared_ptr<std::queue<std::string>> Parser::parse_input(
     return output_queue_pointer;
 }
 
+static bool read_row(std::istream & stream, std::vector<double> & row) {
+    char c = 0;
+    while (c != ']') {
+        double val;
+        stream >> val;
+        row.emplace_back(val);
+        stream >> c;
+        switch (c) {
+        case ',':
+            continue;
+        case ']':
+            return true;
+        default:
+            return false;
+        }
+    }
+}
+
 Matrix Parser::load_matrix(std::istream & stream) const {
     char c;
     std::vector<std::vector<double>> mx;
-    while(stream.peek() != ']' && !stream.eof()){
+    while (stream.peek() != ']' && !stream.eof()) {
         std::vector<double> row;
         stream >> c;
-        if (c != '['){
-            throw std::runtime_error("Matrix parse error.");
-        }
-        while (c != ']'){
-            double val;
-            stream >> val;
-            row.emplace_back(val);
-            stream >> c;
-            if (c == ',' || c == ']'){
-                continue;
-            }
+        if (c != '[') {
             throw std::runtime_error("Matrix parse error.");
         }
 
-        if (!mx.empty() && mx.back().size() != row.size()){
+        if (!read_row(stream, row)) {
+            throw std::runtime_error("Matrix parse error.");
+        }
+
+        if (!mx.empty() && mx.back().size() != row.size()) {
             throw std::runtime_error("Matrix parse error.");
         }
 
         stream >> c;
-        if (c == ',' || c == ']'){
+        if (c == ',' || c == ']') {
             mx.emplace_back(row);
-            if (c == ']'){
+            if (c == ']') {
                 break;
             }
             continue;
@@ -214,9 +223,7 @@ Matrix Parser::load_matrix(std::istream & stream) const {
 
     MatrixDimensions dims(mx.size(), mx.at(0).size());
 
-    return {
-        {new DenseMatrixIterator(&dims, mx, 0, 0)},
-        {new DenseMatrixIterator(&dims, mx, dims.rows(), 0)},
-        _factory
-    };
+    return {{new DenseMatrixIterator(&dims, mx, 0, 0)},
+            {new DenseMatrixIterator(&dims, mx, dims.rows(), 0)},
+            _factory};
 }
