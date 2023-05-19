@@ -7,13 +7,11 @@ class Configurator {
   public:
     Configurator(std::ostream &);
 
-    double ratio() const { return _ratio; }
-    std::size_t input_length() const { return _max_len; }
-
     void load_config(const char *);
+
+    double sparse_ratio;
+    std::size_t max_input_length;
   private:
-    double _ratio;
-    std::size_t _max_len;
     std::ostream & _stream;
 
     void error_and_reset(std::ostream &);

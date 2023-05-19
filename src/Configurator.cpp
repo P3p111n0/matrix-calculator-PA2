@@ -83,7 +83,7 @@ void Configurator::load_config(const char * file_name) {
                 return;
             }
 
-            _ratio = numerator / denominator;
+            sparse_ratio = numerator / denominator;
             continue;
         }
 
@@ -103,7 +103,7 @@ void Configurator::load_config(const char * file_name) {
                 return;
             }
 
-            _max_len = new_len;
+            max_input_length = new_len;
             continue;
         }
 
@@ -128,11 +128,11 @@ void Configurator::syntax_error(std::ostream & os) const {
 }
 
 void Configurator::print_defaults(std::ostream & os) const {
-    os << "\t SPARSE_RATIO = " << _ratio * 100 << "%" << std::endl;
-    os << "\t MAX_INPUT_LEN = " << _max_len << std::endl;
+    os << "\t SPARSE_RATIO = " << sparse_ratio * 100 << "%" << std::endl;
+    os << "\t MAX_INPUT_LEN = " << max_input_length << std::endl;
 }
 
 void Configurator::set_defaults() {
-    _ratio = 2 / 3.0;
-    _max_len = 200;
+    sparse_ratio = 2 / 3.0;
+    max_input_length = 200;
 }
