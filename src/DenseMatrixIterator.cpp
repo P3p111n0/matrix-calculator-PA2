@@ -2,13 +2,15 @@
 
 DenseMatrixIterator::DenseMatrixIterator(const DenseMatrix * ptr,
                                          std::size_t row, std::size_t column)
-    : AbstractMatrixIterator(&ptr->_dimensions, row, column), _data(ptr->_data),
-      _matrix_rows(ptr->_dimensions.rows()),
-      _matrix_columns(ptr->_dimensions.columns()) {}
+    : AbstractMatrixIterator(&ptr->_dimensions, row, column), _data(ptr->_data) {}
+
+DenseMatrixIterator::DenseMatrixIterator(
+    const MatrixDimensions * ptr, const DenseMatrixIterator::DenseMatrixContainer & vec,
+    std::size_t row, std::size_t column) : AbstractMatrixIterator(ptr, row, column), _data(vec) {}
 
 void DenseMatrixIterator::operator++() {
     next_element();
-    while (_row < _matrix_rows && _data[_row][_column] == 0) {
+    while (_row < get_matrix_rows() && _data[_row][_column] == 0) {
         next_element();
     }
 }
@@ -21,7 +23,7 @@ std::size_t
 DenseMatrixIterator::distance(const AbstractMatrixIterator & other) const {
     DenseMatrixIterator it_copy(*this);
     std::size_t result = 0;
-    while (it_copy != other && _row < _matrix_rows) {
+    while (it_copy != other && _row < get_matrix_rows()) {
         ++it_copy;
         ++result;
     }
@@ -30,7 +32,7 @@ DenseMatrixIterator::distance(const AbstractMatrixIterator & other) const {
 
 void DenseMatrixIterator::next_element() {
     ++_column;
-    if (_column >= _matrix_columns) {
+    if (_column >= get_matrix_columns()) {
         ++_row;
         _column = 0;
     }
