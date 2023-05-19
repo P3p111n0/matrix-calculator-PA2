@@ -4,6 +4,42 @@
 #include <unordered_map>
 #include "Operator.h"
 
+static const std::unordered_map<std::string, Operator> FULL_OPERATOR_LOOKUP {
+    {"+", Operator::PLUS},
+    {"-", Operator::MINUS},
+    {"=", Operator::ASSIGN},
+    {"*", Operator::MUL},
+    {"UNITE", Operator::UNITE},
+    {"CUT", Operator::CUT},
+    {"TRANSPOSE", Operator::TRANSPOSE},
+    {"INV", Operator::INV},
+    {"DET", Operator::DET},
+    {"RANK", Operator::RANK},
+    {"GAUSS", Operator::GAUSS},
+    {"IMPORT", Operator::IMPORT},
+    {"EXPORT", Operator::EXPORT},
+    {"PRINT", Operator::PRINT},
+    {"SCAN", Operator::SCAN}
+};
+
+static const std::unordered_map<Operator, std::size_t> N_OF_ARGS_LOOKUP {
+    {Operator::PLUS, 2},
+    {Operator::MINUS, 2},
+    {Operator::ASSIGN, 1},
+    {Operator::MUL, 2},
+    {Operator::TRANSPOSE, 1},
+    {Operator::UNITE, 2},
+    {Operator::CUT, 5},
+    {Operator::INV, 1},
+    {Operator::DET, 1},
+    {Operator::RANK, 1},
+    {Operator::GAUSS, 1},
+    {Operator::IMPORT, 1},
+    {Operator::EXPORT, 1},
+    {Operator::PRINT, 1},
+    {Operator::SCAN, 1}
+};
+
 static const std::unordered_map<std::string, Operator> OPERATOR_LOOKUP{
     {"+", Operator::PLUS},
     {"-", Operator::MINUS},
