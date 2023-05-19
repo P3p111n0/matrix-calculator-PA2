@@ -70,6 +70,13 @@ Matrix::Matrix(const MatrixMemoryRepr & repr, MatrixFactory factory)
     optimize();
 }
 
+Matrix::Matrix(IteratorWrapper begin, IteratorWrapper end,
+               MatrixFactory factory)
+    : _factory(factory) {
+    //todo
+
+}
+
 Matrix::Matrix(double val, MatrixFactory factory) : _factory(factory) {
     _matrix = std::unique_ptr<MatrixMemoryRepr>(_factory.get_initial_repr(val));
 }

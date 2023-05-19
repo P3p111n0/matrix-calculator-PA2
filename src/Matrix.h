@@ -1,5 +1,6 @@
 #pragma once
 
+#include "IteratorWrapper.h"
 #include "MatrixMemoryRepr.h"
 #include "MatrixFactory.h"
 #include <initializer_list>
@@ -14,6 +15,7 @@ class Matrix {
     Matrix(std::size_t, std::size_t, MatrixFactory);
     Matrix(std::initializer_list<std::initializer_list<double>>, MatrixFactory);
     Matrix(const MatrixMemoryRepr &, MatrixFactory);
+    Matrix(IteratorWrapper, IteratorWrapper, MatrixFactory);
     Matrix(double, MatrixFactory);
     Matrix(const Matrix &);
     Matrix(Matrix &&) noexcept;
