@@ -25,7 +25,7 @@ static const std::unordered_map<std::string, Operator> FULL_OPERATOR_LOOKUP {
 static const std::unordered_map<Operator, std::size_t> N_OF_ARGS_LOOKUP {
     {Operator::PLUS, 2},
     {Operator::MINUS, 2},
-    {Operator::ASSIGN, 1},
+    {Operator::ASSIGN, 2},
     {Operator::MUL, 2},
     {Operator::TRANSPOSE, 1},
     {Operator::UNITE, 2},
