@@ -88,6 +88,7 @@ bool InputReader::parse_input(
             std::string new_name = TMP_NAME;
             new_name += std::to_string(variables.size());
             variables.emplace(new_name, parsed_matrix);
+            output_queue.push(new_name);
             continue;
         }
 
@@ -158,6 +159,7 @@ bool InputReader::parse_input(
             std::string new_name = TMP_NAME;
             new_name += std::to_string(variables.size());
             variables.emplace(new_name, number_in_matrix);
+            output_queue.push(new_name);
 
         } catch (std::exception & e) {
             throw std::invalid_argument("Unknown token " + token);
