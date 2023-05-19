@@ -7,14 +7,11 @@
 #include <string>
 #include <unordered_map>
 
-class InputReader {
+class Parser {
   public:
-    InputReader(std::istream &, std::size_t, const MatrixFactory &);
-
-    bool read_input(std::unordered_map<std::string, Matrix> &) const;
-  private:
+    Parser(std::istream &, std::size_t, const MatrixFactory &);
     bool parse_input(std::unordered_map<std::string, Matrix> &) const;
-    bool evaluate_input(std::unordered_map<std::string, Matrix> &) const;
+  private:
     Matrix load_matrix(std::istream &) const;
 
     std::istream & _stream;

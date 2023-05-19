@@ -1,5 +1,6 @@
-#include "InputReader.h"
+#include "Parser.h"
 #include "DenseMatrixIterator.h"
+#include "Matrix.h"
 #include "MatrixDimensions.h"
 #include "MatrixFactory.h"
 #include "Operator.h"
@@ -10,7 +11,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "Matrix.h"
 
 inline constexpr char TMP_NAME[] = "__TMP";
 static const std::unordered_map<std::string, Operator> OPERATOR_LOOKUP{
@@ -57,15 +57,10 @@ static const std::unordered_map<std::string, OperatorPriority> PRIORITY_LOOKUP{
     {"PRINT", OperatorPriority::PRINT},
     {"SCAN", OperatorPriority::SCAN}};
 
-InputReader::InputReader(std::istream & stream, std::size_t max_input_len, const MatrixFactory & factory)
+Parser::Parser(std::istream & stream, std::size_t max_input_len, const MatrixFactory & factory)
     : _stream(stream), _max_len(max_input_len), _factory(factory) {}
 
-bool InputReader::read_input(
-    std::unordered_map<std::string, Matrix> & variables) const {
-    return parse_input(variables);
-}
-
-bool InputReader::parse_input(
+bool Parser::parse_input(
     std::unordered_map<std::string, Matrix> & variables) const {
     std::queue<std::string> output_queue;
     std::stack<std::string> operator_stack;
@@ -177,7 +172,7 @@ bool InputReader::parse_input(
     return true;
 }
 
-Matrix InputReader::load_matrix(std::istream & stream) const {
+Matrix Parser::load_matrix(std::istream & stream) const {
     char c;
     std::vector<std::vector<double>> mx;
     while(stream.peek() != ']' && !stream.eof()){
@@ -216,9 +211,4 @@ Matrix InputReader::load_matrix(std::istream & stream) const {
         {new DenseMatrixIterator(&dims, mx, dims.rows(), 0)},
         _factory
     };
-}
-
-bool InputReader::evaluate_input(
-    std::unordered_map<std::string, Matrix> & variables) const {
-    return false;
 }
