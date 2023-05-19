@@ -78,12 +78,13 @@ bool InputReader::parse_input(
 
     std::stringstream line_stream(line);
     while (!line_stream.eof()) {
+        line_stream >> std::ws;
         std::string token;
 
         if (line_stream.peek() == '['){
             char c;
             line_stream >> c;
-            Matrix parsed_matrix = std::move(load_matrix(line_stream));
+            Matrix parsed_matrix = load_matrix(line_stream);
             std::string new_name = TMP_NAME;
             new_name += std::to_string(variables.size());
             variables.emplace(new_name, parsed_matrix);
@@ -105,6 +106,7 @@ bool InputReader::parse_input(
                     "Functions cannot be used in compound expressions.");
             }
             operator_stack.push(token);
+            continue;
         }
 
         if (token == "(") {
@@ -133,6 +135,8 @@ bool InputReader::parse_input(
                 output_queue.push(operator_stack.top());
                 operator_stack.pop();
             }
+
+            continue;
         }
 
         // token is an operator, parenthesis or brace
@@ -144,6 +148,7 @@ bool InputReader::parse_input(
                 operator_stack.pop();
             }
             operator_stack.push(token);
+            continue;
         }
 
         // token is a number
