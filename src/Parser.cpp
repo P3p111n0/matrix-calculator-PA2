@@ -149,6 +149,11 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
             continue;
         }
 
+        if (operator_stack.top() == "SCAN"){
+            output_queue.push(token);
+            continue;
+        }
+
         // token is a number
         try {
             double num = std::stod(token);
