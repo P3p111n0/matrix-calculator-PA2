@@ -1,4 +1,6 @@
 #include "InputReader.h"
+#include "DenseMatrixIterator.h"
+#include "MatrixDimensions.h"
 #include "MatrixFactory.h"
 #include "Operator.h"
 #include <queue>
@@ -10,7 +12,7 @@
 #include <vector>
 #include "Matrix.h"
 
-static const std::string TMP_NAME = "__TMP";
+inline constexpr char TMP_NAME[] = "__TMP";
 static const std::unordered_map<std::string, Operator> OPERATOR_LOOKUP{
     {"+", Operator::PLUS},
     {"-", Operator::MINUS},
@@ -141,6 +143,18 @@ bool InputReader::parse_input(
             }
             operator_stack.push(token);
         }
+
+        // token is a number
+        try {
+            double num = std::stod(token);
+            Matrix number_in_matrix(num, _factory);
+            std::string new_name = TMP_NAME;
+            new_name += std::to_string(variables.size());
+            variables.emplace(new_name, number_in_matrix);
+
+        } catch (std::exception & e) {
+            throw std::invalid_argument("Unknown token " + token);
+        }
     }
 
     while (!operator_stack.empty()) {
@@ -186,7 +200,13 @@ Matrix InputReader::load_matrix() const {
         throw std::runtime_error("Matrix parse error.");
     }
 
-    return {mx, _factory};
+    MatrixDimensions dims(mx.size(), mx.at(0).size());
+
+    return {
+        {new DenseMatrixIterator(&dims, mx, 0, 0)},
+        {new DenseMatrixIterator(&dims, mx, dims.rows(), 0)},
+        _factory
+    };
 }
 
 bool InputReader::evaluate_input(

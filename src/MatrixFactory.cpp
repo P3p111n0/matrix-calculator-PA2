@@ -45,6 +45,17 @@ MatrixMemoryRepr * MatrixFactory::get_initial_repr(double val) const {
     return repr;
 }
 
+MatrixMemoryRepr * MatrixFactory::get_initial_repr(IteratorWrapper begin,
+                                                   IteratorWrapper end) const {
+    std::size_t distance = begin.distance(end);
+    std::size_t number_of_non_zeroes = (1 - _ratio) * begin.get_matrix_rows() * begin.get_matrix_columns();
+
+    if (distance > number_of_non_zeroes){
+        return new SparseMatrix(std::move(begin), std::move(end));
+    }
+    return new DenseMatrix(std::move(begin), std::move(end));
+}
+
 MatrixMemoryRepr * MatrixFactory::convert(MatrixMemoryRepr * mx) const {
     if (mx->is_efficient(_ratio)) {
         return mx;
