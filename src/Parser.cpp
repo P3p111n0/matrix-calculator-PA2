@@ -105,7 +105,9 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
             continue;
         }
 
-        if (operator_stack.top() == "SCAN"){
+        if (std::string current_op = operator_stack.top();
+            current_op == "SCAN" || current_op == "IMPORT" ||
+            current_op == "EXPORT") {
             output_queue.push(token);
             continue;
         }
