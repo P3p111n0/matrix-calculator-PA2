@@ -72,8 +72,8 @@ Matrix::Matrix(const MatrixMemoryRepr & repr, MatrixFactory factory)
 
 Matrix::Matrix(IteratorWrapper begin, IteratorWrapper end,
                MatrixFactory factory)
-    : _factory(factory),
-      _matrix(_factory.get_initial_repr(std::move(begin), std::move(end))) {}
+    : _matrix(factory.get_initial_repr(std::move(begin), std::move(end))),
+      _factory(factory) {}
 
 Matrix::Matrix(double val, MatrixFactory factory) : _factory(factory) {
     _matrix = std::unique_ptr<MatrixMemoryRepr>(_factory.get_initial_repr(val));
