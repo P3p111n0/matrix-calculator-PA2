@@ -15,7 +15,7 @@ class InputReader {
   private:
     bool parse_input(std::unordered_map<std::string, Matrix> &) const;
     bool evaluate_input(std::unordered_map<std::string, Matrix> &) const;
-    Matrix load_matrix() const;
+    Matrix load_matrix(std::istream &) const;
 
     std::istream & _stream;
     std::size_t _max_len;

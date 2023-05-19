@@ -61,7 +61,9 @@ InputReader::InputReader(std::istream & stream, std::size_t max_input_len, const
     : _stream(stream), _max_len(max_input_len), _factory(factory) {}
 
 bool InputReader::read_input(
-    std::unordered_map<std::string, Matrix> & variables) const {}
+    std::unordered_map<std::string, Matrix> & variables) const {
+    return parse_input(variables);
+}
 
 bool InputReader::parse_input(
     std::unordered_map<std::string, Matrix> & variables) const {
@@ -80,8 +82,8 @@ bool InputReader::parse_input(
 
         if (line_stream.peek() == '['){
             char c;
-            _stream >> c;
-            Matrix parsed_matrix = load_matrix();
+            line_stream >> c;
+            Matrix parsed_matrix = std::move(load_matrix(line_stream));
             std::string new_name = TMP_NAME;
             new_name += std::to_string(variables.size());
             variables.emplace(new_name, parsed_matrix);
@@ -168,20 +170,20 @@ bool InputReader::parse_input(
     return true;
 }
 
-Matrix InputReader::load_matrix() const {
+Matrix InputReader::load_matrix(std::istream & stream) const {
     char c;
     std::vector<std::vector<double>> mx;
-    while(_stream.peek() != ']'){
+    while(stream.peek() != ']' && !stream.eof()){
         std::vector<double> row;
-        _stream >> c;
+        stream >> c;
         if (c != '['){
             throw std::runtime_error("Matrix parse error.");
         }
         while (c != ']'){
             double val;
-            _stream >> val;
+            stream >> val;
             row.emplace_back(val);
-            _stream >> c;
+            stream >> c;
             if (c == ',' || c == ']'){
                 continue;
             }
@@ -192,7 +194,7 @@ Matrix InputReader::load_matrix() const {
             throw std::runtime_error("Matrix parse error.");
         }
 
-        _stream >> c;
+        stream >> c;
         if (c == ',' || c == ']'){
             mx.emplace_back(row);
             continue;
