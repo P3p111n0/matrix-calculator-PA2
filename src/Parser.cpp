@@ -62,7 +62,8 @@ Parser::Parser(std::istream & stream, std::size_t max_input_len, const MatrixFac
 
 std::shared_ptr<std::queue<std::string>> Parser::parse_input(
     std::unordered_map<std::string, Matrix> & variables) const {
-    std::shared_ptr<std::queue<std::string>> output_queue = std::make_shared<std::queue<std::string>>();
+    std::shared_ptr<std::queue<std::string>> output_queue_pointer = std::make_shared<std::queue<std::string>>();
+    auto & output_queue = *output_queue_pointer;
     std::stack<std::string> operator_stack;
     std::string line;
 
@@ -83,15 +84,19 @@ std::shared_ptr<std::queue<std::string>> Parser::parse_input(
             std::string new_name = TMP_NAME;
             new_name += std::to_string(variables.size());
             variables.emplace(new_name, parsed_matrix);
-            output_queue->push(new_name);
+            output_queue.push(new_name);
             continue;
         }
 
         line_stream >> token;
 
+        if (line_stream.eof()){
+            break;
+        }
+
         // token is a variable
         if (variables.count(token)) {
-            output_queue->push(token);
+            output_queue.push(token);
             continue;
         }
 
@@ -115,7 +120,7 @@ std::shared_ptr<std::queue<std::string>> Parser::parse_input(
                 throw std::runtime_error("Parenthesis mismatch on input");
             }
             while (operator_stack.top() != "(") {
-                output_queue->push(operator_stack.top());
+                output_queue.push(operator_stack.top());
                 operator_stack.pop();
                 if (operator_stack.empty()) {
                     throw std::runtime_error("Parenthesis mismatch on input");
@@ -128,7 +133,7 @@ std::shared_ptr<std::queue<std::string>> Parser::parse_input(
             operator_stack.pop();
 
             if (FUNCTION_LOOKUP.count(operator_stack.top())) {
-                output_queue->push(operator_stack.top());
+                output_queue.push(operator_stack.top());
                 operator_stack.pop();
             }
 
@@ -140,7 +145,7 @@ std::shared_ptr<std::queue<std::string>> Parser::parse_input(
             while (!operator_stack.empty() && operator_stack.top() != "(" &&
                    PRIORITY_LOOKUP.at(operator_stack.top()) >
                        PRIORITY_LOOKUP.at(token)) {
-                output_queue->push(operator_stack.top());
+                output_queue.push(operator_stack.top());
                 operator_stack.pop();
             }
             operator_stack.push(token);
@@ -154,7 +159,7 @@ std::shared_ptr<std::queue<std::string>> Parser::parse_input(
             std::string new_name = TMP_NAME;
             new_name += std::to_string(variables.size());
             variables.emplace(new_name, number_in_matrix);
-            output_queue->push(new_name);
+            output_queue.push(new_name);
 
         } catch (std::exception & e) {
             throw std::invalid_argument("Unknown token " + token);
@@ -165,11 +170,11 @@ std::shared_ptr<std::queue<std::string>> Parser::parse_input(
         if (operator_stack.top() == "(" || operator_stack.top() == ")") {
             throw std::runtime_error("Parenthesis mismatch on input");
         }
-        output_queue->push(operator_stack.top());
+        output_queue.push(operator_stack.top());
         operator_stack.pop();
     }
 
-    return output_queue;
+    return output_queue_pointer;
 }
 
 Matrix Parser::load_matrix(std::istream & stream) const {
@@ -199,6 +204,9 @@ Matrix Parser::load_matrix(std::istream & stream) const {
         stream >> c;
         if (c == ',' || c == ']'){
             mx.emplace_back(row);
+            if (c == ']'){
+                break;
+            }
             continue;
         }
         throw std::runtime_error("Matrix parse error.");
