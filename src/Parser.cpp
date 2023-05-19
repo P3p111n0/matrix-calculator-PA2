@@ -192,6 +192,16 @@ static bool read_row(std::istream & stream, std::vector<double> & row) {
     }
 }
 
+static inline Matrix
+create_matrix_from_vec(const std::vector<std::vector<double>> & vec,
+                       const MatrixFactory factory) {
+    MatrixDimensions dims(vec.size(), vec.at(0).size());
+
+    return {{new DenseMatrixIterator(&dims, vec, 0, 0)},
+            {new DenseMatrixIterator(&dims, vec, dims.rows(), 0)},
+            factory};
+}
+
 Matrix Parser::load_matrix(std::istream & stream) const {
     char c;
     std::vector<std::vector<double>> mx;
@@ -221,9 +231,23 @@ Matrix Parser::load_matrix(std::istream & stream) const {
         throw std::runtime_error("Matrix parse error.");
     }
 
-    MatrixDimensions dims(mx.size(), mx.at(0).size());
+    return create_matrix_from_vec(mx, _factory);
+}
 
-    return {{new DenseMatrixIterator(&dims, mx, 0, 0)},
-            {new DenseMatrixIterator(&dims, mx, dims.rows(), 0)},
-            _factory};
+Matrix Parser::load_matrix_scan() const {
+    std::vector<std::vector<double>> mx;
+    std::string line;
+
+    while (std::getline(_stream, line) && line != "END") {
+        std::vector<double> row;
+        if (!read_row(_stream, row)) {
+            throw std::runtime_error("Matrix scan error.");
+        }
+        if (!mx.empty() && mx.back().size() != row.size()) {
+            throw std::runtime_error("Row length mismatch in matrix.");
+        }
+        mx.emplace_back(row);
+    }
+
+    return create_matrix_from_vec(mx, _factory);
 }
