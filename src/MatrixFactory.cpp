@@ -50,7 +50,7 @@ MatrixMemoryRepr * MatrixFactory::get_initial_repr(IteratorWrapper begin,
     std::size_t distance = begin.distance(end);
     std::size_t number_of_non_zeroes = (1 - _ratio) * begin.get_matrix_rows() * begin.get_matrix_columns();
 
-    if (distance > number_of_non_zeroes){
+    if (distance < number_of_non_zeroes){
         return new SparseMatrix(std::move(begin), std::move(end));
     }
     return new DenseMatrix(std::move(begin), std::move(end));
