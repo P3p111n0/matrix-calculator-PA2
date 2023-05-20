@@ -3,8 +3,21 @@
 #include "Operator.h"
 #include "OperatorLookup.h"
 #include <stdexcept>
+#include <string>
+#include <variant>
 
 static inline constexpr char RESULT_NAME[] = "__RESULT";
+
+static inline std::string get_result_name(std::size_t map_size) {
+    return std::string(RESULT_NAME) += std::to_string(map_size);
+}
+
+template<typename T>
+inline T top_and_pop(std::stack<T> & x) {
+    T top = x.top();
+    x.pop();
+    return top;
+}
 
 Evaluator::Evaluator(MatrixFactory factory) : _factory(factory) {}
 
@@ -57,12 +70,10 @@ void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
         throw std::runtime_error("Invalid number of arguments.");
     }
 
-    std::string a = process_stack.top();
-    process_stack.pop();
+    std::string a = top_and_pop(process_stack);
     Matrix rhs = variables.at(a);
 
-    std::string result_name(RESULT_NAME);
-    result_name += std::to_string(variables.size());
+    std::string result_name = get_result_name(variables.size());
 
     if (op == Operator::DET){
         auto det = rhs.det();
@@ -101,13 +112,42 @@ void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
     case Operator::PRINT:
         std::cout << rhs << std::endl;
         break;
-    case Operator::SCAN:
-        break;
     }
 }
 
-void Evaluator::handle_two_args(std::stack<std::string> &,
-                                Evaluator::VariableMap &, Operator) const {}
+void Evaluator::handle_two_args(std::stack<std::string> & process_stack,
+                                Evaluator::VariableMap & variables, Operator op) const {
+    std::string b = top_and_pop(process_stack);
+    std::string a = top_and_pop(process_stack);
+
+    Matrix rhs = variables.at(b);
+    Matrix lhs = variables.at(a);
+
+    std::string result_name = get_result_name(variables.size());
+
+    switch (op) {
+    case Operator::PLUS:
+        variables.emplace(result_name, lhs + rhs);
+        process_stack.push(result_name);
+        break;
+    case Operator::MINUS:
+        variables.emplace(result_name, lhs - rhs);
+        process_stack.push(result_name);
+        break;
+    case Operator::ASSIGN: // todo assignment
+
+        break;
+    case Operator::MUL:
+        variables.emplace(result_name, lhs * rhs);
+        process_stack.push(result_name);
+        break;
+    case Operator::UNITE:
+        lhs.unite(rhs);
+        process_stack.push(a);
+        break;
+    }
+
+}
 
 void Evaluator::handle_five_args(std::stack<std::string> &,
                                  Evaluator::VariableMap &, Operator) const {}
