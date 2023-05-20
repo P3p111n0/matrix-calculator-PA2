@@ -3,10 +3,12 @@
 #include "Matrix.h"
 #include "MatrixDimensions.h"
 #include "MatrixFactory.h"
+#include "Operator.h"
 #include "OperatorLookup.h"
 #include <queue>
 #include <sstream>
 #include <stack>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -34,6 +36,7 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
     while (line_stream >> std::ws && !line_stream.eof()) {
         std::string token;
 
+        // inline matrix in input
         if (line_stream.peek() == '[') {
             char c;
             line_stream >> c;
@@ -60,6 +63,14 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
                     "Functions cannot be used in compound expressions.");
             }
             operator_stack.push(token);
+            if (token == "SCAN"){
+                std::string name;
+                if (!(line_stream >> name)){
+                    throw std::invalid_argument("Invalid argument in call of SCAN.");
+                }
+                auto scanned_mx = load_matrix_scan(_stream);
+                variables.emplace(name, scanned_mx);
+            }
             continue;
         }
 
@@ -105,13 +116,6 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
             continue;
         }
 
-        if (std::string current_op = operator_stack.top();
-            current_op == "SCAN" || current_op == "IMPORT" ||
-            current_op == "EXPORT") {
-            output_queue.push(token);
-            continue;
-        }
-
         // token is a number
         try {
             double num = std::stod(token);
@@ -120,8 +124,11 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
             new_name += std::to_string(variables.size());
             variables.emplace(new_name, number_in_matrix);
             output_queue.push(new_name);
-
         } catch (std::exception & e) {
+            if (output_queue.empty()){
+                output_queue.push(token);
+                continue;
+            }
             throw std::invalid_argument("Unknown token " + token);
         }
     }
@@ -197,13 +204,22 @@ Matrix Parser::load_matrix(std::istream & stream) const {
     return create_matrix_from_vec(mx, _factory);
 }
 
-Matrix Parser::load_matrix_scan() const {
+Matrix Parser::load_matrix_scan(std::istream & stream) const {
     std::vector<std::vector<double>> mx;
     std::string line;
 
-    while (std::getline(_stream, line) && line != "END") {
+    while (std::getline(stream, line) && !line.empty()) {
         std::vector<double> row;
-        if (!read_row(_stream, row)) {
+        std::istringstream line_stream(line);
+
+        char bracket;
+        line_stream >> bracket;
+
+        if (bracket != '['){
+            throw std::runtime_error("Missing opening brace in scanned matrix.");
+        }
+
+        if (!read_row(line_stream, row)) {
             throw std::runtime_error("Matrix scan error.");
         }
         if (!mx.empty() && mx.back().size() != row.size()) {

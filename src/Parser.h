@@ -14,7 +14,7 @@ class Parser {
     std::shared_ptr<std::queue<std::string>> parse_input(std::unordered_map<std::string, Matrix> &) const;
   private:
     Matrix load_matrix(std::istream &) const;
-    Matrix load_matrix_scan() const;
+    Matrix load_matrix_scan(std::istream &) const;
 
     std::istream & _stream;
     std::size_t _max_len;
