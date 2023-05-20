@@ -70,6 +70,7 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
                 }
                 auto scanned_mx = load_matrix_scan(_stream);
                 variables.emplace(name, scanned_mx);
+                output_queue.emplace(name);
             }
             continue;
         }
@@ -139,6 +140,10 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
         }
         output_queue.push(operator_stack.top());
         operator_stack.pop();
+    }
+
+    if (output_queue.size() < 2) {
+        throw std::runtime_error("Invalid number of tokens on input.");
     }
 
     return output_queue_pointer;
