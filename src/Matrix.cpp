@@ -237,6 +237,27 @@ void Matrix::cut(std::size_t new_size_rows, std::size_t new_size_columns,
     optimize();
 }
 
+static inline bool matrix_is_a_number(const Matrix & mx) {
+    return mx.rows() == 1 && mx.columns() == 1;
+}
+
+void Matrix::cut(const Matrix & new_size_rows_mx, const Matrix & new_size_columns_mx,
+                 const Matrix & offset_rows_mx, const Matrix & offset_columns_mx) {
+    if (!matrix_is_a_number(new_size_rows_mx)
+        || !matrix_is_a_number(new_size_columns_mx)
+        || !matrix_is_a_number(offset_rows_mx)
+        || !matrix_is_a_number(offset_columns_mx)){
+        throw std::invalid_argument("Cut: Invalid arguments for conversion.");
+    }
+
+    std::size_t new_size_rows = new_size_rows_mx._matrix->at(0, 0).value();
+    std::size_t new_size_column = new_size_columns_mx._matrix->at(0, 0).value();
+    std::size_t offset_rows = offset_rows_mx._matrix->at(0, 0).value();
+    std::size_t offset_columns = offset_columns_mx._matrix->at(0, 0).value();
+
+    cut(new_size_rows, new_size_column, offset_rows, offset_columns);
+}
+
 void Matrix::inverse() {
     if (rows() != columns()) {
         throw std::logic_error("Non-square matrices cannot be inverted.");
