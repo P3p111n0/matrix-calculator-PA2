@@ -2,7 +2,6 @@
 #include "Matrix.h"
 #include "Operator.h"
 #include "OperatorLookup.h"
-#include <math.h>
 #include <stdexcept>
 
 static inline constexpr char RESULT_NAME[] = "__RESULT";
@@ -36,10 +35,19 @@ bool Evaluator::evaluate_input(
             break;
         case 5:
             handle_five_args(process_stack, variables, op);
+        default:
+            // this shouldn't happen
+            throw std::runtime_error("Unknown number of arguments.");
         }
     }
 
-    return false;
+    if (!process_stack.empty()){
+        std::string leftover = process_stack.top();
+        Matrix res = variables.at(leftover);
+        std::cout << res << std::endl;
+    }
+
+    return true;
 }
 
 void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
