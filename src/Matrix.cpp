@@ -196,21 +196,22 @@ void Matrix::transpose() {
     _matrix = std::move(transposed._matrix);
 }
 
-void Matrix::unite(const Matrix & other) {
-    if (columns() != other.columns()) {
+Matrix Matrix::unite(const Matrix & first, const Matrix & second) {
+    if (first.columns() != second.columns()) {
         throw std::invalid_argument("Unite: matrix dimension mismatch");
     }
-    Matrix united(rows() + other.rows(), columns(), _factory);
-    for (const auto & [pos, val] : *this) {
+    Matrix united(first.rows() + second.rows(), first.columns(),
+                  first._factory);
+    for (const auto & [pos, val] : first) {
         united._matrix->modify(pos.row, pos.column, val);
     }
-    for (const auto & [pos, val] : other) {
-        united._matrix->modify(pos.row + rows(), pos.column, val);
+    for (const auto & [pos, val] : second) {
+        united._matrix->modify(pos.row + first.rows(), pos.column, val);
     }
     united.optimize();
-    _det.reset();
-    _rank.reset();
-    _matrix = std::move(united._matrix);
+    united._det.reset();
+    united._rank.reset();
+    return united;
 }
 
 void Matrix::cut(std::size_t new_size_rows, std::size_t new_size_columns,

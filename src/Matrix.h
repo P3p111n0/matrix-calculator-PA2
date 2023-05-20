@@ -35,7 +35,7 @@ class Matrix {
     std::size_t columns() const;
 
     void transpose();
-    void unite(const Matrix &);
+    static Matrix unite(const Matrix &, const Matrix &);
     void cut(std::size_t, std::size_t, std::size_t, std::size_t);
     void inverse();
     std::optional<double> det();
