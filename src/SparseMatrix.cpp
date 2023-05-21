@@ -1,5 +1,4 @@
 #include "SparseMatrix.h"
-#include "MatrixDimensions.h"
 #include "MatrixElement.h"
 #include "SparseMatrixIterator.h"
 
@@ -90,11 +89,6 @@ void SparseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
         Position new_pos = {pos.row == f_row ? s_row : f_row, pos.column};
         _data[new_pos] = val;
     }
-}
-
-void SparseMatrix::add_row() {
-    _dimensions =
-        MatrixDimensions(_dimensions.rows() + 1, _dimensions.columns());
 }
 
 void SparseMatrix::print(std::ostream & os) const {

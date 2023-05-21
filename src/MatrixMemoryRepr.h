@@ -93,13 +93,6 @@ class MatrixMemoryRepr {
      */
     virtual void swap_rows(std::size_t first_row, std::size_t second_row) = 0;
 
-
-    /**
-     * @brief Adds a new row filled with zeroes to the matrix and increases
-     *        the number of rows by 1.
-     */
-    virtual void add_row() = 0;
-
     /**
      * @brief Checks the efficiency of the representation in the given ratio.
      * @param ratio Ratio of zeroes to the number of elements.

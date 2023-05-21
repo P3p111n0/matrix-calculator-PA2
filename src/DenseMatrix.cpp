@@ -1,7 +1,6 @@
 #include "DenseMatrix.h"
 #include "DenseMatrixIterator.h"
 #include "IteratorWrapper.h"
-#include "MatrixDimensions.h"
 #include "MatrixMemoryRepr.h"
 #include <vector>
 
@@ -83,15 +82,6 @@ void DenseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
         throw std::out_of_range("Swap_rows: index out of range");
     }
     std::swap(_data[f_row], _data[s_row]);
-}
-
-void DenseMatrix::add_row() {
-    _dimensions =
-        MatrixDimensions(_dimensions.rows() + 1, _dimensions.columns());
-
-    std::vector<double> new_row(_dimensions.columns());
-    new_row.assign(new_row.size(), 0);
-    _data.emplace_back(new_row);
 }
 
 void DenseMatrix::print(std::ostream & os) const {

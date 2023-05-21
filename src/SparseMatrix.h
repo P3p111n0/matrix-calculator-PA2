@@ -99,13 +99,6 @@ class SparseMatrix : public MatrixMemoryRepr {
     void swap_rows(std::size_t first_row, std::size_t second_row) override;
 
     /**
-     * @brief Adds a new row filled with zeroes to the matrix and increases
-     *        the number of rows by 1. Using this method might affect the
-     *        efficiency of the representation.
-     */
-    void add_row() override;
-
-    /**
      * @brief Determines, whether the representation as a sparse matrix is
      *        effective for the given ratio.
      * @param ratio The ratio to determine the efficiency of the representation.

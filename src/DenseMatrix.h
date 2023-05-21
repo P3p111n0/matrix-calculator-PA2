@@ -94,13 +94,6 @@ class DenseMatrix : public MatrixMemoryRepr {
     void swap_rows(std::size_t first_row, std::size_t second_row) override;
 
     /**
-     * @brief Adds a new row filled with zeroes to the matrix and increases
-     *        the number of rows by 1. Using this method might cause the
-     *        representation to become inefficient.
-     */
-    void add_row() override;
-
-    /**
      * @brief Determines, whether the representation is effective in the
      *        given ratio.
      * @param ratio Ratio of non-zero to zero values in the matrix.
