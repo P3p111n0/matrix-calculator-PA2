@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include "Operator.h"
 
-static const std::unordered_map<std::string, Operator> FULL_OPERATOR_LOOKUP {
+inline const std::unordered_map<std::string, Operator> FULL_OPERATOR_LOOKUP {
     {"+", Operator::PLUS},
     {"-", Operator::MINUS},
     {"=", Operator::ASSIGN},
@@ -22,7 +22,7 @@ static const std::unordered_map<std::string, Operator> FULL_OPERATOR_LOOKUP {
     {"SCAN", Operator::SCAN}
 };
 
-static const std::unordered_map<Operator, std::size_t> N_OF_ARGS_LOOKUP {
+inline const std::unordered_map<Operator, std::size_t> N_OF_ARGS_LOOKUP {
     {Operator::PLUS, 2},
     {Operator::MINUS, 2},
     {Operator::ASSIGN, 2},
@@ -40,7 +40,7 @@ static const std::unordered_map<Operator, std::size_t> N_OF_ARGS_LOOKUP {
     {Operator::SCAN, 1}
 };
 
-static const std::unordered_map<std::string, Operator> OPERATOR_LOOKUP{
+inline const std::unordered_map<std::string, Operator> OPERATOR_LOOKUP{
     {"+", Operator::PLUS},
     {"-", Operator::MINUS},
     {"=", Operator::ASSIGN},
@@ -52,7 +52,7 @@ static const std::unordered_map<std::string, Operator> OPERATOR_LOOKUP{
     {"[", Operator::MATRIX_BRACE_LEFT},
     {"]", Operator::MATRIX_BRACE_RIGHT}};
 
-static const std::unordered_map<std::string, Operator> FUNCTION_LOOKUP{
+inline const std::unordered_map<std::string, Operator> FUNCTION_LOOKUP{
     {"TRANSPOSE", Operator::TRANSPOSE},
     {"INV", Operator::INV},
     {"DET", Operator::DET},
@@ -63,7 +63,7 @@ static const std::unordered_map<std::string, Operator> FUNCTION_LOOKUP{
     {"PRINT", Operator::PRINT},
     {"SCAN", Operator::SCAN}};
 
-static const std::unordered_map<std::string, OperatorPriority> PRIORITY_LOOKUP{
+inline const std::unordered_map<std::string, OperatorPriority> PRIORITY_LOOKUP{
     {"+", OperatorPriority::PLUS},
     {"-", OperatorPriority::MINUS},
     {"=", OperatorPriority::ASSIGN},
