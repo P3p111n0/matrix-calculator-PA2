@@ -3,11 +3,7 @@
 #include "OperatorLookup.h"
 #include <string>
 
-static inline constexpr char RESULT_NAME[] = "__RESULT";
-
-static inline std::string get_result_name(std::size_t map_size) {
-    return std::string(RESULT_NAME) += std::to_string(map_size);
-}
+static inline constexpr char RESULT_NAME[] = "RESULT";
 
 template <typename T> inline T top_and_pop(std::stack<T> & x) {
     T top = x.top();
@@ -55,7 +51,7 @@ bool Evaluator::evaluate_input(
     if (!process_stack.empty()) {
         std::string leftover = process_stack.top();
         Matrix res = variables.at(leftover);
-        std::cout << res << std::endl;
+        _stream << res << std::endl;
     }
 
     return true;
@@ -75,7 +71,7 @@ void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
     }
 
     Matrix rhs = variables.at(a);
-    std::string result_name = get_result_name(variables.size());
+    std::string result_name = get_temporary_name(RESULT_NAME, variables.size());
 
     if (!process_stack.empty()) {
         result_name = a;
@@ -117,7 +113,7 @@ void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
     case Operator::EXPORT: // todo export
         break;
     case Operator::PRINT:
-        std::cout << rhs << std::endl;
+        _stream << rhs << std::endl;
         break;
     }
 
@@ -142,7 +138,7 @@ void Evaluator::handle_two_args(std::stack<std::string> & process_stack,
         throw std::invalid_argument("Unknown token: " + b);
     }
 
-    std::string result_name = get_result_name(variables.size());
+    std::string result_name = get_temporary_name(RESULT_NAME, variables.size());
 
     Matrix rhs = variables.at(b);
     if (auto a_count = variables.count(a);
@@ -202,7 +198,7 @@ void Evaluator::handle_five_args(std::stack<std::string> & process_stack,
     Matrix new_rows_matrix = variables.at(new_rows_token);
     Matrix new_columns_matrix = variables.at(new_columns_token);
 
-    std::string result_name = get_result_name(variables.size());
+    std::string result_name = get_temporary_name(RESULT_NAME, variables.size());
     if (process_stack.empty()) {
         result_name = rhs_token;
     }

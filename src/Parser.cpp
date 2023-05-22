@@ -7,12 +7,11 @@
 #include <queue>
 #include <sstream>
 #include <stack>
-#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
-inline constexpr char TMP_NAME[] = "__TMP";
+inline constexpr char TMP_NAME[] = "TMP";
 
 Parser::Parser(MatrixFactory factory, std::istream & stream, std::size_t max_input_len)
     : InputHandler(factory), _stream(stream), _max_len(max_input_len) {}
@@ -39,8 +38,7 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
             char c;
             line_stream >> c;
             Matrix parsed_matrix = load_matrix(line_stream);
-            std::string new_name = TMP_NAME;
-            new_name += std::to_string(variables.size());
+            std::string new_name = get_temporary_name(TMP_NAME, variables.size());
             variables.emplace(new_name, parsed_matrix);
             output_queue.push(new_name);
             continue;
@@ -119,8 +117,7 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
         try {
             double num = std::stod(token);
             Matrix number_in_matrix(num, _factory);
-            std::string new_name = TMP_NAME;
-            new_name += std::to_string(variables.size());
+            std::string new_name = get_temporary_name(TMP_NAME, variables.size());
             variables.emplace(new_name, number_in_matrix);
             output_queue.push(new_name);
         } catch (std::exception & e) {
