@@ -19,8 +19,10 @@ bool InputHandler::string_has_prefix(const std::string & src,
     return true;
 }
 
-std::string InputHandler::get_temporary_name(const std::string & name_body, std::size_t postfix_num) {
+std::string InputHandler::get_temporary_name(const std::string & name_body) const {
+    static size_t tmp_cnt = 0;
     std::string new_name = std::string(RESERVED_NAME_PREFIX) + name_body;
-    new_name += std::to_string(postfix_num);
+    new_name += std::to_string(tmp_cnt);
+    ++tmp_cnt;
     return new_name;
 }

@@ -101,7 +101,7 @@ void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
 
     std::string a = top_and_pop(process_stack);
     Matrix rhs = actions.get_var(a);
-    std::string result_name = InputHandler::get_temporary_name(RESULT_NAME, _vars.size());
+    std::string result_name = get_temporary_name(RESULT_NAME);
 
     if (!process_stack.empty()) {
         result_name = a;
@@ -160,7 +160,7 @@ void Evaluator::handle_two_args(std::stack<std::string> & process_stack,
         throw std::runtime_error("Invalid use of '=' inside an expression.");
     }
 
-    std::string result_name = InputHandler::get_temporary_name(RESULT_NAME, _vars.size());
+    std::string result_name = get_temporary_name(RESULT_NAME);
     Matrix rhs = actions.get_var(b);
 
     if (op == Operator::ASSIGN){
@@ -208,7 +208,7 @@ void Evaluator::handle_five_args(std::stack<std::string> & process_stack,
     Matrix new_rows_matrix = actions.get_var(new_rows_token);
     Matrix new_columns_matrix = actions.get_var(new_columns_token);
 
-    std::string result_name = InputHandler::get_temporary_name(RESULT_NAME, _vars.size());
+    std::string result_name = get_temporary_name(RESULT_NAME);
     if (process_stack.empty()) {
         result_name = rhs_token;
     }

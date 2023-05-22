@@ -39,7 +39,7 @@ ParsedInput Parser::parse_input() const {
             char c;
             line_stream >> c;
             Matrix parsed_matrix = load_matrix(line_stream);
-            std::string new_name = InputHandler::get_temporary_name(TMP_NAME, variables.size());
+            std::string new_name = get_temporary_name(TMP_NAME);
             variables.emplace(new_name, parsed_matrix);
             output_queue.push(new_name);
             continue;
@@ -101,7 +101,7 @@ ParsedInput Parser::parse_input() const {
         try {
             double num = std::stod(token);
             Matrix number_in_matrix(num, _factory);
-            std::string new_name = InputHandler::get_temporary_name(TMP_NAME, variables.size());
+            std::string new_name = get_temporary_name(TMP_NAME);
             variables.emplace(new_name, number_in_matrix);
             output_queue.push(new_name);
         } catch (std::exception & e) {

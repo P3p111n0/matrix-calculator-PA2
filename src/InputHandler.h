@@ -11,6 +11,6 @@ class InputHandler {
     MatrixFactory _factory;
 
     static bool string_has_prefix(const std::string &, const std::string &);
-    static std::string get_temporary_name(const std::string &, std::size_t);
+    std::string get_temporary_name(const std::string &) const;
     static constexpr char RESERVED_NAME_PREFIX[] = "__";
 };
