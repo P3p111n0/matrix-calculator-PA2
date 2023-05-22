@@ -31,7 +31,7 @@ void Evaluator::load_nontmp_vars(const Evaluator::VariableMap & tmps) {
 Evaluator::Evaluator(MatrixFactory factory, std::ostream & os)
     : InputHandler(factory), _stream(os) {}
 
-bool Evaluator::evaluate_input(const ParsedInput & input) {
+void Evaluator::evaluate_input(const ParsedInput & input) {
     auto & output_queue = *input.output_queue;
     auto loaded_vars = *input.loaded_variables;
     load_nontmp_vars(loaded_vars);
@@ -70,36 +70,28 @@ bool Evaluator::evaluate_input(const ParsedInput & input) {
         Operator op = OPERATOR_LOOKUP.at(token);
         std::size_t n_of_args = N_OF_ARGS_LOOKUP.at(op);
 
-        try {
-            switch (n_of_args) {
-            case 1:
-                handle_one_arg(process_stack, op, actions);
-                break;
-            case 2:
-                handle_two_args(process_stack, op, actions);
-                break;
-            case 5:
-                handle_five_args(process_stack, op, actions);
-                break;
-            default:
-                // this shouldn't happen
-                _stream << "Unknown number of arguments." << std::endl;
-                return false;
-            }
-        } catch (std::exception & e) {
-            _stream << e.what() << std::endl;
-            return false;
+        switch (n_of_args) {
+        case 1:
+            handle_one_arg(process_stack, op, actions);
+            break;
+        case 2:
+            handle_two_args(process_stack, op, actions);
+            break;
+        case 5:
+            handle_five_args(process_stack, op, actions);
+            break;
+        default:
+            // this shouldn't happen
+            throw std::runtime_error("Unknown number of arguments.");
         }
 
         if (!process_stack.empty()) {
             std::string leftover = process_stack.top();
-            Matrix res = actions.get_var(leftover);
+            Matrix res = getter(leftover);
             _stream << res << std::endl;
         }
-        return true;
     }
 }
-
 void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
                                Operator op, const ContainerOperations & actions) {
     if (process_stack.empty()) {

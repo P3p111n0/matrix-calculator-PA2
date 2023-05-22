@@ -15,7 +15,7 @@ class Evaluator : public InputHandler {
     using VariableMap = std::unordered_map<std::string, Matrix>;
   public:
     Evaluator(MatrixFactory, std::ostream &);
-    bool evaluate_input(const ParsedInput &);
+    void evaluate_input(const ParsedInput &);
 
   private:
     std::ostream & _stream;
