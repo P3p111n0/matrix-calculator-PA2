@@ -1,16 +1,14 @@
 #include "Parser.h"
 #include "DenseMatrixIterator.h"
+#include "InputHandler.h"
 #include "Matrix.h"
 #include "MatrixDimensions.h"
 #include "MatrixFactory.h"
 #include "OperatorLookup.h"
 #include "ParsedInput.h"
-#include <queue>
 #include <sstream>
 #include <stack>
-#include <stdexcept>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 inline constexpr char TMP_NAME[] = "TMP";
@@ -41,7 +39,7 @@ ParsedInput Parser::parse_input() const {
             char c;
             line_stream >> c;
             Matrix parsed_matrix = load_matrix(line_stream);
-            std::string new_name = get_temporary_name(TMP_NAME, variables.size());
+            std::string new_name = InputHandler::get_temporary_name(TMP_NAME, variables.size());
             variables.emplace(new_name, parsed_matrix);
             output_queue.push(new_name);
             continue;
@@ -73,7 +71,6 @@ ParsedInput Parser::parse_input() const {
                 throw std::runtime_error("Parenthesis mismatch on input");
             }
             operator_stack.pop();
-
             continue;
         }
 
@@ -81,7 +78,7 @@ ParsedInput Parser::parse_input() const {
         if (OPERATOR_LOOKUP.count(token)) {
             if (token == "SCAN"){
                 std::string name;
-                if (!(line_stream >> name)){
+                if (!(line_stream >> name) || string_has_prefix(name, RESERVED_NAME_PREFIX)){
                     throw std::invalid_argument("Invalid argument in call of SCAN.");
                 }
                 auto scanned_mx = load_matrix_scan(_stream);
@@ -104,7 +101,7 @@ ParsedInput Parser::parse_input() const {
         try {
             double num = std::stod(token);
             Matrix number_in_matrix(num, _factory);
-            std::string new_name = get_temporary_name(TMP_NAME, variables.size());
+            std::string new_name = InputHandler::get_temporary_name(TMP_NAME, variables.size());
             variables.emplace(new_name, number_in_matrix);
             output_queue.push(new_name);
         } catch (std::exception & e) {
@@ -139,6 +136,7 @@ static bool read_row(std::istream & stream, std::vector<double> & row) {
             return false;
         }
     }
+    return false;
 }
 
 static inline Matrix
