@@ -8,6 +8,7 @@
 #include <queue>
 #include <sstream>
 #include <stack>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -47,6 +48,9 @@ ParsedInput Parser::parse_input() const {
         }
 
         line_stream >> token;
+        if (string_has_prefix(token, RESERVED_NAME_PREFIX)){
+            throw std::runtime_error("Token " + token + "is reserved.");
+        }
 
         if (token == "(") {
             operator_stack.push(token);
