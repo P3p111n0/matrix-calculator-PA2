@@ -4,6 +4,7 @@
 #include "MatrixDimensions.h"
 #include "MatrixFactory.h"
 #include "OperatorLookup.h"
+#include "ParsedInput.h"
 #include <queue>
 #include <sstream>
 #include <stack>
@@ -16,11 +17,12 @@ inline constexpr char TMP_NAME[] = "TMP";
 Parser::Parser(MatrixFactory factory, std::istream & stream, std::size_t max_input_len)
     : InputHandler(factory), _stream(stream), _max_len(max_input_len) {}
 
-std::shared_ptr<std::queue<std::string>>
-Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
-    std::shared_ptr<std::queue<std::string>> output_queue_pointer =
-        std::make_shared<std::queue<std::string>>();
-    auto & output_queue = *output_queue_pointer;
+ParsedInput Parser::parse_input() const {
+    ParsedInput result;
+
+    auto & output_queue = *result.output_queue;
+    auto & variables = *result.loaded_variables;
+
     std::stack<std::string> operator_stack;
     std::string line;
 
@@ -46,31 +48,6 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
 
         line_stream >> token;
 
-        // token is a variable
-        if (variables.count(token)) {
-            output_queue.push(token);
-            continue;
-        }
-
-        // token is a single argument function
-        if (FUNCTION_LOOKUP.count(token)) {
-            if (operator_stack.size() > 1) {
-                throw std::runtime_error(
-                    "Functions cannot be used in compound expressions.");
-            }
-            operator_stack.push(token);
-            if (token == "SCAN"){
-                std::string name;
-                if (!(line_stream >> name)){
-                    throw std::invalid_argument("Invalid argument in call of SCAN.");
-                }
-                auto scanned_mx = load_matrix_scan(_stream);
-                variables.emplace(name, scanned_mx);
-                output_queue.emplace(name);
-            }
-            continue;
-        }
-
         if (token == "(") {
             operator_stack.push(token);
             continue;
@@ -93,16 +70,22 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
             }
             operator_stack.pop();
 
-            if (FUNCTION_LOOKUP.count(operator_stack.top())) {
-                output_queue.push(operator_stack.top());
-                operator_stack.pop();
-            }
-
             continue;
         }
 
         // token is an operator, parenthesis or brace
         if (OPERATOR_LOOKUP.count(token)) {
+            if (token == "SCAN"){
+                std::string name;
+                if (!(line_stream >> name)){
+                    throw std::invalid_argument("Invalid argument in call of SCAN.");
+                }
+                auto scanned_mx = load_matrix_scan(_stream);
+                variables.emplace(name, scanned_mx);
+                output_queue.emplace(name);
+                continue;
+            }
+
             while (!operator_stack.empty() && operator_stack.top() != "(" &&
                    PRIORITY_LOOKUP.at(operator_stack.top()) >
                        PRIORITY_LOOKUP.at(token)) {
@@ -121,11 +104,7 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
             variables.emplace(new_name, number_in_matrix);
             output_queue.push(new_name);
         } catch (std::exception & e) {
-            if (output_queue.empty()){
-                output_queue.push(token);
-                continue;
-            }
-            throw std::invalid_argument("Unknown token " + token);
+            output_queue.push(token);
         }
     }
 
@@ -137,11 +116,7 @@ Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {
         operator_stack.pop();
     }
 
-    if (output_queue.size() < 2) {
-        throw std::runtime_error("Invalid number of tokens on input.");
-    }
-
-    return output_queue_pointer;
+    return result;
 }
 
 static bool read_row(std::istream & stream, std::vector<double> & row) {
