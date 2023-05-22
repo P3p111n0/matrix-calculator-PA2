@@ -2,6 +2,7 @@
 #include "Matrix.h"
 #include "OperatorLookup.h"
 #include <string>
+#include <vector>
 
 static inline constexpr char RESULT_NAME[] = "RESULT";
 
@@ -10,6 +11,19 @@ template <typename T> inline T top_and_pop(std::stack<T> & x) {
     x.pop();
     return top;
 }
+
+void Evaluator::cleanup(Evaluator::VariableMap & vars) {
+    std::vector<std::string> vars_to_delete;
+    for (const auto & [key, val] : vars){
+        if (string_has_prefix(key, RESERVED_NAME_PREFIX)){
+            vars_to_delete.emplace_back(key);
+        }
+    }
+    for (const auto & var_name : vars_to_delete){
+        vars.erase(var_name);
+    }
+}
+
 
 Evaluator::Evaluator(MatrixFactory factory, std::ostream & os)
     : InputHandler(factory), _stream(os) {}
@@ -54,6 +68,7 @@ bool Evaluator::evaluate_input(
         _stream << res << std::endl;
     }
 
+    cleanup(variables);
     return true;
 }
 

@@ -27,4 +27,5 @@ class Evaluator : public InputHandler {
                          Operator) const;
     void handle_five_args(std::stack<std::string> &, VariableMap &,
                           Operator) const;
+    static void cleanup(VariableMap &);
 };
