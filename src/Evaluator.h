@@ -12,7 +12,6 @@
 
 class Evaluator : public InputHandler {
     using OutputQueue = std::shared_ptr<std::queue<std::string>>;
-    using VariableMap = std::unordered_map<std::string, Matrix>;
 
   public:
     Evaluator(MatrixFactory, std::ostream &);
@@ -27,5 +26,4 @@ class Evaluator : public InputHandler {
                          Operator) const;
     void handle_five_args(std::stack<std::string> &, VariableMap &,
                           Operator) const;
-    static void cleanup(VariableMap &);
 };
