@@ -24,15 +24,3 @@ std::string InputHandler::get_temporary_name(const std::string & name_body, std:
     new_name += std::to_string(postfix_num);
     return new_name;
 }
-
-void InputHandler::remove_temporary_vars(InputHandler::VariableMap & vars) {
-    std::vector<std::string> vars_to_delete;
-    for (const auto & [key, val] : vars){
-        if (string_has_prefix(key, RESERVED_NAME_PREFIX)){
-            vars_to_delete.emplace_back(key);
-        }
-    }
-    for (const auto & var_name : vars_to_delete){
-        vars.erase(var_name);
-    }
-}
