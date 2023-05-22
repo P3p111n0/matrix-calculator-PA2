@@ -3,7 +3,6 @@
 #include "Matrix.h"
 #include "MatrixDimensions.h"
 #include "MatrixFactory.h"
-#include "Operator.h"
 #include "OperatorLookup.h"
 #include <queue>
 #include <sstream>
@@ -15,9 +14,8 @@
 
 inline constexpr char TMP_NAME[] = "__TMP";
 
-Parser::Parser(std::istream & stream, std::size_t max_input_len,
-               const MatrixFactory & factory)
-    : _stream(stream), _max_len(max_input_len), _factory(factory) {}
+Parser::Parser(MatrixFactory factory, std::istream & stream, std::size_t max_input_len)
+    : InputHandler(factory), _stream(stream), _max_len(max_input_len) {}
 
 std::shared_ptr<std::queue<std::string>>
 Parser::parse_input(std::unordered_map<std::string, Matrix> & variables) const {

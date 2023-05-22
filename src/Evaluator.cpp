@@ -15,7 +15,8 @@ template <typename T> inline T top_and_pop(std::stack<T> & x) {
     return top;
 }
 
-Evaluator::Evaluator(MatrixFactory factory) : _factory(factory) {}
+Evaluator::Evaluator(MatrixFactory factory, std::ostream & os)
+    : InputHandler(factory), _stream(os) {}
 
 bool Evaluator::evaluate_input(
     Evaluator::VariableMap & variables,
@@ -180,8 +181,9 @@ void Evaluator::handle_two_args(std::stack<std::string> & process_stack,
 }
 
 void Evaluator::handle_five_args(std::stack<std::string> & process_stack,
-                                 Evaluator::VariableMap & variables, Operator op) const {
-    if (process_stack.size() < 5){
+                                 Evaluator::VariableMap & variables,
+                                 Operator op) const {
+    if (process_stack.size() < 5) {
         throw std::runtime_error("Invalid number of arguments, 5 expected " +
                                  std::to_string(process_stack.size()) +
                                  " provided");
@@ -201,13 +203,14 @@ void Evaluator::handle_five_args(std::stack<std::string> & process_stack,
     Matrix new_columns_matrix = variables.at(new_columns_token);
 
     std::string result_name = get_result_name(variables.size());
-    if (process_stack.empty()){
+    if (process_stack.empty()) {
         result_name = rhs_token;
     }
 
-    switch(op){
+    switch (op) {
     case Operator::CUT:
-        rhs.cut(new_rows_matrix, new_columns_matrix, offset_row_matrix, offset_column_matrix);
+        rhs.cut(new_rows_matrix, new_columns_matrix, offset_row_matrix,
+                offset_column_matrix);
         break;
     }
 
