@@ -47,7 +47,7 @@ bool Evaluator::evaluate_input(const ParsedInput & input) {
     };
 
     auto inserter = [&](const std::string & key, const Matrix & value) {
-        if (string_has_prefix(key, RESERVED_NAME_PREFIX)){
+        if (string_has_prefix(key, RESERVED_NAME_PREFIX)) {
             loaded_vars.erase(key);
             loaded_vars.emplace(key, value);
             return;
@@ -70,28 +70,34 @@ bool Evaluator::evaluate_input(const ParsedInput & input) {
         Operator op = OPERATOR_LOOKUP.at(token);
         std::size_t n_of_args = N_OF_ARGS_LOOKUP.at(op);
 
-        switch (n_of_args) {
-        case 1:
-            handle_one_arg(process_stack, op, actions);
-            break;
-        case 2:
-            handle_two_args(process_stack, op, actions);
-            break;
-        case 5:
-            handle_five_args(process_stack, op, actions);
-            break;
-        default:
-            // this shouldn't happen
-            throw std::runtime_error("Unknown number of arguments.");
+        try {
+            switch (n_of_args) {
+            case 1:
+                handle_one_arg(process_stack, op, actions);
+                break;
+            case 2:
+                handle_two_args(process_stack, op, actions);
+                break;
+            case 5:
+                handle_five_args(process_stack, op, actions);
+                break;
+            default:
+                // this shouldn't happen
+                _stream << "Unknown number of arguments." << std::endl;
+                return false;
+            }
+        } catch (std::exception & e) {
+            _stream << e.what() << std::endl;
+            return false;
         }
-    }
 
-    if (!process_stack.empty()) {
-        std::string leftover = process_stack.top();
-        Matrix res = getter(leftover);
-        _stream << res << std::endl;
+        if (!process_stack.empty()) {
+            std::string leftover = process_stack.top();
+            Matrix res = actions.get_var(leftover);
+            _stream << res << std::endl;
+        }
+        return true;
     }
-    return true;
 }
 
 void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
