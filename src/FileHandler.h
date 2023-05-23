@@ -1,10 +1,11 @@
 #pragma once
 
+#include "BaseHandler.h"
 #include <string>
 
-class FileHandler {
+class FileHandler : public BaseHandler {
   public:
-    FileHandler() = default;
+    FileHandler(MatrixFactory);
     bool good() const;
     bool bad() const;
     const std::string & status() const;

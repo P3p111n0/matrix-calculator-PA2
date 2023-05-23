@@ -1,7 +1,7 @@
 #include "InputHandler.h"
 #include <string>
 
-InputHandler::InputHandler(MatrixFactory factory) : _factory(factory) {}
+InputHandler::InputHandler(MatrixFactory factory) : BaseHandler(factory) {}
 
 bool InputHandler::string_has_prefix(const std::string & src,
                                      const std::string & prefix) {
