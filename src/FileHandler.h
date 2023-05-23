@@ -12,4 +12,6 @@ class FileHandler : public BaseHandler {
   protected:
     std::string _status;
     bool _is_failed;
+
+    void reset();
 };
