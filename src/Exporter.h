@@ -6,7 +6,7 @@
 
 class Exporter : public FileHandler {
   public:
-    Exporter() = default;
+    Exporter(MatrixFactory);
     void export_to_file(const std::unordered_map<std::string, Matrix> &,
                         const std::string &);
 };
