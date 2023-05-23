@@ -123,7 +123,7 @@ void Importer::import_from_file(std::unordered_map<std::string, Matrix> & vars,
                     read_sparse(input_data, key, {rows, columns}, _factory));
             }
         } catch (std::exception & e) {
-            _status = "An error occured while reading matrix: " + key;
+            _status = "An error occurred while reading matrix: " + key;
             _is_failed = true;
             return;
         }
