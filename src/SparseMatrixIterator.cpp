@@ -10,6 +10,13 @@ SparseMatrixIterator::SparseMatrixIterator(
           map_iterator == ptr->_data.end() ? 0 : map_iterator->first.column),
       _it(map_iterator), _end(ptr->_data.end()) {}
 
+SparseMatrixIterator::SparseMatrixIterator(
+    const MatrixDimensions * ptr, const SparseMatrixIterator::MapIterator & it,
+    const SparseMatrixIterator::MapIterator & end_it)
+    : AbstractMatrixIterator(ptr, it == end_it ? ptr->rows() : it->first.row,
+                             it == end_it ? 0 : it->first.column),
+      _it(it), _end(end_it) {}
+
 void SparseMatrixIterator::operator++() {
     ++_it;
     if (_it == _end) {

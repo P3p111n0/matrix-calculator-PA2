@@ -11,6 +11,7 @@ class SparseMatrixIterator : public AbstractMatrixIterator {
   public:
     SparseMatrixIterator(const SparseMatrix *,
                          const MapIterator &);
+    SparseMatrixIterator(const MatrixDimensions *, const MapIterator &, const MapIterator &);
     void operator++() override;
     MatrixElement operator*() const override;
     std::size_t distance(const AbstractMatrixIterator & other) const override;
