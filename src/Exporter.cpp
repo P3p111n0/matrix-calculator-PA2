@@ -52,7 +52,7 @@ void Exporter::export_to_file(const std::unordered_map<std::string, Matrix> & va
         }
     }
     outfile << std::setw(3) << out_data;
-    if (!outfile.is_open() || outfile.bad()){
+    if (!outfile.is_open() || outfile.fail() || outfile.bad()){
         _status = "Error while writing data.";
         _is_failed = true;
     } else {
