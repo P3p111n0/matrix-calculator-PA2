@@ -14,6 +14,7 @@ class MatrixFactory {
     MatrixMemoryRepr * get_initial_repr(double) const;
     MatrixMemoryRepr * get_initial_repr(IteratorWrapper, IteratorWrapper) const;
     MatrixMemoryRepr * convert(MatrixMemoryRepr *) const;
+    double ratio() const;
   private:
     double _ratio;
 };

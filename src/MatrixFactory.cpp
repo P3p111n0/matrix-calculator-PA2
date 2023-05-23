@@ -67,3 +67,5 @@ MatrixMemoryRepr * MatrixFactory::convert(MatrixMemoryRepr * mx) const {
     }
     return new DenseMatrix(mx->begin(), mx->end());
 }
+
+double MatrixFactory::ratio() const { return _ratio; }
