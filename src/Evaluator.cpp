@@ -1,7 +1,7 @@
 #include "Evaluator.h"
+#include "Lexer.h"
 #include "Matrix.h"
 #include "Operator.h"
-#include "OperatorLookup.h"
 #include "ParsedInput.h"
 #include <functional>
 #include <stdexcept>
@@ -33,11 +33,11 @@ Evaluator::Evaluator(MatrixFactory factory, std::ostream & os)
 
 void Evaluator::evaluate_input(const ParsedInput & input) {
     auto & output_queue = *input.output_queue;
-    auto loaded_vars = *input.loaded_variables;
+    auto & loaded_vars = *input.loaded_variables;
     load_nontmp_vars(loaded_vars);
     std::stack<std::string> process_stack;
 
-    auto getter = [&](const std::string & key) {
+    auto getter = [&](const std::string & key) -> Matrix & {
         if (_vars.count(key)) {
             return _vars.at(key);
         } else if (loaded_vars.count(key)) {
@@ -62,13 +62,13 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
         std::string token = output_queue.front();
         output_queue.pop();
 
-        if (!OPERATOR_LOOKUP.count(token)) {
+        if (!Lexer::OPERATOR_LOOKUP.count(token)) {
             process_stack.push(token);
             continue;
         }
 
-        Operator op = OPERATOR_LOOKUP.at(token);
-        std::size_t n_of_args = N_OF_ARGS_LOOKUP.at(op);
+        Operator op = Lexer::OPERATOR_LOOKUP.at(token);
+        std::size_t n_of_args = Lexer::N_OF_ARGS_LOOKUP.at(op);
 
         switch (n_of_args) {
         case 1:
@@ -92,6 +92,7 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
         }
     }
 }
+
 void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
                                Operator op, const ContainerOperations & actions) {
     if (process_stack.empty()) {
@@ -102,10 +103,6 @@ void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
     std::string a = top_and_pop(process_stack);
     Matrix rhs = actions.get_var(a);
     std::string result_name = get_temporary_name(RESULT_NAME);
-
-    if (!process_stack.empty()) {
-        result_name = a;
-    }
 
     switch (op) {
     case Operator::DET: {
@@ -137,6 +134,8 @@ void Evaluator::handle_one_arg(std::stack<std::string> & process_stack,
     case Operator::PRINT:
         _stream << rhs << std::endl;
         break;
+    default:
+        break;
     }
 
     if (op != Operator::PRINT) {
@@ -161,14 +160,14 @@ void Evaluator::handle_two_args(std::stack<std::string> & process_stack,
     }
 
     std::string result_name = get_temporary_name(RESULT_NAME);
-    Matrix rhs = actions.get_var(b);
+    Matrix & rhs = actions.get_var(b);
 
     if (op == Operator::ASSIGN){
         actions.replace_var(a, rhs);
         return;
     }
 
-    Matrix lhs = actions.get_var(a);
+    Matrix & lhs = actions.get_var(a);
 
     switch (op) {
     case Operator::PLUS:
@@ -182,6 +181,8 @@ void Evaluator::handle_two_args(std::stack<std::string> & process_stack,
         break;
     case Operator::UNITE:
         actions.replace_var(result_name, Matrix::unite(lhs, rhs));
+        break;
+    default:
         break;
     }
     process_stack.push(result_name);
@@ -203,15 +204,12 @@ void Evaluator::handle_five_args(std::stack<std::string> & process_stack,
 
     // might have to check for existing tokens
     Matrix rhs = actions.get_var(rhs_token);
-    Matrix offset_row_matrix = actions.get_var(offset_row_token);
-    Matrix offset_column_matrix = actions.get_var(offset_column_token);
-    Matrix new_rows_matrix = actions.get_var(new_rows_token);
-    Matrix new_columns_matrix = actions.get_var(new_columns_token);
+    Matrix & offset_row_matrix = actions.get_var(offset_row_token);
+    Matrix & offset_column_matrix = actions.get_var(offset_column_token);
+    Matrix & new_rows_matrix = actions.get_var(new_rows_token);
+    Matrix & new_columns_matrix = actions.get_var(new_columns_token);
 
     std::string result_name = get_temporary_name(RESULT_NAME);
-    if (process_stack.empty()) {
-        result_name = rhs_token;
-    }
 
     switch (op) {
     case Operator::CUT:

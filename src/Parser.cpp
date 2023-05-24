@@ -1,10 +1,10 @@
 #include "Parser.h"
 #include "DenseMatrixIterator.h"
 #include "InputHandler.h"
+#include "Lexer.h"
 #include "Matrix.h"
 #include "MatrixDimensions.h"
 #include "MatrixFactory.h"
-#include "OperatorLookup.h"
 #include "ParsedInput.h"
 #include <sstream>
 #include <stack>
@@ -75,7 +75,7 @@ ParsedInput Parser::parse_input() const {
         }
 
         // token is an operator, parenthesis or brace
-        if (OPERATOR_LOOKUP.count(token)) {
+        if (Lexer::OPERATOR_LOOKUP.count(token)) {
             if (token == "SCAN"){
                 std::string name;
                 if (!(line_stream >> name) || string_has_prefix(name, RESERVED_NAME_PREFIX)){
@@ -88,8 +88,8 @@ ParsedInput Parser::parse_input() const {
             }
 
             while (!operator_stack.empty() && operator_stack.top() != "(" &&
-                   PRIORITY_LOOKUP.at(operator_stack.top()) >
-                       PRIORITY_LOOKUP.at(token)) {
+                   Lexer::PRIORITY_LOOKUP.at(operator_stack.top()) >
+                       Lexer::PRIORITY_LOOKUP.at(token)) {
                 output_queue.push(operator_stack.top());
                 operator_stack.pop();
             }
