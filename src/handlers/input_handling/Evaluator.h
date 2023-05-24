@@ -3,6 +3,7 @@
 #include "../../matrix_operations/Operator.h"
 #include "../../matrix_wrapper/Matrix.h"
 #include "../../matrix_wrapper/MatrixFactory.h"
+#include "ContainerOperations.h"
 #include "InputHandler.h"
 #include "ParsedInput.h"
 #include <memory>
@@ -20,16 +21,6 @@ class Evaluator : public InputHandler {
   private:
     std::ostream & _stream;
     VariableMap _vars;
-
-    struct ContainerOperations {
-        ContainerOperations(
-            const std::function<Matrix&(const std::string &)> & getter,
-            const std::function<void(const std::string &, const Matrix &)> &
-                replacer)
-            : get_var(getter), replace_var(replacer) {}
-        std::function<Matrix&(const std::string &)> get_var;
-        std::function<void(const std::string &, const Matrix &)> replace_var;
-    };
 
     void handle_one_arg(std::stack<std::string> &, Operator, const ContainerOperations &);
     void handle_two_args(std::stack<std::string> &, Operator, const ContainerOperations &);
