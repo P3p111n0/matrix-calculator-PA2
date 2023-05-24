@@ -69,7 +69,6 @@ ParsedInput Parser::parse_input() const {
             continue;
         }
 
-        // token is an operator, parenthesis or brace
         if (token == "SCAN") {
             std::string name;
             if (!(line_stream >> name) ||
@@ -80,7 +79,7 @@ ParsedInput Parser::parse_input() const {
             }
             variables.emplace(name, load_matrix_scan(_stream));
             output_queue.emplace(name);
-            continue;
+            break;
         }
         if (operations.is_operation(token)) {
             std::unique_ptr<MatrixOp> token_op(operations.get_operation(token));

@@ -15,9 +15,9 @@ static std::vector<Matrix> get_args(std::stack<std::string> & token_stack,
                                     std::size_t n) {
     std::vector<Matrix> res;
     for (std::size_t i = 0; i < n; i++) {
-        const auto & token = token_stack.top();
-        res.emplace_back(actions.get_var(token));
+        std::string token = token_stack.top();
         token_stack.pop();
+        res.emplace_back(actions.get_var(token));
     }
     return res;
 }
@@ -112,11 +112,11 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
             get_args(process_stack, actions, operation->arity()));
         std::string temporary_name = get_temporary_name(RESULT_NAME);
         temp_vars.emplace(temporary_name, std::move(result));
-
-        if (!process_stack.empty()) {
-            std::string leftover = process_stack.top();
-            Matrix res = actions.get_var(leftover);
-            _stream << res << std::endl;
-        }
+        process_stack.push(temporary_name);
+    }
+    if (!process_stack.empty()) {
+        std::string leftover = process_stack.top();
+        Matrix res = actions.get_var(leftover);
+        _stream << res << std::endl;
     }
 }
