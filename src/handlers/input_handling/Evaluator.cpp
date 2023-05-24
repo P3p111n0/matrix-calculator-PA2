@@ -83,13 +83,13 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
             case SpecialCases::EXPORT:{
                 const std::string & filename = process_stack.top();
                 _exporter.export_to_file(_vars, filename);
-                _stream << _exporter.status();
+                _stream << _exporter.status() << std::endl;
                 return;
             }
             case SpecialCases::IMPORT:{
                 const std::string & filename = process_stack.top();
                 _importer.import_from_file(_vars, filename);
-                _importer.status();
+                _stream << _importer.status() << std::endl;
                 return;
             }
             case SpecialCases::ASSIGN:{
