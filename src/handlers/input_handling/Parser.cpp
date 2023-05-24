@@ -28,10 +28,6 @@ ParsedInput Parser::parse_input() const {
     _stream.getline(buffer.get(), _max_len - 1);
 
     std::stringstream line_stream(buffer.get());
-    line_stream.peek();
-    if (line_stream.eof()) {
-        throw std::runtime_error("Parse error: Couldn't read data during parsing.");
-    }
     while (line_stream >> std::ws && !line_stream.eof()) {
         std::string token;
 

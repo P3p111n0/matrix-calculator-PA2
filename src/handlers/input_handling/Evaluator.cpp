@@ -72,23 +72,32 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
         if (special_case_table.count(token)) {
             switch (special_case_table.at(token)) {
             case SpecialCases::PRINT: {
+                if (process_stack.size() != 1){
+                    throw std::runtime_error("Invalid use of PRINT.");
+                }
                 auto arg = get_args(process_stack, actions, 1);
                 _stream << arg[0] << std::endl;
                 continue;
             }
             case SpecialCases::EXPORT:{
+                if (process_stack.size() != 1){
+                    throw std::runtime_error("Invalid use of EXPORT.");
+                }
                 const std::string & filename = process_stack.top();
                 _exporter.export_to_file(_vars, filename);
                 _stream << _exporter.status() << std::endl;
                 process_stack.pop();
-                continue;
+                return;
             }
             case SpecialCases::IMPORT:{
+                if (process_stack.size() != 1){
+                    throw std::runtime_error("Invalid use of IMPORT.");
+                }
                 const std::string & filename = process_stack.top();
                 _importer.import_from_file(_vars, filename);
                 _stream << _importer.status() << std::endl;
                 process_stack.pop();
-                continue;
+                return;
             }
             case SpecialCases::ASSIGN:{
                 auto arg = get_args(process_stack, actions, 1);
