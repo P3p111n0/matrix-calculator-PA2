@@ -16,7 +16,7 @@ class Matrix {
     Matrix(std::initializer_list<std::initializer_list<double>>, MatrixFactory);
     Matrix(const MatrixMemoryRepr &, MatrixFactory);
     Matrix(IteratorWrapper, IteratorWrapper, MatrixFactory);
-    Matrix(double, MatrixFactory);
+    Matrix(double);
     Matrix(const Matrix &);
     Matrix(Matrix &&) noexcept;
 
