@@ -74,26 +74,31 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
             case SpecialCases::PRINT: {
                 auto arg = get_args(process_stack, actions, 1);
                 _stream << arg[0] << std::endl;
-                return;
+                continue;
             }
             case SpecialCases::EXPORT:{
                 const std::string & filename = process_stack.top();
                 _exporter.export_to_file(_vars, filename);
                 _stream << _exporter.status() << std::endl;
-                return;
+                process_stack.pop();
+                continue;
             }
             case SpecialCases::IMPORT:{
                 const std::string & filename = process_stack.top();
                 _importer.import_from_file(_vars, filename);
                 _stream << _importer.status() << std::endl;
-                return;
+                process_stack.pop();
+                continue;
             }
             case SpecialCases::ASSIGN:{
                 auto arg = get_args(process_stack, actions, 1);
                 const std::string & dest = process_stack.top();
                 _vars.erase(dest);
                 _vars.emplace(dest, std::move(arg[0]));
-                return;
+                if (process_stack.size() == 1){
+                    process_stack.pop();
+                }
+                continue;
             }
             }
         }

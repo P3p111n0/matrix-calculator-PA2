@@ -14,6 +14,10 @@ void MatrixCalculator::start() {
                   _config.max_input_length);
     Evaluator evaluator(MatrixFactory(_config.sparse_ratio), _out);
     while (!_in.eof()) {
+        if (!_in.good()){
+            _out << "Corrupted data detected on input, quitting." << std::endl;
+            return;
+        }
         try {
             auto parsed_input = parser.parse_input();
             evaluator.evaluate_input(parsed_input);
