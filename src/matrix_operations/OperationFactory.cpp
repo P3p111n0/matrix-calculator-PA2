@@ -7,6 +7,10 @@
 #include "single_argument/MatrixOpInv.h"
 #include "single_argument/MatrixOpRank.h"
 #include "single_argument/MatrixOpTranspose.h"
+#include "special_cases/MatrixOpAssign.h"
+#include "special_cases/MatrixOpExport.h"
+#include "special_cases/MatrixOpImport.h"
+#include "special_cases/MatrixOpPrint.h"
 #include "two_args/MatrixOpMinus.h"
 #include "two_args/MatrixOpMul.h"
 #include "two_args/MatrixOpPlus.h"
@@ -29,6 +33,11 @@ OperationFactory::OperationFactory() {
     _operations.emplace("DET", Operator::DET);
     _operations.emplace("RANK", Operator::RANK);
     _operations.emplace("GAUSS", Operator::GAUSS);
+    _operations.emplace("PRINT", Operator::PRINT);
+    _operations.emplace("EXPORT", Operator::EXPORT);
+    _operations.emplace("IMPORT", Operator::IMPORT);
+    _operations.emplace("=", Operator::ASSIGN);
+
 }
 
 MatrixOp * OperationFactory::get_operation(const std::string & op_name) const {
@@ -58,6 +67,14 @@ MatrixOp * OperationFactory::get_operation(const std::string & op_name) const {
         return new MatrixOpRank;
     case Operator::GAUSS:
         return new MatrixOpGauss;
+    case Operator::PRINT:
+        return new MatrixOpPrint;
+    case Operator::EXPORT:
+        return new MatrixOpExport;
+    case Operator::IMPORT:
+        return new MatrixOpImport;
+    case Operator::ASSIGN:
+        return new MatrixOpAssign;
     default:
         // this definitely shouldn't happen
         throw std::runtime_error("No matching operator for: " + op_name);
