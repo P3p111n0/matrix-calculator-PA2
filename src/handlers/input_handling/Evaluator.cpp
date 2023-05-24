@@ -1,8 +1,8 @@
 #include "Evaluator.h"
 #include "../../matrix_operations/Operator.h"
 #include "../../matrix_wrapper/Matrix.h"
-#include "input_handling/Lexer.h"
-#include "input_handling/ParsedInput.h"
+#include "Lexer.h"
+#include "ParsedInput.h"
 #include <functional>
 #include <stdexcept>
 #include <string>
