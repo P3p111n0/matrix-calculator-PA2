@@ -1,11 +1,9 @@
 #include "Parser.h"
 #include "../../iterators/DenseMatrixIterator.h"
-#include "../../matrix_wrapper/Matrix.h"
-#include "../../matrix_wrapper/MatrixDimensions.h"
-#include "../../matrix_wrapper/MatrixFactory.h"
+#include "../../matrix_operations/OperationFactory.h"
 #include "InputHandler.h"
-#include "Lexer.h"
 #include "ParsedInput.h"
+#include <memory>
 #include <sstream>
 #include <stack>
 #include <string>
@@ -13,12 +11,13 @@
 
 inline constexpr char TMP_NAME[] = "TMP";
 
-Parser::Parser(MatrixFactory factory, std::istream & stream, std::size_t max_input_len)
+Parser::Parser(MatrixFactory factory, std::istream & stream,
+               std::size_t max_input_len)
     : InputHandler(factory), _stream(stream), _max_len(max_input_len) {}
 
 ParsedInput Parser::parse_input() const {
     ParsedInput result;
-
+    OperationFactory operations;
     auto & output_queue = *result.output_queue;
     auto & variables = *result.loaded_variables;
 
@@ -37,16 +36,15 @@ ParsedInput Parser::parse_input() const {
         // inline matrix in input
         if (line_stream.peek() == '[') {
             char c;
-            line_stream >> c;
-            Matrix parsed_matrix = load_matrix(line_stream);
+            line_stream >> c; // this is the peeked '['
             std::string new_name = get_temporary_name(TMP_NAME);
-            variables.emplace(new_name, parsed_matrix);
+            variables.emplace(new_name, load_matrix(line_stream));
             output_queue.push(new_name);
             continue;
         }
 
         line_stream >> token;
-        if (string_has_prefix(token, RESERVED_NAME_PREFIX)){
+        if (string_has_prefix(token, RESERVED_NAME_PREFIX)) {
             throw std::runtime_error("Token " + token + "is reserved.");
         }
 
@@ -75,21 +73,23 @@ ParsedInput Parser::parse_input() const {
         }
 
         // token is an operator, parenthesis or brace
-        if (Lexer::OPERATOR_LOOKUP.count(token)) {
-            if (token == "SCAN"){
-                std::string name;
-                if (!(line_stream >> name) || string_has_prefix(name, RESERVED_NAME_PREFIX)){
-                    throw std::invalid_argument("Invalid argument in call of SCAN.");
-                }
-                auto scanned_mx = load_matrix_scan(_stream);
-                variables.emplace(name, scanned_mx);
-                output_queue.emplace(name);
-                continue;
+        if (token == "SCAN") {
+            std::string name;
+            if (!(line_stream >> name) ||
+                string_has_prefix(name, RESERVED_NAME_PREFIX) ||
+                operations.is_operation(token)) {
+                throw std::invalid_argument(
+                    "Invalid argument in call of SCAN.");
             }
-
+            variables.emplace(name, load_matrix_scan(_stream));
+            output_queue.emplace(name);
+            continue;
+        }
+        if (operations.is_operation(token)) {
+            std::unique_ptr<MatrixOp> token_op(operations.get_operation(token));
             while (!operator_stack.empty() && operator_stack.top() != "(" &&
-                   Lexer::PRIORITY_LOOKUP.at(operator_stack.top()) >
-                       Lexer::PRIORITY_LOOKUP.at(token)) {
+                   operations.priority_of(operator_stack.top()) >
+                       token_op->priority()) {
                 output_queue.push(operator_stack.top());
                 operator_stack.pop();
             }
@@ -100,7 +100,7 @@ ParsedInput Parser::parse_input() const {
         // token is a number
         try {
             double num = std::stod(token);
-            Matrix number_in_matrix(num, _factory);
+            Matrix number_in_matrix(num);
             std::string new_name = get_temporary_name(TMP_NAME);
             variables.emplace(new_name, number_in_matrix);
             output_queue.push(new_name);
@@ -192,8 +192,9 @@ Matrix Parser::load_matrix_scan(std::istream & stream) const {
         char bracket;
         line_stream >> bracket;
 
-        if (bracket != '['){
-            throw std::runtime_error("Missing opening brace in scanned matrix.");
+        if (bracket != '[') {
+            throw std::runtime_error(
+                "Missing opening brace in scanned matrix.");
         }
 
         if (!read_row(line_stream, row)) {
