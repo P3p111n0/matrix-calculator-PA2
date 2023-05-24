@@ -3,6 +3,8 @@
 #include "../../matrix_operations/Operator.h"
 #include "../../matrix_wrapper/Matrix.h"
 #include "../../matrix_wrapper/MatrixFactory.h"
+#include "../file_handling/Exporter.h"
+#include "../file_handling/Importer.h"
 #include "ContainerOperations.h"
 #include "InputHandler.h"
 #include "ParsedInput.h"
@@ -21,9 +23,7 @@ class Evaluator : public InputHandler {
   private:
     std::ostream & _stream;
     VariableMap _vars;
-
-    void handle_one_arg(std::stack<std::string> &, Operator, const ContainerOperations &);
-    void handle_two_args(std::stack<std::string> &, Operator, const ContainerOperations &);
-    void handle_five_args(std::stack<std::string> &, Operator, const ContainerOperations &);
+    Exporter _exporter;
+    Importer _importer;
     void load_nontmp_vars(const VariableMap &);
 };
