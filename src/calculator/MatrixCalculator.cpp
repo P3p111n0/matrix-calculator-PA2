@@ -19,6 +19,7 @@ void MatrixCalculator::start() {
             return;
         }
         try {
+            _out << ">>> ";
             auto parsed_input = parser.parse_input();
             evaluator.evaluate_input(parsed_input);
         } catch (std::exception & e){

@@ -43,7 +43,7 @@ ParsedInput Parser::parse_input() const {
 
         line_stream >> token;
         if (string_has_prefix(token, RESERVED_NAME_PREFIX)) {
-            throw std::runtime_error("Token " + token + "is reserved.");
+            throw std::runtime_error("Token " + token + " is reserved.");
         }
 
         if (token == "(") {
