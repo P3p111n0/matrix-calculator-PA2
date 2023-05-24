@@ -22,14 +22,11 @@ ParsedInput Parser::parse_input() const {
     auto & variables = *result.loaded_variables;
 
     std::stack<std::string> operator_stack;
-    std::string line;
 
-    std::getline(_stream, line);
-    if (line.length() > _max_len) {
-        throw std::runtime_error("Max input length exceeded");
-    }
+    std::unique_ptr<char[]> buffer(new char[_max_len]);
+    _stream.getline(buffer.get(), _max_len - 1);
 
-    std::stringstream line_stream(line);
+    std::stringstream line_stream(buffer.get());
     while (line_stream >> std::ws && !line_stream.eof()) {
         std::string token;
 
