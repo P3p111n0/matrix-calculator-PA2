@@ -22,13 +22,6 @@ inline const std::unordered_map<std::string, Operator> OPERATOR_LOOKUP{
     {"PRINT", Operator::PRINT},
     {"SCAN", Operator::SCAN}};
 
-inline const std::unordered_map<Operator, std::size_t> N_OF_ARGS_LOOKUP{
-    {Operator::PLUS, 2},   {Operator::MINUS, 2},     {Operator::ASSIGN, 2},
-    {Operator::MUL, 2},    {Operator::TRANSPOSE, 1}, {Operator::UNITE, 2},
-    {Operator::CUT, 5},    {Operator::INV, 1},       {Operator::DET, 1},
-    {Operator::RANK, 1},   {Operator::GAUSS, 1},     {Operator::IMPORT, 1},
-    {Operator::EXPORT, 1}, {Operator::PRINT, 1},     {Operator::SCAN, 1}};
-
 inline const std::unordered_map<std::string, OperatorPriority> PRIORITY_LOOKUP{
     {"+", OperatorPriority::PLUS},
     {"-", OperatorPriority::MINUS},
