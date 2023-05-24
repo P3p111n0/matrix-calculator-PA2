@@ -17,7 +17,7 @@ bool OperationCmp::operator()(const std::shared_ptr<MatrixOp> & lhs,
     return lhs->name() < rhs->name();
 }
 
-static inline const std::unordered_map<std::string, Operator> lookup_map = {
+inline const std::unordered_map<std::string, Operator> lookup_map = {
     {"+", Operator::PLUS},
     {"-", Operator::MINUS},
     {"*", Operator::MUL},
@@ -72,4 +72,8 @@ OperationFactory::get_all_operations() const {
         op_set.emplace(get_operation(key));
     }
     return op_set;
+}
+
+bool OperationFactory::is_operation(const std::string & name) const {
+    return _operations.count(name);
 }
