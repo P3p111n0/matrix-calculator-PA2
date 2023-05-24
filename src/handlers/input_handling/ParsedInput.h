@@ -1,10 +1,10 @@
 #pragma once
 
+#include "../../matrix_wrapper/Matrix.h"
 #include <memory>
-#include <unordered_map>
-#include <string>
 #include <queue>
-#include "Matrix.h"
+#include <string>
+#include <unordered_map>
 
 class ParsedInput {
     using OutputQueuePointer = std::shared_ptr<std::queue<std::string>>;

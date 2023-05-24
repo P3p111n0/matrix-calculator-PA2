@@ -1,6 +1,6 @@
 #include "SparseMatrix.h"
-#include "MatrixElement.h"
-#include "SparseMatrixIterator.h"
+#include "../iterators/SparseMatrixIterator.h"
+#include "../matrix_wrapper/MatrixElement.h"
 
 SparseMatrix::SparseMatrix(std::size_t r, std::size_t c)
     : MatrixMemoryRepr(r, c) {

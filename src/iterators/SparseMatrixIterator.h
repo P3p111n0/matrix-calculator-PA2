@@ -1,9 +1,8 @@
 #pragma once
 
+#include "../representations/SparseMatrix.h"
 #include "AbstractMatrixIterator.h"
 #include <map>
-#include "SparseMatrix.h"
-
 
 class SparseMatrixIterator : public AbstractMatrixIterator {
     using MapIterator = std::map<Position, double>::const_iterator;

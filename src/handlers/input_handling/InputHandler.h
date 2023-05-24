@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../../matrix_wrapper/Matrix.h"
+#include "../../matrix_wrapper/MatrixFactory.h"
+#include "../BaseHandler.h"
 #include <unordered_map>
-#include "BaseHandler.h"
-#include "MatrixFactory.h"
-#include "Matrix.h"
 
 class InputHandler : public BaseHandler {
   public:

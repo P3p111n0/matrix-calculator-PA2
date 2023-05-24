@@ -1,7 +1,7 @@
 #pragma once
 
-#include "MatrixDimensions.h"
-#include "MatrixElement.h"
+#include "../matrix_wrapper/MatrixDimensions.h"
+#include "../matrix_wrapper/MatrixElement.h"
 
 class AbstractMatrixIterator {
   public:

@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../matrix_wrapper/MatrixDimensions.h"
+#include "../representations/DenseMatrix.h"
 #include "AbstractMatrixIterator.h"
-#include "DenseMatrix.h"
-#include "MatrixDimensions.h"
 #include <vector>
 
 class DenseMatrixIterator : public AbstractMatrixIterator {

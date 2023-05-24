@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MatrixFactory.h"
+#include "../matrix_wrapper/MatrixFactory.h"
 class BaseHandler {
   public:
     BaseHandler(MatrixFactory);

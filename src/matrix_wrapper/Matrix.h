@@ -1,13 +1,13 @@
 #pragma once
 
-#include "IteratorWrapper.h"
-#include "MatrixMemoryRepr.h"
+#include "../iterators/IteratorWrapper.h"
+#include "../representations/MatrixMemoryRepr.h"
 #include "MatrixFactory.h"
+#include <functional>
 #include <initializer_list>
+#include <iostream>
 #include <memory>
 #include <optional>
-#include <iostream>
-#include <functional>
 #include <vector>
 
 class Matrix {

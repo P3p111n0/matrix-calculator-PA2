@@ -1,15 +1,15 @@
 #pragma once
 
+#include "../../matrix_operations/Operator.h"
+#include "../../matrix_wrapper/Matrix.h"
+#include "../../matrix_wrapper/MatrixFactory.h"
+#include "InputHandler.h"
+#include "ParsedInput.h"
 #include <memory>
 #include <queue>
-#include <string>
 #include <stack>
+#include <string>
 #include <unordered_map>
-#include "InputHandler.h"
-#include "Matrix.h"
-#include "MatrixFactory.h"
-#include "Operator.h"
-#include "ParsedInput.h"
 
 class Evaluator : public InputHandler {
     using VariableMap = std::unordered_map<std::string, Matrix>;

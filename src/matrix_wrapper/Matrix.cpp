@@ -1,6 +1,6 @@
 #include "Matrix.h"
+#include "../representations/MatrixMemoryRepr.h"
 #include "MatrixFactory.h"
-#include "MatrixMemoryRepr.h"
 #include <queue>
 #include <set>
 

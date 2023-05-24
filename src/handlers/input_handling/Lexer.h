@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Operator.h"
+#include "../../matrix_operations/Operator.h"
 #include <string>
 #include <unordered_map>
 

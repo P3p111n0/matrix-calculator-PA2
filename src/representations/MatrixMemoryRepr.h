@@ -1,11 +1,11 @@
 #pragma once
 
+#include "../iterators/IteratorWrapper.h"
+#include "../matrix_wrapper/MatrixDimensions.h"
 #include <cstdlib>
 #include <iostream>
 #include <optional>
 #include <vector>
-#include "MatrixDimensions.h"
-#include "IteratorWrapper.h"
 
 class MatrixMemoryRepr {
   public:

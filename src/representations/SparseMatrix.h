@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../matrix_wrapper/MatrixElement.h"
 #include "MatrixMemoryRepr.h"
-#include "MatrixElement.h"
 #include <functional>
 #include <initializer_list>
 #include <map>

@@ -1,11 +1,11 @@
 #pragma once
 
+#include "../../matrix_wrapper/Matrix.h"
+#include "../../matrix_wrapper/MatrixFactory.h"
+#include "InputHandler.h"
+#include "ParsedInput.h"
 #include <cstdlib>
 #include <iostream>
-#include "InputHandler.h"
-#include "Matrix.h"
-#include "MatrixFactory.h"
-#include "ParsedInput.h"
 
 class Parser : public InputHandler {
   public:

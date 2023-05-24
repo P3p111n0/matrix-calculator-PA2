@@ -1,6 +1,6 @@
 #include "MatrixFactory.h"
-#include "DenseMatrix.h"
-#include "SparseMatrix.h"
+#include "../representations/DenseMatrix.h"
+#include "../representations/SparseMatrix.h"
 #include <vector>
 
 MatrixFactory::MatrixFactory(double ratio) : _ratio(ratio) {}

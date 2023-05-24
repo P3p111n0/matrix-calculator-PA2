@@ -1,6 +1,6 @@
 #include "DenseMatrix.h"
-#include "DenseMatrixIterator.h"
-#include "IteratorWrapper.h"
+#include "../iterators/DenseMatrixIterator.h"
+#include "../iterators/IteratorWrapper.h"
 #include "MatrixMemoryRepr.h"
 #include <vector>
 

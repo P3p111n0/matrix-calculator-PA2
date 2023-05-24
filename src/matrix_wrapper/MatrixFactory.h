@@ -1,7 +1,7 @@
 #pragma once
 
-#include "IteratorWrapper.h"
-#include "MatrixMemoryRepr.h"
+#include "../iterators/IteratorWrapper.h"
+#include "../representations/MatrixMemoryRepr.h"
 #include <vector>
 
 class MatrixFactory {
