@@ -80,18 +80,16 @@ Matrix::Matrix(double val) : _factory(0.5) {
 }
 
 Matrix::Matrix(const Matrix & src)
-    : _matrix(src._matrix->clone()), _det(src._det), _rank(src._rank),
+    : _matrix(src._matrix->clone()),
       _factory(src._factory) {}
 
 Matrix::Matrix(Matrix && src) noexcept
-    : _matrix(std::move(src._matrix)), _det(src._det), _rank(src._rank),
+    : _matrix(std::move(src._matrix)),
       _factory(src._factory) {}
 
 Matrix & Matrix::operator=(const Matrix & src) {
     if (this != &src) {
         _matrix = std::unique_ptr<MatrixMemoryRepr>(src._matrix->clone());
-        _det = src._det;
-        _rank = src._rank;
         _factory = src._factory;
     }
     return *this;
@@ -100,8 +98,6 @@ Matrix & Matrix::operator=(const Matrix & src) {
 Matrix & Matrix::operator=(Matrix && src) noexcept {
     if (this != &src) {
         _matrix = std::move(src._matrix);
-        _det = src._det;
-        _rank = src._rank;
         _factory = src._factory;
     }
     return *this;
@@ -117,8 +113,6 @@ Matrix Matrix::operator+(const Matrix & other) const {
         result._matrix->add(pos.row, pos.column, val);
     }
     result.optimize();
-    result._det.reset();
-    result._rank.reset();
     return result;
 }
 
@@ -132,8 +126,6 @@ Matrix Matrix::operator-(const Matrix & other) const {
         result._matrix->add(pos.row, pos.column, val * -1);
     }
     result.optimize();
-    result._det.reset();
-    result._rank.reset();
     return result;
 }
 
@@ -163,8 +155,6 @@ Matrix Matrix::operator*(const Matrix & other) const {
         }
     }
     result.optimize();
-    result._det.reset();
-    result._rank.reset();
     return result;
 }
 
@@ -175,8 +165,6 @@ Matrix operator*(double scalar, const Matrix & mx) {
         result._matrix->modify(pos.row, pos.column, new_value);
     }
     result.optimize();
-    result._det.reset();
-    result._rank.reset();
     return result;
 }
 
@@ -209,8 +197,6 @@ Matrix Matrix::unite(const Matrix & first, const Matrix & second) {
         united._matrix->modify(pos.row + first.rows(), pos.column, val);
     }
     united.optimize();
-    united._det.reset();
-    united._rank.reset();
     return united;
 }
 
@@ -232,8 +218,6 @@ void Matrix::cut(std::size_t new_size_rows, std::size_t new_size_columns,
         }
     }
     _matrix = std::move(result._matrix);
-    _det.reset();
-    _rank.reset();
     optimize();
 }
 
@@ -262,13 +246,9 @@ void Matrix::inverse() {
     if (rows() != columns()) {
         throw std::logic_error("Non-square matrices cannot be inverted.");
     }
-    if (_det.has_value() && _det.value() == 0) {
-        throw std::logic_error("Matrix is not invertible.");
-    }
 
     std::queue<std::size_t> index_queue;
     std::set<std::size_t> visited_indexes;
-    double determinant = 1;
     std::size_t dim = rows();
 
     for (std::size_t i = 0; i < dim; i++) {
@@ -282,14 +262,12 @@ void Matrix::inverse() {
     for (std::size_t pivot_loc = index_queue.front(); !index_queue.empty();
          index_queue.pop(), pivot_loc = index_queue.front()) {
         double pivot = _matrix->at(pivot_loc, pivot_loc).value();
-        determinant *= pivot; // step 3
         if (pivot == 0) {
             if (!visited_indexes.count(pivot_loc)) {
                 index_queue.emplace(pivot_loc);
                 visited_indexes.emplace(pivot_loc);
                 continue;
             }
-            _det = 0;
             throw std::logic_error("Matrix is not invertible.");
         }
         // step 6
@@ -323,60 +301,13 @@ void Matrix::inverse() {
         _matrix->swap_rows(first_row, second_row);
     }
 
-    _det = 1 / determinant;
-    _rank = dim;
     optimize();
-}
-
-std::optional<double> Matrix::det() {
-    if (rows() != columns()) {
-        return std::nullopt;
-    }
-    if (_det.has_value()) {
-        return _det;
-    }
-    _det = calc_det();
-    return _det;
 }
 
 std::optional<double> Matrix::det() const {
     if (rows() != columns()) {
         return std::nullopt;
     }
-    if (_det.has_value()) {
-        return _det;
-    }
-    return calc_det();
-}
-
-std::size_t Matrix::rank() {
-    if (_rank.has_value()) {
-        return _rank.value();
-    }
-    _rank = calc_rank();
-    return _rank.value();
-}
-
-std::size_t Matrix::rank() const {
-    if (_rank.has_value()) {
-        return _rank.value();
-    }
-    return calc_rank();
-}
-
-std::ostream & operator<<(std::ostream & os, const Matrix & mx) {
-    os << *(mx._matrix);
-    return os;
-}
-
-void Matrix::gem() {
-    gem_swap_rows();
-    gem_row_elim();
-    optimize();
-    _det.reset();
-}
-
-std::optional<double> Matrix::calc_det() const {
     Matrix copied_matrix(*this);
 
     std::vector<double> division_vec;
@@ -402,7 +333,7 @@ std::optional<double> Matrix::calc_det() const {
     return det;
 }
 
-std::size_t Matrix::calc_rank() const {
+std::size_t Matrix::rank() const {
     Matrix copied_matrix(*this);
     copied_matrix.gem();
 
@@ -417,4 +348,15 @@ std::size_t Matrix::calc_rank() const {
     }
 
     return rank;
+}
+
+std::ostream & operator<<(std::ostream & os, const Matrix & mx) {
+    os << *(mx._matrix);
+    return os;
+}
+
+void Matrix::gem() {
+    gem_swap_rows();
+    gem_row_elim();
+    optimize();
 }

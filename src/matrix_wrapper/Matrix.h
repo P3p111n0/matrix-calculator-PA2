@@ -39,9 +39,7 @@ class Matrix {
     void cut(std::size_t, std::size_t, std::size_t, std::size_t);
     void cut(const Matrix &, const Matrix &, const Matrix &, const Matrix &);
     void inverse();
-    std::optional<double> det();
     std::optional<double> det() const;
-    std::size_t rank();
     std::size_t rank() const;
     void gem();
 
@@ -49,8 +47,6 @@ class Matrix {
 
   private:
     std::unique_ptr<MatrixMemoryRepr> _matrix;
-    std::optional<double> _det;
-    std::optional<std::size_t> _rank;
     MatrixFactory _factory;
 
     void gem_swap_rows(std::function<void(std::size_t, std::size_t)> &&);
