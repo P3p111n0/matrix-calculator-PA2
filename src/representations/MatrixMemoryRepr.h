@@ -7,6 +7,11 @@
 #include <optional>
 #include <vector>
 
+/**
+ * @brief MatrixMemoryRepr is an abstract base class for various representations
+ *        of matrices. Any classes implementing MatrixMemoryRepr are not
+ *        obligated to guarantee memory efficiency.
+ */
 class MatrixMemoryRepr {
   public:
     /**

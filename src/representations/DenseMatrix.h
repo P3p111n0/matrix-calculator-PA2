@@ -3,6 +3,12 @@
 #include "MatrixMemoryRepr.h"
 #include <vector>
 
+/**
+ * @brief Despite being called DenseMatrix, this class serves solely as a
+ *        container for values and as such can't guarantee any memory efficiency.
+ *        If you want to use a memory efficient implementation of a matrix,
+ *        please use the Matrix class.
+ */
 class DenseMatrix : public MatrixMemoryRepr {
     friend class DenseMatrixIterator;
 
