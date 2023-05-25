@@ -81,7 +81,7 @@ void Configurator::load_config(const char * file_name) {
 }
 
 void Configurator::print_defaults(std::ostream & os) const {
-    os << "\t sparse_ration = " << sparse_ratio * 100 << "%" << std::endl;
+    os << "\t sparse_ratio = " << sparse_ratio * 100 << "%" << std::endl;
     os << "\t max_input_length = " << max_input_length << std::endl;
 }
 
