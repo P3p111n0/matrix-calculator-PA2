@@ -59,6 +59,12 @@ void Configurator::load_config(const char * file_name) {
         print_defaults(_stream);
         return;
     }
+    if (config_data.size() > required_attrs.size()){
+        _stream << "One or more abundant attributes found in config. Defaulting to: " << std::endl;
+        set_defaults();
+        print_defaults(_stream);
+        return;
+    }
     double sparse_r = config_data["sparse_ratio"].get<double>();
     std::size_t max_len = config_data["max_input_length"].get<std::size_t>();
 
