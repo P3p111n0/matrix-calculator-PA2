@@ -121,11 +121,13 @@ static bool read_row(std::istream & stream, std::vector<double> & row) {
     char c = 0;
     while (c != ']') {
         double val;
+        stream >> std::ws;
         stream >> val;
         if (stream.fail()){
             return false;
         }
         row.emplace_back(val);
+        stream >> std::ws;
         stream >> c;
         switch (c) {
         case ',':
@@ -189,6 +191,7 @@ Matrix Parser::load_matrix_scan(std::istream & stream) const {
         std::vector<double> row;
         std::istringstream line_stream(line);
 
+        line_stream >> std::ws;
         char bracket;
         line_stream >> bracket;
 
