@@ -3,6 +3,7 @@
 #include "MatrixFactory.h"
 #include <queue>
 #include <set>
+#include <stdexcept>
 
 constexpr auto default_capture = [](std::size_t, std::size_t) { return; };
 
@@ -80,12 +81,10 @@ Matrix::Matrix(double val) : _factory(0.5) {
 }
 
 Matrix::Matrix(const Matrix & src)
-    : _matrix(src._matrix->clone()),
-      _factory(src._factory) {}
+    : _matrix(src._matrix->clone()), _factory(src._factory) {}
 
 Matrix::Matrix(Matrix && src) noexcept
-    : _matrix(std::move(src._matrix)),
-      _factory(src._factory) {}
+    : _matrix(std::move(src._matrix)), _factory(src._factory) {}
 
 Matrix & Matrix::operator=(const Matrix & src) {
     if (this != &src) {
@@ -176,12 +175,12 @@ IteratorWrapper Matrix::begin() const { return _matrix->begin(); }
 
 IteratorWrapper Matrix::end() const { return _matrix->end(); }
 
-void Matrix::transpose() {
+Matrix Matrix::transpose() const {
     Matrix transposed(columns(), rows(), _factory);
     for (const auto & [pos, val] : *this) {
         transposed._matrix->modify(pos.column, pos.row, val);
     }
-    _matrix = std::move(transposed._matrix);
+    return transposed;
 }
 
 Matrix Matrix::unite(const Matrix & first, const Matrix & second) {
@@ -200,8 +199,8 @@ Matrix Matrix::unite(const Matrix & first, const Matrix & second) {
     return united;
 }
 
-void Matrix::cut(std::size_t new_size_rows, std::size_t new_size_columns,
-                 std::size_t offset_rows, std::size_t offset_columns) {
+Matrix Matrix::cut(std::size_t new_size_rows, std::size_t new_size_columns,
+                   std::size_t offset_rows, std::size_t offset_columns) const {
     if (!new_size_rows || !new_size_columns) {
         throw std::invalid_argument("Cut: invalid new dimensions.");
     }
@@ -217,20 +216,22 @@ void Matrix::cut(std::size_t new_size_rows, std::size_t new_size_columns,
                 i, j, _matrix->at(offset_rows + i, offset_columns + j).value());
         }
     }
-    _matrix = std::move(result._matrix);
-    optimize();
+    result.optimize();
+    return result;
 }
 
 static inline bool matrix_is_a_number(const Matrix & mx) {
     return mx.rows() == 1 && mx.columns() == 1;
 }
 
-void Matrix::cut(const Matrix & new_size_rows_mx, const Matrix & new_size_columns_mx,
-                 const Matrix & offset_rows_mx, const Matrix & offset_columns_mx) {
-    if (!matrix_is_a_number(new_size_rows_mx)
-        || !matrix_is_a_number(new_size_columns_mx)
-        || !matrix_is_a_number(offset_rows_mx)
-        || !matrix_is_a_number(offset_columns_mx)){
+Matrix Matrix::cut(const Matrix & new_size_rows_mx,
+                   const Matrix & new_size_columns_mx,
+                   const Matrix & offset_rows_mx,
+                   const Matrix & offset_columns_mx) const {
+    if (!matrix_is_a_number(new_size_rows_mx) ||
+        !matrix_is_a_number(new_size_columns_mx) ||
+        !matrix_is_a_number(offset_rows_mx) ||
+        !matrix_is_a_number(offset_columns_mx)) {
         throw std::invalid_argument("Cut: Invalid arguments for conversion.");
     }
 
@@ -239,13 +240,23 @@ void Matrix::cut(const Matrix & new_size_rows_mx, const Matrix & new_size_column
     std::size_t offset_rows = offset_rows_mx._matrix->at(0, 0).value();
     std::size_t offset_columns = offset_columns_mx._matrix->at(0, 0).value();
 
-    cut(new_size_rows, new_size_column, offset_rows, offset_columns);
+    return cut(new_size_rows, new_size_column, offset_rows, offset_columns);
 }
 
-void Matrix::inverse() {
+// https://www.researchgate.net/publication/220337322_An_Efficient_and_Simple_Algorithm_for_Matrix_Inversion
+// implementing this algorithm shortened my expected lifespan by like 5 years
+// the algorithm is described in mathematical notation and in C, however,
+// the order of steps between these descriptions doesn't match up, the
+// mathematical notation is simply wrong. if you ever decide to reimplement this
+// (please don't), then don't bother with the math notation and rewrite the
+// C code provided in the link (because it's wrong as well lmao, it doesn't
+// make any sense)
+Matrix Matrix::inverse() const {
     if (rows() != columns()) {
         throw std::logic_error("Non-square matrices cannot be inverted.");
     }
+
+    Matrix result(*this);
 
     std::queue<std::size_t> index_queue;
     std::set<std::size_t> visited_indexes;
@@ -256,52 +267,55 @@ void Matrix::inverse() {
     }
 
     std::vector<std::pair<std::size_t, std::size_t>> row_swap_vec;
-    gem_swap_rows(
+    result.gem_swap_rows(
         [&](std::size_t i, std::size_t j) { row_swap_vec.emplace_back(i, j); });
 
     for (std::size_t pivot_loc = index_queue.front(); !index_queue.empty();
          index_queue.pop(), pivot_loc = index_queue.front()) {
-        double pivot = _matrix->at(pivot_loc, pivot_loc).value();
+        double pivot = result._matrix->at(pivot_loc, pivot_loc).value();
         if (pivot == 0) {
             if (!visited_indexes.count(pivot_loc)) {
                 index_queue.emplace(pivot_loc);
                 visited_indexes.emplace(pivot_loc);
                 continue;
             }
-            throw std::logic_error("Matrix is not invertible.");
+            throw std::runtime_error("Matrix is not invertible.");
         }
         // step 6
         for (std::size_t pivot_column = 0; pivot_column < dim; pivot_column++) {
-            _matrix->modify(pivot_column, pivot_loc,
-                            _matrix->at(pivot_column, pivot_loc).value() /
-                                (-pivot));
+            result._matrix->modify(
+                pivot_column, pivot_loc,
+                result._matrix->at(pivot_column, pivot_loc).value() / (-pivot));
         }
         // step 7
         for (std::size_t j = 0; j < dim; j++) {
             if (pivot_loc != j) {
                 for (std::size_t k = 0; k < dim; k++) {
                     if (pivot_loc != k) {
-                        _matrix->add(j, k,
-                                     _matrix->at(pivot_loc, k).value() *
-                                         _matrix->at(j, pivot_loc).value());
+                        result._matrix->add(
+                            j, k,
+                            result._matrix->at(pivot_loc, k).value() *
+                                result._matrix->at(j, pivot_loc).value());
                     }
                 }
             }
         }
         // step 5 / 8
         for (std::size_t pivot_row = 0; pivot_row < dim; pivot_row++) {
-            _matrix->modify(pivot_loc, pivot_row,
-                            _matrix->at(pivot_loc, pivot_row).value() / pivot);
+            result._matrix->modify(
+                pivot_loc, pivot_row,
+                result._matrix->at(pivot_loc, pivot_row).value() / pivot);
         }
-        _matrix->modify(pivot_loc, pivot_loc,
-                        1 / pivot); // step 8 / 9
+        result._matrix->modify(pivot_loc, pivot_loc,
+                               1 / pivot); // step 8 / 9
     }
 
     for (const auto & [first_row, second_row] : row_swap_vec) {
-        _matrix->swap_rows(first_row, second_row);
+        result._matrix->swap_rows(first_row, second_row);
     }
 
-    optimize();
+    result.optimize();
+    return result;
 }
 
 std::optional<double> Matrix::det() const {
@@ -355,8 +369,10 @@ std::ostream & operator<<(std::ostream & os, const Matrix & mx) {
     return os;
 }
 
-void Matrix::gem() {
-    gem_swap_rows();
-    gem_row_elim();
-    optimize();
+Matrix Matrix::gem() const {
+    Matrix result(*this);
+    result.gem_swap_rows();
+    result.gem_row_elim();
+    result.optimize();
+    return result;
 }
