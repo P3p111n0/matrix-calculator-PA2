@@ -122,6 +122,9 @@ static bool read_row(std::istream & stream, std::vector<double> & row) {
     while (c != ']') {
         double val;
         stream >> val;
+        if (stream.fail()){
+            return false;
+        }
         row.emplace_back(val);
         stream >> c;
         switch (c) {
@@ -196,6 +199,9 @@ Matrix Parser::load_matrix_scan(std::istream & stream) const {
 
         if (!read_row(line_stream, row)) {
             throw std::runtime_error("Matrix scan error.");
+        }
+        if (!(line_stream >> std::ws) || !(line_stream.eof())) {
+            throw std::runtime_error("Unexpected character in matrix scan.");
         }
         if (!mx.empty() && mx.back().size() != row.size()) {
             throw std::runtime_error("Row length mismatch in matrix.");

@@ -53,6 +53,7 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
     load_nontmp_vars(temp_vars);
     std::stack<std::string> process_stack;
     OperationFactory op_factory;
+    bool an_operator_occurred = false;
 
     auto getter = [&](const std::string & key) -> Matrix & {
         if (_vars.count(key)) {
@@ -70,17 +71,18 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
         output_queue.pop();
 
         if (special_case_table.count(token)) {
+            an_operator_occurred = true;
             switch (special_case_table.at(token)) {
             case SpecialCases::PRINT: {
-                if (process_stack.size() != 1){
+                if (process_stack.size() != 1) {
                     throw std::runtime_error("Invalid use of PRINT.");
                 }
                 auto arg = get_args(process_stack, actions, 1);
                 _stream << arg[0] << std::endl;
                 continue;
             }
-            case SpecialCases::EXPORT:{
-                if (process_stack.size() != 1){
+            case SpecialCases::EXPORT: {
+                if (process_stack.size() != 1) {
                     throw std::runtime_error("Invalid use of EXPORT.");
                 }
                 const std::string & filename = process_stack.top();
@@ -89,8 +91,8 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
                 process_stack.pop();
                 return;
             }
-            case SpecialCases::IMPORT:{
-                if (process_stack.size() != 1){
+            case SpecialCases::IMPORT: {
+                if (process_stack.size() != 1) {
                     throw std::runtime_error("Invalid use of IMPORT.");
                 }
                 const std::string & filename = process_stack.top();
@@ -99,12 +101,12 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
                 process_stack.pop();
                 return;
             }
-            case SpecialCases::ASSIGN:{
+            case SpecialCases::ASSIGN: {
                 auto arg = get_args(process_stack, actions, 1);
                 const std::string & dest = process_stack.top();
                 _vars.erase(dest);
                 _vars.emplace(dest, std::move(arg[0]));
-                if (process_stack.size() == 1){
+                if (process_stack.size() == 1) {
                     process_stack.pop();
                 }
                 continue;
@@ -117,9 +119,11 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
             continue;
         }
 
+        an_operator_occurred = true;
         std::unique_ptr<MatrixOp> operation(op_factory.get_operation(token));
-        if (process_stack.size() < operation->arity()){
-            _stream << "Not enough arguments for operation: " << token << std::endl;
+        if (process_stack.size() < operation->arity()) {
+            _stream << "Not enough arguments for operation: " << token
+                    << std::endl;
             return;
         }
         Matrix result = operation->evaluate(
@@ -129,8 +133,14 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
         process_stack.push(temporary_name);
     }
     if (!process_stack.empty()) {
-        std::string leftover = process_stack.top();
-        Matrix res = actions.get_var(leftover);
-        _stream << res << std::endl;
+        if (process_stack.size() == 1) {
+            std::string leftover = process_stack.top();
+            Matrix res = actions.get_var(leftover);
+            _stream << res << std::endl;
+        } else if (!an_operator_occurred) {
+            throw std::runtime_error("No operator has been found.");
+        } else {
+            throw std::runtime_error("An unknown evaluation error occurred.");
+        }
     }
 }
