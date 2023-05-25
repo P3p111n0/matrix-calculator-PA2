@@ -152,7 +152,7 @@ create_matrix_from_vec(const std::vector<std::vector<double>> & vec,
 }
 
 Matrix Parser::load_matrix(std::istream & stream) const {
-    char c;
+    char c = 0;
     std::vector<std::vector<double>> mx;
     while (stream.peek() != ']' && !stream.eof()) {
         std::vector<double> row;
@@ -179,7 +179,9 @@ Matrix Parser::load_matrix(std::istream & stream) const {
         }
         throw std::runtime_error("Matrix parse error.");
     }
-
+    if (c != ']'){
+        throw std::runtime_error("Matrix parse error.");
+    }
     return create_matrix_from_vec(mx, _factory);
 }
 
