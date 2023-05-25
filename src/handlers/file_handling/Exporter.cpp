@@ -32,7 +32,7 @@ void Exporter::export_to_file(const std::unordered_map<std::string, Matrix> & va
     reset();
     std::ofstream outfile(filename);
     if (!outfile.is_open() || outfile.bad()){
-        _status = "Coulnd't open file: " + filename;
+        _status = "Couldn't open file: " + filename;
         _is_failed = true;
         return;
     }
