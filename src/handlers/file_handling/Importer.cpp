@@ -2,10 +2,6 @@
 #include "../../../libs/json.hpp"
 #include "../../iterators/DenseMatrixIterator.h"
 #include "../../iterators/SparseMatrixIterator.h"
-#include "../../matrix_wrapper/Matrix.h"
-#include "../../matrix_wrapper/MatrixDimensions.h"
-#include "../../matrix_wrapper/MatrixElement.h"
-#include "../../matrix_wrapper/MatrixFactory.h"
 #include <fstream>
 #include <vector>
 

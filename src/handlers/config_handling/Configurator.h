@@ -5,7 +5,7 @@
 
 class Configurator {
   public:
-    Configurator(std::ostream &);
+    explicit Configurator(std::ostream &);
 
     void load_config(const char *);
 
@@ -14,9 +14,7 @@ class Configurator {
   private:
     std::ostream & _stream;
 
-    void error_and_reset(std::ostream &);
     void print_defaults(std::ostream &) const;
-    void syntax_error(std::ostream &) const;
     void set_defaults();
 };
 

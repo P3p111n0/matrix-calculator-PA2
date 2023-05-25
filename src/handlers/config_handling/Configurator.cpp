@@ -1,14 +1,31 @@
 #include "Configurator.h"
+#include <exception>
 #include <filesystem>
 #include <fstream>
 #include <ostream>
-#include <set>
-#include <sstream>
-#include <stdexcept>
 #include <string>
+#include <vector>
+#include "../../../libs/json.hpp"
+#include <limits>
 
 Configurator::Configurator(std::ostream & stream) : _stream(stream) {
     set_defaults();
+}
+
+inline const std::vector<std::string> required_attrs {
+    "sparse_ratio",
+    "max_input_length"
+};
+
+using json = nlohmann::json;
+
+static bool check_config(const json & data, const std::vector<std::string> & attrs){
+    for (const auto & attr : attrs){
+        if (!data.contains(attr) || !data[attr].is_number()){
+            return false;
+        }
+    }
+    return true;
 }
 
 void Configurator::load_config(const char * file_name) {
@@ -27,112 +44,48 @@ void Configurator::load_config(const char * file_name) {
         return;
     }
 
-    std::set<std::string> set_values;
+    json config_data;
+    try {
+        config_data = json::parse(file);
+    } catch (std::exception & e) {
+        _stream << "An error occurred during config parsing. Defaulting to: " << std::endl;
+        set_defaults();
+        print_defaults(_stream);
+        return;
+    }
+    if (!check_config(config_data, required_attrs)){
+        _stream << "One or more attributes are missing in the provided config. Defaulting to: " << std::endl;
+        set_defaults();
+        print_defaults(_stream);
+        return;
+    }
+    double sparse_r = config_data["sparse_ratio"].get<double>();
+    std::size_t max_len = config_data["max_input_length"].get<std::size_t>();
 
-    std::string line;
-    while (std::getline(file, line)) {
-        if (line.empty()) {
-            continue;
-        }
-
-        // 2 is the minimal line length
-        if (line.length() < 2) {
-            syntax_error(_stream);
-            return;
-        }
-
-        // skip comments
-        if (line[0] == '/' && line[1] == '/') {
-            continue;
-        }
-
-        std::stringstream line_stream(line);
-        std::string config_val;
-        line_stream >> config_val;
-
-        if (set_values.count(config_val)) {
-            _stream << "Multiple definitions of: " << config_val << std::endl;
-            _stream << "Defaulting to: " << std::endl;
-            set_defaults();
-            print_defaults(_stream);
-            return;
-        }
-
-        set_values.emplace(config_val);
-
-        if (config_val == "SPARSE_RATIO") {
-            char symbol;
-            double numerator, denominator;
-
-            line_stream >> symbol;
-            if (symbol != '=' || line_stream.bad()) {
-                error_and_reset(_stream);
-                return;
-            }
-
-            line_stream >> numerator;
-
-            line_stream >> symbol;
-            if (symbol != '/' || line_stream.bad()) {
-                error_and_reset(_stream);
-                return;
-            }
-            line_stream >> denominator;
-            if (line_stream.bad()) {
-                error_and_reset(_stream);
-                return;
-            }
-
-            sparse_ratio = numerator / denominator;
-            continue;
-        }
-
-        if (config_val == "MAX_INPUT_LEN") {
-            char symbol;
-            std::size_t new_len;
-
-            line_stream >> symbol;
-            if (symbol != '=' || line_stream.bad()) {
-                error_and_reset(_stream);
-                return;
-            }
-
-            line_stream >> new_len;
-            if (line_stream.bad()) {
-                error_and_reset(_stream);
-                return;
-            }
-
-            max_input_length = new_len;
-            continue;
-        }
-
-        _stream << "Unknown parameter: " << config_val << std::endl;
-        _stream << "Defaulting to: " << std::endl;
+    if (sparse_r < 0 || sparse_r > 1){
+        _stream << "Invalid value of sparse_ratio. Defaulting to: " << std::endl;
+        set_defaults();
+        print_defaults(_stream);
+        return;
+    }
+    if (max_len == 0 || max_len == std::numeric_limits<std::size_t>::max()){
+        _stream << "Invalid value of max_input_length. Defaulting to: " << std::endl;
         set_defaults();
         print_defaults(_stream);
         return;
     }
 
+    sparse_ratio = sparse_r;
+    max_input_length = max_len;
     _stream << "Config file: OK" << std::endl;
 }
 
-void Configurator::error_and_reset(std::ostream & os) {
-    syntax_error(os);
-    set_defaults();
-}
-
-void Configurator::syntax_error(std::ostream & os) const {
-    os << "Syntax error in configuration file, defaulting to:" << std::endl;
-    print_defaults(os);
-}
-
 void Configurator::print_defaults(std::ostream & os) const {
-    os << "\t SPARSE_RATIO = " << sparse_ratio * 100 << "%" << std::endl;
-    os << "\t MAX_INPUT_LEN = " << max_input_length << std::endl;
+    os << "\t sparse_ration = " << sparse_ratio * 100 << "%" << std::endl;
+    os << "\t max_input_length = " << max_input_length << std::endl;
 }
 
 void Configurator::set_defaults() {
-    sparse_ratio = 2 / 3.0;
-    max_input_length = 200;
+    sparse_ratio = 0.5;
+    max_input_length = 500;
 }
