@@ -36,8 +36,8 @@ class Parser : public InputHandler {
      *                            "SCAN"
      * @throws std::runtime_error if a matrix cannot be parsed in user input.
      * @throws std::invalid_argument if a token starts with a number
-     * @throws std::length_error if an expression exceeds the maximum allowed
-     *                           limit.
+     * @throws std::ios_base::failure if an expression exceeds the maximum allowed
+     *                                limit.
      * @throws std::ios_base::failure if the input stream fails while reading.
      */
     ParsedInput parse_input() const;
