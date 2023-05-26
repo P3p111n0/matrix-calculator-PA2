@@ -9,7 +9,14 @@ IMPLS = $(wildcard src/*.cpp src/*/*.cpp src/*/*/*.cpp src/*/*/*/*.cpp)
 OBJS = $(patsubst %.cpp, build/%.o, $(IMPLS))
 BUILD_DIR = $(dir $(OBJS))
 
-.PHONY: compile debug clean zip doc run make_path
+.PHONY: all compile debug clean zip doc run make_path
+
+default: all
+
+all: $(LOGIN) doc
+
+doc:
+	doxygen
 
 debug: CFLAGS += -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer -ftrapv
 debug: LDFLAGS += -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer -ftrapv
@@ -27,8 +34,8 @@ build/%.o:
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 build:
-	mkdir -p $(BUILD_DIR)
-	mkdir -p build
+	@mkdir -p $(BUILD_DIR)
+	@mkdir -p build
 
 -include build/Makefile.d
 
@@ -36,5 +43,6 @@ build/Makefile.d:  $(IMPLS) $(HEADERS) build
 		$(foreach f, $(IMPLS), ${CXX} -MM  $(f) -MT $(patsubst %.cpp, build/%.o, $(f)) >> $@ ;)
 
 clean:
-	rm -rf ${LOGIN}
-	rm -rf build
+	@rm -rf doc
+	@rm -rf ${LOGIN}
+	@rm -rf build
