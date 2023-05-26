@@ -14,6 +14,8 @@ class BaseHandler {
      *                exporting.
      */
     BaseHandler(MatrixFactory factory);
+
+    virtual ~BaseHandler() = default;
   protected:
 
     /**
