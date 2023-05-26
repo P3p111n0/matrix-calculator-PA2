@@ -1,6 +1,5 @@
 #include "OperationFactory.h"
 #include "MatrixOp.h"
-#include "Operator.h"
 #include "five_args/MatrixOpCut.h"
 #include "single_argument/MatrixOpDet.h"
 #include "single_argument/MatrixOpGauss.h"
@@ -23,71 +22,30 @@ bool OperationCmp::operator()(const std::shared_ptr<MatrixOp> & lhs,
 }
 
 OperationFactory::OperationFactory() {
-    _operations.emplace("+", Operator::PLUS);
-    _operations.emplace("-", Operator::MINUS);
-    _operations.emplace("*", Operator::MUL);
-    _operations.emplace("UNITE", Operator::UNITE);
-    _operations.emplace("CUT", Operator::CUT);
-    _operations.emplace("TRANSPOSE", Operator::TRANSPOSE);
-    _operations.emplace("INV", Operator::INV);
-    _operations.emplace("DET", Operator::DET);
-    _operations.emplace("RANK", Operator::RANK);
-    _operations.emplace("GAUSS", Operator::GAUSS);
-    _operations.emplace("PRINT", Operator::PRINT);
-    _operations.emplace("EXPORT", Operator::EXPORT);
-    _operations.emplace("IMPORT", Operator::IMPORT);
-    _operations.emplace("=", Operator::ASSIGN);
+    _operations.emplace("+", new MatrixOpPlus);
+    _operations.emplace("-", new MatrixOpMinus);
+    _operations.emplace("*", new MatrixOpMul);
+    _operations.emplace("UNITE", new MatrixOpUnite);
+    _operations.emplace("CUT", new MatrixOpCut);
+    _operations.emplace("TRANSPOSE", new MatrixOpTranspose);
+    _operations.emplace("INV", new MatrixOpInv);
+    _operations.emplace("DET",new MatrixOpDet);
+    _operations.emplace("RANK", new MatrixOpRank);
+    _operations.emplace("GAUSS", new MatrixOpGauss);
+    _operations.emplace("PRINT", new MatrixOpPrint);
+    _operations.emplace("EXPORT", new MatrixOpExport);
+    _operations.emplace("IMPORT", new MatrixOpImport);
+    _operations.emplace("=", new MatrixOpAssign);
 
 }
 
-MatrixOp * OperationFactory::get_operation(const std::string & op_name) const {
-    if (!_operations.count(op_name)) {
+std::shared_ptr<MatrixOp>
+OperationFactory::get_operation(const std::string & name) const {
+    if (!_operations.count(name)) {
         // this shouldn't happen
-        throw std::invalid_argument("Unknown operation name: " + op_name);
+        throw std::invalid_argument("Unknown operation name: " + name);
     }
-    Operator op = _operations.at(op_name);
-    switch (op) {
-    case Operator::PLUS:
-        return new MatrixOpPlus;
-    case Operator::MINUS:
-        return new MatrixOpMinus;
-    case Operator::MUL:
-        return new MatrixOpMul;
-    case Operator::TRANSPOSE:
-        return new MatrixOpTranspose;
-    case Operator::UNITE:
-        return new MatrixOpUnite;
-    case Operator::CUT:
-        return new MatrixOpCut;
-    case Operator::INV:
-        return new MatrixOpInv;
-    case Operator::DET:
-        return new MatrixOpDet;
-    case Operator::RANK:
-        return new MatrixOpRank;
-    case Operator::GAUSS:
-        return new MatrixOpGauss;
-    case Operator::PRINT:
-        return new MatrixOpPrint;
-    case Operator::EXPORT:
-        return new MatrixOpExport;
-    case Operator::IMPORT:
-        return new MatrixOpImport;
-    case Operator::ASSIGN:
-        return new MatrixOpAssign;
-    default:
-        // this definitely shouldn't happen
-        throw std::runtime_error("No matching operator for: " + op_name);
-    }
-}
-
-std::set<std::shared_ptr<MatrixOp>, OperationCmp>
-OperationFactory::get_all_operations() const {
-    std::set<std::shared_ptr<MatrixOp>, OperationCmp> op_set;
-    for (const auto & [key, op] : _operations) {
-        op_set.emplace(get_operation(key));
-    }
-    return op_set;
+    return _operations.at(name);
 }
 
 bool OperationFactory::is_operation(const std::string & name) const {
@@ -95,6 +53,6 @@ bool OperationFactory::is_operation(const std::string & name) const {
 }
 
 std::size_t OperationFactory::priority_of(const std::string & op) const {
-    std::unique_ptr<MatrixOp> operation(get_operation(op));
+    std::shared_ptr<MatrixOp> operation(get_operation(op));
     return operation->priority();
 }

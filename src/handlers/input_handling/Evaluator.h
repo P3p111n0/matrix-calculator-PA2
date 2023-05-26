@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../matrix_operations/Operator.h"
 #include "../../matrix_wrapper/Matrix.h"
 #include "../../matrix_wrapper/MatrixFactory.h"
 #include "../file_handling/Exporter.h"

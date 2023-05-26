@@ -120,7 +120,7 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
         }
 
         an_operator_occurred = true;
-        std::unique_ptr<MatrixOp> operation(op_factory.get_operation(token));
+        std::shared_ptr<MatrixOp> operation(op_factory.get_operation(token));
         if (process_stack.size() < operation->arity()) {
             _stream << "Not enough arguments for operation: " << token
                     << std::endl;

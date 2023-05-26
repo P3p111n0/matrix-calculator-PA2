@@ -83,7 +83,7 @@ ParsedInput Parser::parse_input() const {
             break;
         }
         if (operations.is_operation(token)) {
-            std::unique_ptr<MatrixOp> token_op(operations.get_operation(token));
+            std::shared_ptr<MatrixOp> token_op(operations.get_operation(token));
             while (!operator_stack.empty() && operator_stack.top() != "(" &&
                    operations.priority_of(operator_stack.top()) >
                        token_op->priority()) {
