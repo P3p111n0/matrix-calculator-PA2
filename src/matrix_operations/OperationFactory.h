@@ -5,11 +5,6 @@
 #include <set>
 #include <unordered_map>
 
-struct OperationCmp {
-    bool operator()(const std::shared_ptr<MatrixOp> &,
-                           const std::shared_ptr<MatrixOp> &) const;
-};
-
 class OperationFactory {
   public:
     OperationFactory();

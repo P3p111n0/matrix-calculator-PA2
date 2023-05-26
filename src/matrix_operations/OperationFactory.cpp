@@ -16,11 +16,6 @@
 #include "two_args/MatrixOpUnite.h"
 #include <memory>
 
-bool OperationCmp::operator()(const std::shared_ptr<MatrixOp> & lhs,
-                              const std::shared_ptr<MatrixOp> & rhs) const {
-    return lhs->name() < rhs->name();
-}
-
 OperationFactory::OperationFactory() {
     _operations.emplace("+", new MatrixOpPlus);
     _operations.emplace("-", new MatrixOpMinus);
