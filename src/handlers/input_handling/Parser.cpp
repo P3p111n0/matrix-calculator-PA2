@@ -3,6 +3,7 @@
 #include "../../matrix_operations/OperationFactory.h"
 #include "InputHandler.h"
 #include "ParsedInput.h"
+#include <ios>
 #include <memory>
 #include <optional>
 #include <sstream>
@@ -22,10 +23,10 @@ static std::optional<double> read_double(const std::string & token) {
     double val = 0;
     try {
         val = std::stod(token, &len);
-    } catch (std::exception & e){
+    } catch (std::exception & e) {
         return std::nullopt;
     }
-    if (len != token.length()){
+    if (len != token.length()) {
         throw std::invalid_argument("Identifiers cannot begin with a number.");
     }
     return val;
@@ -39,8 +40,15 @@ ParsedInput Parser::parse_input() const {
 
     std::stack<std::string> operator_stack;
 
-    std::unique_ptr<char[]> buffer(new char[_max_len]);
-    _stream.getline(buffer.get(), _max_len - 1);
+    std::unique_ptr<char[]> buffer(new char[_max_len + 1]);
+    _stream.getline(buffer.get(), _max_len);
+    if (_stream.get() != '\n') {
+        throw std::length_error("Maximum input length exceeded.");
+    }
+    if (_stream.bad() || _stream.fail()) {
+        throw std::ios_base::failure(
+            "Couldn't read user input due to an unexpected error.");
+    }
 
     std::stringstream line_stream(buffer.get());
     while (line_stream >> std::ws && !line_stream.eof()) {
@@ -109,9 +117,9 @@ ParsedInput Parser::parse_input() const {
             continue;
         }
 
-        //token is a number
+        // token is a number
         std::optional token_to_val = read_double(token);
-        if (!token_to_val.has_value()){
+        if (!token_to_val.has_value()) {
             output_queue.push(token);
             continue;
         }
@@ -137,7 +145,7 @@ static bool read_row(std::istream & stream, std::vector<double> & row) {
         double val;
         stream >> std::ws;
         stream >> val;
-        if (stream.fail()){
+        if (stream.fail()) {
             return false;
         }
         row.emplace_back(val);
@@ -193,7 +201,7 @@ Matrix Parser::load_matrix(std::istream & stream) const {
         }
         throw std::runtime_error("Matrix parse error.");
     }
-    if (c != ']'){
+    if (c != ']') {
         throw std::runtime_error("Matrix parse error.");
     }
     return create_matrix_from_vec(mx, _factory);
