@@ -2,7 +2,7 @@
 #include <exception>
 
 MatrixCalculator::MatrixCalculator(std::istream & input, std::ostream & output,
-                                   const std::string & config_file = "")
+                                   const std::string & config_file)
     : _config(output), _in(input), _out(output) {
     if (!config_file.empty()) {
         _config.load_config(config_file.c_str());
