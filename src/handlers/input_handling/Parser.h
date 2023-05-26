@@ -35,6 +35,7 @@ class Parser : public InputHandler {
      * @throws std::runtime_error if an operation name is used in call of
      *                            "SCAN"
      * @throws std::runtime_error if a matrix cannot be parsed in user input.
+     * @throws std::invalid_argument if a token starts with a number
      */
     ParsedInput parse_input() const;
 
