@@ -137,12 +137,13 @@ class SparseMatrix : public MatrixMemoryRepr {
   private:
 
     /**
-     * @brief A container for the values of the represented matrix.
-     *        Key - A Position struct with the row and column of the given value.
-     *              Values are sorted primarily by their rows and by their
-     *              columns, if such a comparison would be insufficient.
-     *        Value - The value at in the row and column. Only non-zero values
-     *                are present.
+     * @brief A container for the values of the represented matrix.\n
+     *        <b>Key</b> - A Position struct with the row and column of the
+     *                     given value. Values are sorted primarily by their
+     *                     rows and by their columns, if such a comparison would
+     *                     be insufficient.\n
+     *        <b>Value</b> - The value at in the row and column. Only non-zero
+     *                       values are present.
      */
      std::map<Position, double> _data;
 };

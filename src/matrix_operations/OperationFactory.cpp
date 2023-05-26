@@ -48,6 +48,9 @@ bool OperationFactory::is_operation(const std::string & name) const {
 }
 
 std::size_t OperationFactory::priority_of(const std::string & op) const {
+    if (!_operations.count(op)){
+        throw std::invalid_argument("Invalid operation: " + op);
+    }
     std::shared_ptr<MatrixOp> operation(get_operation(op));
     return operation->priority();
 }
