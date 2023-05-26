@@ -43,8 +43,8 @@ ParsedInput Parser::parse_input() const {
     std::unique_ptr<char[]> buffer(new char[_max_len + 1]);
     _stream.getline(buffer.get(), _max_len);
     if (_stream.bad() || _stream.fail()) {
-        throw std::ios_base::failure(
-            "Couldn't read user input due to an unexpected error.");
+        throw std::length_error(
+            "Maximum input length exceeded.");
     }
 
     std::stringstream line_stream(buffer.get());
