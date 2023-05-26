@@ -4,6 +4,7 @@
 #include "InputHandler.h"
 #include "ParsedInput.h"
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <stack>
 #include <stdexcept>
@@ -15,6 +16,20 @@ inline constexpr char TMP_NAME[] = "TMP";
 Parser::Parser(MatrixFactory factory, std::istream & stream,
                std::size_t max_input_len)
     : InputHandler(factory), _stream(stream), _max_len(max_input_len) {}
+
+static std::optional<double> read_double(const std::string & token) {
+    std::size_t len = 0;
+    double val = 0;
+    try {
+        val = std::stod(token, &len);
+    } catch (std::exception & e){
+        return std::nullopt;
+    }
+    if (len != token.length()){
+        throw std::invalid_argument("Identifiers cannot begin with a number.");
+    }
+    return val;
+}
 
 ParsedInput Parser::parse_input() const {
     ParsedInput result;
@@ -94,16 +109,15 @@ ParsedInput Parser::parse_input() const {
             continue;
         }
 
-        // token is a number
-        try {
-            double num = std::stod(token); // TODO: fix conversion
-            Matrix number_in_matrix(num);
-            std::string new_name = get_temporary_name(TMP_NAME);
-            variables.emplace(new_name, number_in_matrix);
-            output_queue.push(new_name);
-        } catch (std::exception & e) {
+        //token is a number
+        std::optional token_to_val = read_double(token);
+        if (!token_to_val.has_value()){
             output_queue.push(token);
+            continue;
         }
+        std::string name_of_val = get_temporary_name(TMP_NAME);
+        variables.emplace(name_of_val, token_to_val.value());
+        output_queue.push(name_of_val);
     }
 
     while (!operator_stack.empty()) {
