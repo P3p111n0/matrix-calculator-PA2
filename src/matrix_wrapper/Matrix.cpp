@@ -8,7 +8,7 @@
 constexpr auto default_capture = [](std::size_t, std::size_t) { return; };
 
 void Matrix::gem_swap_rows(std::function<void(std::size_t, std::size_t)> &&
-                               capture_fn = default_capture) {
+                               capture_fn) {
 
     for (std::size_t i = 0, column_index = 0;
          i < rows() && column_index < columns(); i++, column_index++) {
@@ -29,7 +29,7 @@ void Matrix::gem_swap_rows(std::function<void(std::size_t, std::size_t)> &&
 
 // https://www.math-cs.gordon.edu/courses/ma342/handouts/gauss.pdf
 void Matrix::gem_row_elim(std::function<void(std::size_t, std::size_t)> &&
-                              capture_fn = default_capture) {
+                              capture_fn) {
 
     for (std::size_t i = 0; i < columns(); i++) {
         for (std::size_t j = i + 1; j < rows(); j++) {

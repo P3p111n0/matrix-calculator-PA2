@@ -266,12 +266,13 @@ class Matrix {
      *        and determinant calculation. Swaps rows as necessary to convert
      *        the matrix to row echelon form.
      * @param capture_fn A function which serves to optimise different use cases
-     *                   for row-swapping. Is called everytime 2 rows are swapped
-     *                   with the indices of the two swapped rows. Defaults to
-     *                   an empty lambda function if not provided.
+     *                   for row-swapping. Is called everytime 2 rows are
+     * swapped with the indices of the two swapped rows. Defaults to an empty
+     * lambda function if not provided.
      */
-    void gem_swap_rows(std::function<void(std::size_t row1,
-                                          std::size_t row2)> && capture_fn);
+    void gem_swap_rows(
+        std::function<void(std::size_t row1, std::size_t row2)> && capture_fn =
+            default_capture);
 
     /**
      * @brief A helper function for Gaussian elimination and determinant
@@ -286,7 +287,17 @@ class Matrix {
      *                   provided.
      */
     void gem_row_elim(
-        std::function<void(std::size_t row, std::size_t column)> && capture_fn);
+        std::function<void(std::size_t row, std::size_t column)> && capture_fn =
+            default_capture);
+
+    /**
+     * @brief A default capture lambda for <b>Matrix::gem_swap_rows</b> and
+     *        <b>Matrix::gem_row_elim</b>, for when no capture is needed.
+     *        Does nothing.
+     */
+    static constexpr auto default_capture = [](std::size_t, std::size_t) {
+        return;
+    };
 
     /**
      * @brief Tries to convert the representation, does nothing no optimisation
