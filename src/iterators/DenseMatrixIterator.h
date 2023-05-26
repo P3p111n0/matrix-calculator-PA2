@@ -28,7 +28,7 @@ class DenseMatrixIterator : public AbstractMatrixIterator {
      *        container and dimensions are taken as an argument, especially
      *        useful for reading user input, as no DenseMatrix object needs to
      *        exist.
-     * @param ptr Pointer to the dimensions of <b>data<b>
+     * @param ptr Pointer to the dimensions of <b>data</b>
      * @param data A reference to the data container of matrix.
      * @param row Row of the starting element.
      * @param column Column of the starting element.

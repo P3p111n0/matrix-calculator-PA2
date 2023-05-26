@@ -68,7 +68,7 @@ class SparseMatrix : public MatrixMemoryRepr {
     std::optional<double> at(std::size_t row, std::size_t column) const override;
 
     /**
-     * @brief Increases the element's value at the given indices by @value
+     * @brief Increases the element's value at the given indices by <b>value</b>
      *        using operator+. Standard zero-based indexing is presumed.
      *        No guarantees are provided regarding memory efficiency when using
      *        this method.
@@ -81,7 +81,7 @@ class SparseMatrix : public MatrixMemoryRepr {
     void add(std::size_t row, std::size_t column, double value) override;
 
     /**
-     * @brief Changes the element at the given indices to @value. Standard
+     * @brief Changes the element at the given indices to <b>value</b>. Standard
      *        zero-based indexing is presumed. Memory efficiency cannot be
      *        guaranteed when using this method. If the represented matrix
      *        becomes a dense one because of this method, this event won't be
@@ -95,7 +95,7 @@ class SparseMatrix : public MatrixMemoryRepr {
     void modify(std::size_t row, std::size_t column, double value) override;
 
     /**
-     * @brief Swaps elements in @first_row and @second_row. Standard zero-based
+     * @brief Swaps elements in <b>first_row</b> and <b>second_row</b>. Standard zero-based
      *        indexing is presumed.
      * @param first_row Index of the row to swap with second_row.
      * @param second_row Index of the row to swap with first_row.
