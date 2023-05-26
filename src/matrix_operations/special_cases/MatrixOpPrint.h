@@ -1,18 +1,16 @@
 #pragma once
 
-#include "../MatrixOp.h"
+#include "MatrixOpSpecial.h"
 
 /**
- * @brief Represents a special case for matrix operations. Classes in the
- *        <b>special_cases</b> directory do nothing, they only exist for
- *        the purposes of parsing.
+ * @brief Represents a special case for matrix operations. Does nothing,
+ *        only exists for the purposes of parsing.
  */
-class MatrixOpPrint : public MatrixOp {
+class MatrixOpPrint : public MatrixOpSpecial {
   public:
 
     /**
-     * @brief Initializes the operation to <b>arity = 1</b>, <b>priority = 0</b>
-     *        and <b>name = "PRINT"</b>.
+     * @brief Initializes the operation to <b>name = "PRINT"</b>.
      */
     MatrixOpPrint();
 

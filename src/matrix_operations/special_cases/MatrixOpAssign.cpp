@@ -1,6 +1,6 @@
 #include "MatrixOpAssign.h"
 
-MatrixOpAssign::MatrixOpAssign() : MatrixOp(2, 0, "=") {}
+MatrixOpAssign::MatrixOpAssign() : MatrixOpSpecial("=") {}
 
 Matrix MatrixOpAssign::evaluate(const std::vector<Matrix> &) const {
     return {0};
