@@ -3,6 +3,7 @@
 #include "../../iterators/DenseMatrixIterator.h"
 #include "../../iterators/SparseMatrixIterator.h"
 #include <fstream>
+#include <stdexcept>
 #include <vector>
 
 using json = nlohmann::json;
@@ -43,6 +44,15 @@ Matrix read_dense(json & json_data, const std::string & name,
     }
     mx_data = json_data[name]["data"]["array"]
                   .get<std::vector<std::vector<double>>>();
+    if (mx_data.size() != dims.rows()){
+        throw std::runtime_error("Invalid array dimensions in matrix.");
+    }
+    for (const auto & row : mx_data){
+        if (row.size() != dims.columns()){
+            throw std::runtime_error("Invalid array dimensions in matrix,");
+        }
+    }
+
     return {{new DenseMatrixIterator(&dims, mx_data, 0, 0)},
             {new DenseMatrixIterator(&dims, mx_data, dims.rows(), 0)},
             factory};
@@ -62,7 +72,7 @@ Matrix read_sparse(json & json_data, const std::string & name,
             continue;
         }
         if (!(oss >> row) || !(oss >> c) || c != ':' || !(oss >> col)) {
-            throw std::runtime_error("Unknown key in " + name + ": " + key);
+            throw std::runtime_error("Unknown key: " + key);
         }
         if (row >= dims.rows() || col >= dims.columns()) {
             throw std::runtime_error("Unknown position: " + key);
@@ -122,7 +132,8 @@ void Importer::import_from_file(std::unordered_map<std::string, Matrix> & vars,
                     read_sparse(input_data, key, {rows, columns}, _factory));
             }
         } catch (std::exception & e) {
-            _status = "An error occurred while reading matrix: " + key;
+            _status = "An error occurred while reading matrix: " + key + '\n';
+            _status += e.what();
             _is_failed = true;
             return;
         }
