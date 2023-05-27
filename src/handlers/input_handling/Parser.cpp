@@ -42,12 +42,11 @@ ParsedInput Parser::parse_input() const {
 
     std::unique_ptr<char[]> buffer(new char[_max_len + 1]);
     _stream.getline(buffer.get(), _max_len);
-    if (_stream.eof()){
+    if (_stream.eof()) {
         throw std::invalid_argument("End-of-file reached.");
     }
     if (_stream.bad() || _stream.fail()) {
-        throw std::length_error(
-            "Maximum input length exceeded.");
+        throw std::length_error("Maximum input length exceeded.");
     }
 
     std::stringstream line_stream(buffer.get());
@@ -101,6 +100,11 @@ ParsedInput Parser::parse_input() const {
                 operations.is_operation(token) || !output_queue.empty()) {
                 throw std::invalid_argument(
                     "Invalid argument in call of SCAN.");
+            }
+            std::optional<double> name_test = read_double(name);
+            if (name_test.has_value()) {
+                throw std::invalid_argument(
+                    "Cannot bind a number to a matrix in call of SCAN.");
             }
             variables.emplace(name, load_matrix_scan(_stream));
             output_queue.emplace(name);

@@ -33,13 +33,16 @@ class Parser : public InputHandler {
      *                            encountered.
      * @throws std::runtime_error if all parenthesis on input aren't matching.
      * @throws std::runtime_error if an operation name is used in call of
-     *                            "SCAN"
+     *                            "SCAN" or if "SCAN" is used in a compound
+     *                            expression
      * @throws std::runtime_error if a matrix cannot be parsed in user input.
      * @throws std::invalid_argument if a token starts with a number.
      * @throws std::length_error if an expression exceeds the maximum allowed
      *                           limit.
-     * @throws std::invalid_argument If end-of-file has been reached during
+     * @throws std::invalid_argument if end-of-file has been reached during
      *                               reading.
+     * @throws std::invalid_argument if a number is used as an identifier in
+     *                               call of "SCAN"
      */
     ParsedInput parse_input() const;
 
