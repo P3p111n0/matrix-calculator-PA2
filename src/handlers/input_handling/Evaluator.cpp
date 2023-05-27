@@ -35,6 +35,19 @@ void Evaluator::load_nontmp_vars(const Evaluator::VariableMap & tmps) {
     }
 }
 
+void Evaluator::print_available_vars() const {
+    _stream << "Imported variables: " << std::endl;
+    std::size_t cnt = 0;
+    for (const auto & [key, val] : _vars){
+        _stream << key;
+        ++cnt;
+        if (cnt != _vars.size()){
+            _stream << ",";
+        }
+    }
+    _stream << std::endl;
+}
+
 enum class SpecialCases { PRINT, EXPORT, IMPORT, ASSIGN };
 
 inline const std::unordered_map<std::string, SpecialCases> special_case_table =
@@ -99,6 +112,9 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
                 _importer.import_from_file(_vars, filename);
                 _stream << _importer.status() << std::endl;
                 process_stack.pop();
+                if (_importer.good()) {
+                    print_available_vars();
+                }
                 return;
             }
             case SpecialCases::ASSIGN: {

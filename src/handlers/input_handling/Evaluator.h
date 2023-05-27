@@ -79,4 +79,9 @@ class Evaluator : public InputHandler {
      *        in user input over to <b>_vars</b>.
      */
     void load_nontmp_vars(const VariableMap & temp_vars);
+
+    /**
+     * @brief Prints newly available variables after importing from a file.
+     */
+    void print_available_vars() const;
 };
