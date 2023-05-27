@@ -77,7 +77,7 @@ void SparseMatrix::modify(std::size_t row, std::size_t column, double new_val) {
 
 void SparseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
     std::vector<MatrixElement> swap_elements;
-    if (f_row >= _dimensions.rows() || s_row >= _dimensions.columns()) {
+    if (f_row >= _dimensions.rows() || s_row >= _dimensions.rows()) {
         throw std::out_of_range("Swap_rows: index out of range");
     }
     for (const auto & [key, value] : _data) {
