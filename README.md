@@ -7,7 +7,7 @@ The calculator accepts a JSON config file as an optional command line argument. 
 config file can be found in `examples/config.json`. If no configuration file is 
 specified, default values are used.
 
-The calculator supports following operations, with a 2x2 matrix used as an example:
+The calculator supports following operations, with a 3x3 matrix used as an example:
 ```
 ----------
 A = [[1, 0, 0], [0, 1, 0], [0, 0, 1]] // declaring a matrix inline
