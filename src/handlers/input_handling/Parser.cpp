@@ -65,15 +65,16 @@ ParsedInput Parser::parse_input() const {
         }
 
         line_stream >> token;
+        // check if token is reserved
         if (string_has_prefix(token, RESERVED_NAME_PREFIX)) {
             throw std::runtime_error("Token " + token + " is reserved.");
         }
-
+        // token is an opening parenthesis
         if (token == "(") {
             operator_stack.push(token);
             continue;
         }
-
+        // token is a closing parenthesis
         if (token == ")") {
             if (operator_stack.empty()) {
                 throw std::runtime_error("Parenthesis mismatch on input");
@@ -92,12 +93,12 @@ ParsedInput Parser::parse_input() const {
             operator_stack.pop();
             continue;
         }
-
+        // token is a call of scan
         if (token == "SCAN") {
             std::string name;
             if (!(line_stream >> name) ||
                 string_has_prefix(name, RESERVED_NAME_PREFIX) ||
-                operations.is_operation(token)) {
+                operations.is_operation(token) || !output_queue.empty()) {
                 throw std::invalid_argument(
                     "Invalid argument in call of SCAN.");
             }
@@ -105,6 +106,7 @@ ParsedInput Parser::parse_input() const {
             output_queue.emplace(name);
             break;
         }
+        // token is an operation
         if (operations.is_operation(token)) {
             std::shared_ptr<MatrixOp> token_op(operations.get_operation(token));
             while (!operator_stack.empty() && operator_stack.top() != "(" &&
@@ -127,7 +129,7 @@ ParsedInput Parser::parse_input() const {
         variables.emplace(name_of_val, token_to_val.value());
         output_queue.push(name_of_val);
     }
-
+    // popping leftover operations with low priority
     while (!operator_stack.empty()) {
         if (operator_stack.top() == "(" || operator_stack.top() == ")") {
             throw std::runtime_error("Parenthesis mismatch on input");
