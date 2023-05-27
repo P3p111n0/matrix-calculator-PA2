@@ -37,6 +37,8 @@ build:
 	@mkdir -p $(BUILD_DIR)
 	@mkdir -p build
 
+## original idea from this thread and from docs
+## https://stackoverflow.com/questions/4864345/how-to-conditionally-include-a-file-into-makefile
 ifeq (, $(filter $(MAKECMDGOALS), clean doc))
 -include build/Makefile.d
 endif
