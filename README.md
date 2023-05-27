@@ -54,7 +54,12 @@ If the result is not assigned to a variable, it gets printed to standard output 
 // [3, 3]
 ```
 
-Exit the app with:
+Exit the app with the `QUIT` command:
+```
+>>> QUIT
+```
+
+or with the standard shortcut:
 
 ```
 Ctrl+C
