@@ -58,6 +58,9 @@ Matrix read_sparse(json & json_data, const std::string & name,
         char c;
 
         double value_at_key = json_data[name]["data"][key].get<double>();
+        if (value_at_key == 0){
+            continue;
+        }
         if (!(oss >> row) || !(oss >> c) || c != ':' || !(oss >> col)) {
             throw std::runtime_error("Unknown key in " + name + ": " + key);
         }
