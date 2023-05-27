@@ -95,9 +95,11 @@ ParsedInput Parser::parse_input() const {
         // token is a call of scan
         if (token == "SCAN") {
             std::string name;
-            if (!(line_stream >> name) ||
+            line_stream >> name;
+            if (line_stream.bad() || line_stream.fail() ||
                 string_has_prefix(name, RESERVED_NAME_PREFIX) ||
-                operations.is_operation(token) || !output_queue.empty()) {
+                operations.is_operation(name) || !output_queue.empty()
+                || name == "SCAN") {
                 throw std::invalid_argument(
                     "Invalid argument in call of SCAN.");
             }
