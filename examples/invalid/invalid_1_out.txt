@@ -1,2 +1,2 @@
 >>> No operator has been found.
->>> End-of-file reached.
+!**>>> End-of-file reached.

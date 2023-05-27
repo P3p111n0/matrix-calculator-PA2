@@ -1,2 +1,2 @@
 >>> >>> Invalid number of arguments for operation '='.
->>> End-of-file reached.
+!**>>> End-of-file reached.

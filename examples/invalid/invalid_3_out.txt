@@ -1,3 +1,5 @@
 >>> Import from file examples/sample_imports/sample1.json successfully finished
+Imported variables: 
+A,C,D,B,E
 >>> Matrix multiplication: invalid matrix dimensions.
->>> End-of-file reached.
+!**>>> End-of-file reached.

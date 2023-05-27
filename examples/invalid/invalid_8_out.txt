@@ -1,3 +1,3 @@
 >>> Invalid argument in call of SCAN.
->>> Matrix parse error.
->>> >>> End-of-file reached.
+!**>>> Matrix parse error.
+!**>>> >>> End-of-file reached.
