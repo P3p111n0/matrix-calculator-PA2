@@ -43,6 +43,10 @@ class Evaluator : public InputHandler {
      * @throws std::runtime_error if more than token is left after evaluation.
      * @throws std::runtime_error if <b>MatrixOp::evaluate(
      *                            const std::vector<Matrix> &)</b> throws.
+     * @throws std::invalid_argument if an assignment to a temporary value is
+     *                               attempted.
+     * @throws std::runtime_error if assignment is called with less than two
+     *                            arguments.
      */
     void evaluate_input(const ParsedInput & input);
 

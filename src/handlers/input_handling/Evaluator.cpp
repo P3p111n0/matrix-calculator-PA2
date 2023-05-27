@@ -102,8 +102,16 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
                 return;
             }
             case SpecialCases::ASSIGN: {
+                if (process_stack.size() < 2) {
+                    throw std::runtime_error(
+                        "Invalid number of arguments for operation '='.");
+                }
                 auto arg = get_args(process_stack, actions, 1);
                 const std::string & dest = process_stack.top();
+                if (string_has_prefix(dest, RESERVED_NAME_PREFIX)) {
+                    throw std::invalid_argument(
+                        "Invalid identifier used in assignment.");
+                }
                 _vars.erase(dest);
                 _vars.emplace(dest, std::move(arg[0]));
                 if (process_stack.size() == 1) {
