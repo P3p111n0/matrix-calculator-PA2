@@ -31,7 +31,8 @@ static std::optional<double> read_double(const std::string & token) {
     }
     return val;
 }
-
+//implements Dijkstra's Shunting-yard algorithm
+// https://en.wikipedia.org/wiki/Shunting_yard_algorithm
 ParsedInput Parser::parse_input() const {
     ParsedInput result;
     OperationFactory operations;
