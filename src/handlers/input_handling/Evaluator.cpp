@@ -112,6 +112,10 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
                     throw std::invalid_argument(
                         "Invalid identifier used in assignment.");
                 }
+                if (_vars.count(dest)) {
+                    _stream << "Warning: Redefinition of variable: " << dest
+                            << std::endl;
+                }
                 _vars.erase(dest);
                 _vars.emplace(dest, std::move(arg[0]));
                 if (process_stack.size() == 1) {
