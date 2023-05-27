@@ -42,6 +42,9 @@ ParsedInput Parser::parse_input() const {
 
     std::unique_ptr<char[]> buffer(new char[_max_len + 1]);
     _stream.getline(buffer.get(), _max_len);
+    if (_stream.eof()){
+        throw std::invalid_argument("End-of-file reached.");
+    }
     if (_stream.bad() || _stream.fail()) {
         throw std::length_error(
             "Maximum input length exceeded.");
