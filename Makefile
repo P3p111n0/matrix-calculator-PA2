@@ -9,7 +9,7 @@ IMPLS = $(wildcard src/*.cpp src/*/*.cpp src/*/*/*.cpp src/*/*/*/*.cpp)
 OBJS = $(patsubst %.cpp, build/%.o, $(IMPLS))
 BUILD_DIR = $(dir $(OBJS))
 
-.PHONY: all compile debug clean zip doc run 
+.PHONY: all compile debug clean doc run 
 
 default: all
 
