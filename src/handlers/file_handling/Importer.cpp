@@ -127,6 +127,12 @@ void Importer::import_from_file(std::unordered_map<std::string, Matrix> & vars,
             return;
         }
     }
-    vars = std::move(loaded_matrices);
-    _status = "Import from file " + filename + " successfully finished";
+    for (auto & [key, val] : loaded_matrices){
+        if (vars.count(key)){
+            _status += "Overwriting variable: " + key + '\n';
+        }
+        vars.erase(key);
+        vars.emplace(key, val);
+    }
+    _status += "Import from file " + filename + " successfully finished";
 }
