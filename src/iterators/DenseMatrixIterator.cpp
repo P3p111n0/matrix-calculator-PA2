@@ -30,7 +30,7 @@ MatrixElement DenseMatrixIterator::operator*() const {
 std::size_t
 DenseMatrixIterator::distance(const AbstractMatrixIterator & other) const {
     DenseMatrixIterator it_copy(*this);
-    if (_data[_row][_column] == 0){
+    if (_row < get_matrix_rows() && _data[_row][_column] == 0){
         ++it_copy;
     }
     std::size_t result = 0;
