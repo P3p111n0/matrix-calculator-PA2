@@ -1,0 +1,10 @@
+>>> [ 1, 2, 3 ]
+[ 5, 7, 11 ]
+[ 13, 17, 19 ]
+>>> >>> Warning: Redefinition of variable: B
+>>> Warning: Redefinition of variable: B
+>>> Warning: Redefinition of variable: B
+>>> [ -5.75, 8, 2.25 ]
+[ 0, -78.875, -84.625 ]
+[ 0, 0, -6624.72 ]
+>>> End-of-file reached.

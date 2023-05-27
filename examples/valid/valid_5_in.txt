@@ -1,0 +1,10 @@
+SCAN A
+[1, 2, 3]
+[5, 7, 11]
+[13, 17, 19]
+
+B = INV A
+B = B * ( RANK B )
+B = TRANSPOSE B
+B = GAUSS ( B + A )
+PRINT B

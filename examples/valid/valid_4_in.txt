@@ -1,0 +1,4 @@
+IMPORT examples/sample_imports/sample1.json
+x = C + ( C + ( D * C ) * 4 ) + D
+x = CUT x 2 2 0 0
+PRINT x

@@ -1,0 +1,7 @@
+>>> Import from file examples/sample_imports/sample1.json successfully finished
+Available variables: 
+A,C,D,B,E
+>>> >>> Warning: Redefinition of variable: x
+>>> [ 999, 4995 ]
+[ 1.23123e+08, 4.39562e+09 ]
+>>> End-of-file reached.
