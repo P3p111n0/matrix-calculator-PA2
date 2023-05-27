@@ -1,5 +1,6 @@
 #include "MatrixCalculator.h"
 #include <exception>
+#include "../exceptions/QuitSignal.h"
 
 MatrixCalculator::MatrixCalculator(std::istream & input, std::ostream & output,
                                    const std::string & config_file)
@@ -24,6 +25,8 @@ void MatrixCalculator::start() {
             auto parsed_input = parser.parse_input();
             evaluator.evaluate_input(parsed_input);
             prefix.clear();
+        } catch (QuitSignal &) {
+            return;
         } catch (std::exception & e){
             _out << e.what() << std::endl;
             prefix = "!**";

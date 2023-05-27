@@ -1,10 +1,11 @@
 #include "calculator/MatrixCalculator.h"
 #include <csignal>
 #include <iostream>
+#include "exceptions/QuitSignal.h"
 
 //http://vyuka.bernhauer.cz/pa2-clanky/semestralni-prace
 void signal_handler(int) {
-    exit(0);
+    throw QuitSignal();
 }
 
 int main(int argc, char * argv[]){

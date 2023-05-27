@@ -47,6 +47,8 @@ class Evaluator : public InputHandler {
      *                               attempted.
      * @throws std::runtime_error if assignment is called with less than two
      *                            arguments.
+     * @throws std::runtime_error if "QUIT" is used in a compound expression.
+     * @throws QuitSignal if "QUIT" is read from user input.
      */
     void evaluate_input(const ParsedInput & input);
 

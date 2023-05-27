@@ -1,4 +1,5 @@
 #include "Evaluator.h"
+#include "../../exceptions/QuitSignal.h"
 #include "../../matrix_operations/OperationFactory.h"
 #include "ContainerOperations.h"
 #include "ParsedInput.h"
@@ -82,6 +83,13 @@ void Evaluator::evaluate_input(const ParsedInput & input) {
     while (!output_queue.empty()) {
         std::string token = output_queue.front();
         output_queue.pop();
+
+        if (token == "QUIT") {
+            if (!output_queue.empty() || !process_stack.empty()){
+                throw std::runtime_error("Invalid use of QUIT.");
+            }
+            throw QuitSignal();
+        }
 
         if (special_case_table.count(token)) {
             an_operator_occurred = true;
