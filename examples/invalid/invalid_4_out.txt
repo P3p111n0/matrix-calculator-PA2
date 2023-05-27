@@ -1,0 +1,3 @@
+>>> Import from file examples/sample_imports/sample1.json successfully finished
+>>> Parenthesis mismatch on input
+>>> End-of-file reached.

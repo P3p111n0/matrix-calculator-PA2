@@ -1,0 +1,2 @@
+IMPORT examples/sample_imports/sample1.json
+A + + B *
