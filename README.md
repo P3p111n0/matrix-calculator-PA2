@@ -16,7 +16,7 @@ SCAN B
 [1, 2, 3]
 [4, 5, 6]
 [7, 8, 9]
-// an empty line signals an end of scanning
+// an empty line signals the end of the matrix
 ----------
 C = A + B // matrix addition
 ----------
