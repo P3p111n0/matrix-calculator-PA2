@@ -1,2 +1,2 @@
-Čestně prohlašuji, že tuto práci jsem vypracoval sám, odnikud jsem jí nezkopíroval a že v kódu nejsou dynamic_casty.
+Čestně prohlašuji, že jsem tuto práci vypracoval sám a že jsem jí odnikud nezkopíroval. 
 Josef Melcr
