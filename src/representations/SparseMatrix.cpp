@@ -87,6 +87,7 @@ void SparseMatrix::swap_rows(std::size_t f_row, std::size_t s_row) {
     }
     for (const auto & [pos, val] : swap_elements) {
         Position new_pos = {pos.row == f_row ? s_row : f_row, pos.column};
+        _data.erase(pos);
         _data[new_pos] = val;
     }
 }
