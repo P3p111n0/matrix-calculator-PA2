@@ -1,14 +1,17 @@
 #!/bin/zsh
-mkdir -p tmp/melcrjos
-cp -r src tmp/melcrjos/
-cp -r examples tmp/melcrjos/
-cp -r libs tmp/melcrjos/
-cp zadani.txt tmp/melcrjos/
-cp prohlaseni.txt tmp/melcrjos/
-cp Doxyfile tmp/melcrjos/
-cp Makefile tmp/melcrjos/
-cp README.md tmp/melcrjos/
+
+LOGIN=melcrjos
+
+mkdir -p tmp/$LOGIN
+cp -r src tmp/$LOGIN
+cp -r examples tmp/$LOGIN/
+cp -r libs tmp/$LOGIN/
+cp zadani.txt tmp/$LOGIN/
+cp prohlaseni.txt tmp/$LOGIN/
+cp Doxyfile tmp/$LOGIN/
+cp Makefile tmp/$LOGIN/
+cp README.md tmp/$LOGIN/
 cd tmp
-zip -r ../melcrjos.zip melcrjos
+zip -r ../$LOGIN.zip $LOGIN
 cd ..
 rm -rf tmp
