@@ -54,6 +54,12 @@ If the result is not assigned to a variable, it gets printed to standard output 
 // [3, 3]
 ```
 
+Exit the app with:
+
+```
+Ctrl+C
+```
+
 # Building from sources
 
 > The calculator can be build from sources using:
