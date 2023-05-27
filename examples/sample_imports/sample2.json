@@ -1,0 +1,16 @@
+{
+	"sparse_1": {
+		"rows": 5,
+		"columns": 5,
+		"data": {
+			"1:2": 5,
+			"0:0": 0.78,
+			"4:4": 85
+		}
+	},
+	"sparse_2": {
+		"rows": 10,
+		"columns": 10,
+		"data": null
+	}
+}
