@@ -36,7 +36,7 @@ void Evaluator::load_nontmp_vars(const Evaluator::VariableMap & tmps) {
 }
 
 void Evaluator::print_available_vars() const {
-    _stream << "Imported variables: " << std::endl;
+    _stream << "Available variables: " << std::endl;
     std::size_t cnt = 0;
     for (const auto & [key, val] : _vars){
         _stream << key;
