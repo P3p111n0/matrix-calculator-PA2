@@ -43,7 +43,7 @@ class Parser : public InputHandler {
      *                               reading.
      * @throws std::invalid_argument if a number is used as an identifier in
      *                               call of "SCAN".
-     * @throws std::runtime_error if the input stream has it's badbit set.
+     * @throws std::runtime_error if the input stream has its badbit set.
      */
     ParsedInput parse_input() const;
 
