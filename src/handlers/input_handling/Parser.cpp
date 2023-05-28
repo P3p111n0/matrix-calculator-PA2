@@ -31,8 +31,8 @@ static std::optional<double> read_double(const std::string & token) {
     }
     return val;
 }
-//implements Dijkstra's Shunting-yard algorithm
-// https://en.wikipedia.org/wiki/Shunting_yard_algorithm
+// implements Dijkstra's Shunting-yard algorithm
+//  https://en.wikipedia.org/wiki/Shunting_yard_algorithm
 ParsedInput Parser::parse_input() const {
     ParsedInput result;
     OperationFactory operations;
@@ -46,7 +46,10 @@ ParsedInput Parser::parse_input() const {
     if (_stream.eof()) {
         throw std::invalid_argument("End-of-file reached.");
     }
-    if (_stream.bad() || _stream.fail()) {
+    if (_stream.bad()) {
+        throw std::runtime_error("Irrecoverable error in input detected.");
+    }
+    if (_stream.fail()) {
         throw std::length_error("Maximum input length exceeded.");
     }
 
@@ -99,8 +102,8 @@ ParsedInput Parser::parse_input() const {
             line_stream >> name;
             if (line_stream.bad() || line_stream.fail() ||
                 string_has_prefix(name, RESERVED_NAME_PREFIX) ||
-                operations.is_operation(name) || !output_queue.empty()
-                || name == "SCAN") {
+                operations.is_operation(name) || !output_queue.empty() ||
+                name == "SCAN") {
                 throw std::invalid_argument(
                     "Invalid argument in call of SCAN.");
             }

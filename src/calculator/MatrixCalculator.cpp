@@ -17,7 +17,6 @@ void MatrixCalculator::start() {
     std::string prefix;
     while (!_in.eof()) {
         if (!_in.good()){
-            _out << "Corrupted data detected on input, quitting." << std::endl;
             return;
         }
         try {
